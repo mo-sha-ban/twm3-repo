@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار ميزات البروفايل - TeamWork M3</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Favicon -->
+    <link rel="icon" href="img/loogo.png">
+
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1d4ed8;
+            --success-color: #10b981;
+            --error-color: #ef4444;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 10px;
+            --radius-xl: 12px;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        body {
+            font-family: 'Cairo', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+            background-color: #f8fafc;
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            background-color: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .test-section {
+            background: var(--bg-primary);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .test-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .test-description {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .feature-list {
+            list-style-type: none;
+            padding: 0;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .feature-item.completed {
+            color: var(--success-color);
+        }
+
+        .feature-item.completed i {
+            color: var(--success-color);
+        }
+
+        .test-steps {
+            margin-top: 1.5rem;
+        }
+
+        .step {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .step-title {
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .step-description {
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .step-action {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .step-action:hover {
+            background: var(--secondary-color);
+        }
+
+        .test-results {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .results-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .result-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            padding: 0.5rem;
+            border-radius: var(--radius-sm);
+        }
+
+        .result-item.success {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 3px solid var(--success-color);
+        }
+
+        .result-item.error {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 3px solid var(--error-color);
+        }
+
+        .result-item i {
+            font-size: 1.1rem;
+        }
+
+        .result-item.success i {
+            color: var(--success-color);
+        }
+
+        .result-item.error i {
+            color: var(--error-color);
+        }
+
+        .back-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .back-button:hover {
+            background: var(--secondary-color);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .header {
+                padding: 0.75rem 1rem;
+            }
+
+            .header-title {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-title">اختبار ميزات البروفايل</div>
+        <button class="back-button" onclick="window.location.href='profile.html'">
+            <i class="fas fa-arrow-left"></i> العودة للبروفايل
+        </button>
+    </header>
+
+    <main class="container">
+        <div class="test-section">
+            <h2 class="test-title">🎯 ميزات البروفايل المتاحة</h2>
+            <p class="test-description">
+                تم تنفيذ جميع الميزات المطلوبة بنجاح. يمكنك اختبارها مباشرة من هذه الصفحة.
+            </p>
+
+            <ul class="feature-list">
+                <li class="feature-item completed">
+                    <i class="fas fa-check-circle"></i>
+                    <strong>إعادة تعيين تقدم الكورسات:</strong> زر الإعدادات (⚙️) في البروفايل يفتح مودال لإعادة تعيين التقدم
+                </li>
+                <li class="feature-item completed">
+                    <i class="fas fa-check-circle"></i>
+                    <strong>أيقونات المتجر والسلة:</strong> تم إضافة أيقونات المتجر (🏪) والسلة (🛒) في السايدبار
+                </li>
+                <li class="feature-item completed">
+                    <i class="fas fa-check-circle"></i>
+                    <strong>صفحة السلة:</strong> تم إنشاء صفحة سلة مشتريات كاملة مع إمكانية إتمام الشراء
+                </li>
+                <li class="feature-item completed">
+                    <i class="fas fa-check-circle"></i>
+                    <strong>وظيفة إضافة للسلة:</strong> تم تحديث store.js لإضافة المنتجات للسلة بشكل صحيح
+                </li>
+            </ul>
+
+            <div class="test-steps">
+                <h3 class="step-title">📋 خطوات اختبار الميزات:</h3>
+
+                <div class="step">
+                    <div class="step-title">1. اختبار إعادة تعيين تقدم الكورسات</div>
+                    <div class="step-description">
+                        اذهب إلى صفحة البروفايل وانقر على زر الإعدادات (⚙️) في الجزء العلوي من الصفحة.
+                    </div>
+                    <div class="step-description">
+                        ستظهر نافذة مودال تطلب تأكيد إعادة تعيين التقدم. انقر على "تأكيد إعادة التعيين".
+                    </div>
+                    <div class="step-description">
+                        سيتم إعادة تعيين تقدم جميع الكورسات إلى 0% مع الحفاظ على الكورسات مرئية.
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">2. اختبار أيقونات السايدبار</div>
+                    <div class="step-description">
+                        في صفحة البروفايل، افتح السايدبار (إذا كان مغلقًا).
+                    </div>
+                    <div class="step-description">
+                        ستجد أيقونتين جديدتين: متجر (🏪) وسلة (🛒).
+                    </div>
+                    <div class="step-description">
+                        انقر على أيقونة المتجر للذهاب إلى صفحة المتجر.
+                    </div>
+                    <div class="step-description">
+                        انقر على أيقونة السلة للذهاب إلى صفحة السلة.
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">3. اختبار إضافة المنتجات للسلة</div>
+                    <div class="step-description">
+                        اذهب إلى صفحة المتجر (store.html).
+                    </div>
+                    <div class="step-description">
+                        اختر منتجًا متاحًا وانقر على زر "إضافة للسلة".
+                    </div>
+                    <div class="step-description">
+                        ستظهر رسالة نجاح "تم إضافة المنتج للسلة".
+                    </div>
+                    <div class="step-description">
+                        المنتج سيتم حفظه في localStorage ويمكنك مشاهدته في صفحة السلة.
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">4. اختبار صفحة السلة وإتمام الشراء</div>
+                    <div class="step-description">
+                        اذهب إلى صفحة السلة (cart.html) من السايدبار أو مباشرة.
+                    </div>
+                    <div class="step-description">
+                        ستظهر جميع المنتجات التي أضفتها مع تفاصيلها (اسم، سعر، كمية).
+                    </div>
+                    <div class="step-description">
+                        يمكنك زيادة أو تقليل الكمية أو إزالة المنتجات.
+                    </div>
+                    <div class="step-description">
+                        في الجزء الأيمن، ستجد ملخص الطلب مع المجموع الفرعي والضريبة (14%) والإجمالي.
+                    </div>
+                    <div class="step-description">
+                        انقر على زر "إتمام الشراء" لإكمال عملية الشراء.
+                    </div>
+                    <div class="step-description">
+                        سيتم إعادة توجيهك إلى صفحة إتمام الطلب (finish-order.html).
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2 class="test-title">🔍 اختبار مباشر للميزات</h2>
+            <p class="test-description">
+                يمكنك اختبار بعض الوظائف مباشرة من هنا:
+            </p>
+
+            <div class="test-steps">
+                <div class="step">
+                    <div class="step-title">اختبار وظيفة إضافة للسلة</div>
+                    <div class="step-description">
+                        هذا الزر سيضيف منتجًا افتراضيًا للسلة (لأغراض الاختبار فقط).
+                    </div>
+                    <button class="step-action" onclick="testAddToCart()">
+                        <i class="fas fa-cart-plus"></i> اختبار إضافة للسلة
+                    </button>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">اختبار عرض محتويات السلة</div>
+                    <div class="step-description">
+                        هذا الزر سيظهر محتويات السلة الحالية (من localStorage).
+                    </div>
+                    <button class="step-action" onclick="testShowCartContents()">
+                        <i class="fas fa-shopping-cart"></i> عرض محتويات السلة
+                    </button>
+                </div>
+
+                <div class="step">
+                    <div class="step-title">اختبار إعادة تعيين السلة</div>
+                    <div class="step-description">
+                        هذا الزر سيقوم بإفراغ السلة (لأغراض الاختبار فقط).
+                    </div>
+                    <button class="step-action" onclick="testClearCart()">
+                        <i class="fas fa-trash"></i> إعادة تعيين السلة
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="test-results">
+            <h3 class="results-title">📊 نتائج الاختبار</h3>
+            <div id="testResults">
+                <!-- Test results will be displayed here -->
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Test functions
+        function testAddToCart() {
+            try {
+                // Add a test product to cart
+                const testProduct = {
+                    productId: 'test-product-' + Date.now(),
+                    addedAt: new Date().toISOString()
+                };
+
+                const cartData = localStorage.getItem('cartItems');
+                let cartItems = cartData ? JSON.parse(cartData) : [];
+
+                cartItems.push(testProduct);
+                localStorage.setItem('cartItems', JSON.stringify(cartItems));
+
+                showTestResult('نجاح', 'تم إضافة منتج اختبار للسلة بنجاح!', 'success');
+                showToast('نجاح', 'تم إضافة المنتج للسلة', 'success');
+
+            } catch (error) {
+                console.error('Error in testAddToCart:', error);
+                showTestResult('خطأ', 'فشل في إضافة منتج اختبار للسلة', 'error');
+            }
+        }
+
+        function testShowCartContents() {
+            try {
+                const cartData = localStorage.getItem('cartItems');
+                const cartItems = cartData ? JSON.parse(cartData) : [];
+
+                if (cartItems.length === 0) {
+                    showTestResult('معلومات', 'السلة فارغة حاليًا', 'info');
+                    return;
+                }
+
+                let resultHTML = `<div class="result-item success">
+                    <i class="fas fa-check-circle"></i>
+                    <strong>محتويات السلة (${cartItems.length} منتج):</strong>
+                </div>`;
+
+                cartItems.forEach((item, index) => {
+                    resultHTML += `<div class="result-item success" style="margin-left: 2rem;">
+                        <i class="fas fa-box"></i>
+                        منتج ${index + 1}: ${item.productId} (أضيف في: ${new Date(item.addedAt).toLocaleString()})
+                    </div>`;
+                });
+
+                document.getElementById('testResults').innerHTML = resultHTML;
+
+            } catch (error) {
+                console.error('Error in testShowCartContents:', error);
+                showTestResult('خطأ', 'فشل في عرض محتويات السلة', 'error');
+            }
+        }
+
+        function testClearCart() {
+            try {
+                localStorage.removeItem('cartItems');
+                showTestResult('نجاح', 'تم إعادة تعيين السلة بنجاح!', 'success');
+                showToast('نجاح', 'تم إعادة تعيين السلة', 'success');
+
+            } catch (error) {
+                console.error('Error in testClearCart:', error);
+                showTestResult('خطأ', 'فشل في إعادة تعيين السلة', 'error');
+            }
+        }
+
+        function showTestResult(title, message, type) {
+            const resultsContainer = document.getElementById('testResults');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `result-item ${type}`;
+            resultDiv.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+                <strong>${title}:</strong> ${message}
+            `;
+            resultsContainer.appendChild(resultDiv);
+
+            // Auto-scroll to results
+            setTimeout(() => {
+                resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        function showToast(title, message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Add CSS for toasts
+        const style = document.createElement('style');
+        style.textContent = `
+            .toast {
+                position: fixed;
+                bottom: 2rem;
+                right: 2rem;
+                padding: 1rem 1.5rem;
+                border-radius: var(--radius-lg);
+                box-shadow: var(--shadow-md);
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                z-index: 1000;
+                animation: slideIn 0.3s ease-out;
+            }
+
+            .toast-success {
+                background: rgba(16, 185, 129, 0.95);
+                color: white;
+            }
+
+            .toast-error {
+                background: rgba(239, 68, 68, 0.95);
+                color: white;
+            }
+
+            .toast-info {
+                background: rgba(59, 130, 246, 0.95);
+                color: white;
+            }
+
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Show initial success message
+        showTestResult('نجاح', 'جميع الميزات المطلوبة متاحة وجاهزة للاختبار!', 'success');
+    </script>
+</body>
+</html>

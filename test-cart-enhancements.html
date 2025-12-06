@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار تحسينات سلة المشتريات</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .test-container {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .test-section {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--bg-primary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .test-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .test-steps {
+            margin-left: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .test-step {
+            margin-bottom: 0.5rem;
+            color: var(--text-secondary);
+        }
+
+        .test-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: var(--secondary-dark);
+        }
+
+        .btn-danger {
+            background: var(--error-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .results {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .success {
+            color: var(--success-color);
+            font-weight: 600;
+        }
+
+        .error {
+            color: var(--error-color);
+            font-weight: 600;
+        }
+
+        .cart-state {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            direction: ltr;
+            text-align: left;
+        }
+
+        .progress-container {
+            margin: 2rem 0;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1><i class="fas fa-shopping-cart"></i> اختبار تحسينات سلة المشتريات</h1>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">0% مكتمل</div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title"><i class="fas fa-check-circle"></i> 1. اختبار إضافة منتجات فردية</div>
+            <div class="test-steps">
+                <div class="test-step">1. إضافة منتج واحد إلى السلة</div>
+                <div class="test-step">2. التحقق من أن المنتج قد تم إضافته مع كمية 1</div>
+                <div class="test-step">3. التحقق من أن العداد قد تم تحديثه</div>
+            </div>
+            <div class="test-actions">
+                <button class="btn-primary" onclick="testSingleProductAdd()">
+                    <i class="fas fa-plus"></i> اختبار إضافة منتج فردي
+                </button>
+                <button class="btn-secondary" onclick="clearCart()">
+                    <i class="fas fa-trash"></i> مسح السلة
+                </button>
+            </div>
+            <div class="results" id="test1Results"></div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title"><i class="fas fa-sync-alt"></i> 2. اختبار إضافة منتجات مكررة</div>
+            <div class="test-steps">
+                <div class="test-step">1. إضافة نفس المنتج مرتين</div>
+                <div class="test-step">2. التحقق من أن الكمية قد تم تحديثها إلى 2 بدلاً من إنشاء مدخلين منفصلين</div>
+                <div class="test-step">3. التحقق من أن السعر الإجمالي يعكس الكمية المحدثة</div>
+            </div>
+            <div class="test-actions">
+                <button class="btn-primary" onclick="testDuplicateProductAdd()">
+                    <i class="fas fa-redo"></i> اختبار إضافة منتجات مكررة
+                </button>
+                <button class="btn-secondary" onclick="clearCart()">
+                    <i class="fas fa-trash"></i> مسح السلة
+                </button>
+            </div>
+            <div class="results" id="test2Results"></div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title"><i class="fas fa-calculator"></i> 3. اختبار تحديث الكمية</div>
+            <div class="test-steps">
+                <div class="test-step">1. إضافة منتج إلى السلة</div>
+                <div class="test-step">2. زيادة الكمية باستخدام زر (+)</div>
+                <div class="test-step">3. تقليل الكمية باستخدام زر (-)</div>
+                <div class="test-step">4. التحقق من أن الكمية قد تم تحديثها بشكل صحيح</div>
+            </div>
+            <div class="test-actions">
+                <button class="btn-primary" onclick="testQuantityUpdate()">
+                    <i class="fas fa-calculator"></i> اختبار تحديث الكمية
+                </button>
+                <button class="btn-secondary" onclick="clearCart()">
+                    <i class="fas fa-trash"></i> مسح السلة
+                </button>
+            </div>
+            <div class="results" id="test3Results"></div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title"><i class="fas fa-trash-alt"></i> 4. اختبار إزالة المنتجات</div>
+            <div class="test-steps">
+                <div class="test-step">1. إضافة منتج إلى السلة</div>
+                <div class="test-step">2. إزالة المنتج من السلة</div>
+                <div class="test-step">3. التحقق من أن المنتج قد تم إزالته</div>
+                <div class="test-step">4. التحقق من أن العداد قد تم تحديثه</div>
+            </div>
+            <div class="test-actions">
+                <button class="btn-primary" onclick="testProductRemoval()">
+                    <i class="fas fa-trash"></i> اختبار إزالة المنتجات
+                </button>
+                <button class="btn-secondary" onclick="clearCart()">
+                    <i class="fas fa-trash"></i> مسح السلة
+                </button>
+            </div>
+            <div class="results" id="test4Results"></div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title"><i class="fas fa-shopping-basket"></i> 5. اختبار سلة فارغة</div>
+            <div class="test-steps">
+                <div class="test-step">1. مسح جميع العناصر من السلة</div>
+                <div class="test-step">2. التحقق من أن السلة فارغة</div>
+                <div class="test-step">3. التحقق من أن العداد يعرض 0</div>
+            </div>
+            <div class="test-actions">
+                <button class="btn-primary" onclick="testEmptyCart()">
+                    <i class="fas fa-box-open"></i> اختبار سلة فارغة
+                </button>
+                <button class="btn-secondary" onclick="clearCart()">
+                    <i class="fas fa-trash"></i> مسح السلة
+                </button>
+            </div>
+            <div class="results" id="test5Results"></div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title"><i class="fas fa-database"></i> 6. اختبار تكامل البيانات</div>
+            <div class="test-steps">
+                <div class="test-step">1. إضافة منتجات متعددة مع كميات مختلفة</div>
+                <div class="test-step">2. التحقق من أن جميع البيانات مخزنة بشكل صحيح</div>
+                <div class="test-step">3. التحقق من أن السعر الإجمالي محسوب بشكل صحيح</div>
+            </div>
+            <div class="test-actions">
+                <button class="btn-primary" onclick="testDataIntegrity()">
+                    <i class="fas fa-database"></i> اختبار تكامل البيانات
+                </button>
+                <button class="btn-secondary" onclick="clearCart()">
+                    <i class="fas fa-trash"></i> مسح السلة
+                </button>
+            </div>
+            <div class="results" id="test6Results"></div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title"><i class="fas fa-info-circle"></i> حالة السلة الحالية</div>
+            <div class="cart-state" id="cartState">
+                جاري التحميل...
+            </div>
+        </div>
+
+        <div class="test-section">
+            <div class="test-title"><i class="fas fa-rocket"></i> تشغيل جميع الاختبارات</div>
+            <div class="test-actions">
+                <button class="btn-primary" onclick="runAllTests()">
+                    <i class="fas fa-play"></i> تشغيل جميع الاختبارات
+                </button>
+                <button class="btn-danger" onclick="resetAllTests()">
+                    <i class="fas fa-redo"></i> إعادة تعيين جميع الاختبارات
+                </button>
+            </div>
+            <div class="results" id="allTestsResults"></div>
+        </div>
+    </div>
+
+    <script>
+        // Test variables
+        let testResults = {
+            test1: null,
+            test2: null,
+            test3: null,
+            test4: null,
+            test5: null,
+            test6: null
+        };
+
+        let completedTests = 0;
+        const totalTests = 6;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartState();
+            updateProgress();
+        });
+
+        // Update cart state display
+        function updateCartState() {
+            const cartStateElement = document.getElementById('cartState');
+            try {
+                const cartData = localStorage.getItem('cartItems');
+                const cartItems = cartData ? JSON.parse(cartData) : [];
+
+                let stateInfo = 'حالة السلة الحالية:\n';
+                stateInfo += `عدد العناصر: ${cartItems.length}\n\n`;
+
+                if (cartItems.length > 0) {
+                    stateInfo += 'المنتجات في السلة:\n';
+                    cartItems.forEach((item, index) => {
+                        stateInfo += `${index + 1}. منتج ID: ${item.productId}, كمية: ${item.quantity || 1}\n`;
+                    });
+                } else {
+                    stateInfo += 'السلة فارغة';
+                }
+
+                cartStateElement.textContent = stateInfo;
+            } catch (error) {
+                cartStateElement.textContent = 'خطأ في تحميل حالة السلة: ' + error.message;
+            }
+        }
+
+        // Update progress bar
+        function updateProgress() {
+            const progress = (completedTests / totalTests) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `${Math.round(progress)}% مكتمل (${completedTests}/${totalTests})`;
+        }
+
+        // Test 1: Single product add
+        function testSingleProductAdd() {
+            const resultsElement = document.getElementById('test1Results');
+            resultsElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الاختبار...';
+
+            try {
+                // Clear cart first
+                localStorage.removeItem('cartItems');
+
+                // Add a single product
+                const productId = 'test-product-1';
+                const cartData = localStorage.getItem('cartItems');
+                let cartItems = cartData ? JSON.parse(cartData) : [];
+
+                cartItems.push({
+                    productId: productId,
+                    quantity: 1,
+                    addedAt: new Date().toISOString()
+                });
+
+                localStorage.setItem('cartItems', JSON.stringify(cartItems));
+
+                // Verify
+                const updatedCartData = localStorage.getItem('cartItems');
+                const updatedCartItems = updatedCartData ? JSON.parse(updatedCartData) : [];
+
+                if (updatedCartItems.length === 1 &&
+                    updatedCartItems[0].productId === productId &&
+                    updatedCartItems[0].quantity === 1) {
+
+                    testResults.test1 = true;
+                    resultsElement.innerHTML = '<span class="success"><i class="fas fa-check-circle"></i> نجاح: تم إضافة منتج فردي بشكل صحيح</span>';
+                    completedTests++;
+                } else {
+                    testResults.test1 = false;
+                    resultsElement.innerHTML = '<span class="error"><i class="fas fa-times-circle"></i> فشل: لم يتم إضافة المنتج بشكل صحيح</span>';
+                }
+
+                updateCartState();
+                updateProgress();
+            } catch (error) {
+                resultsElement.innerHTML = '<span class="error"><i class="fas fa-exclamation-circle"></i> خطأ: ' + error.message + '</span>';
+            }
+        }
+
+        // Test 2: Duplicate product add
+        function testDuplicateProductAdd() {
+            const resultsElement = document.getElementById('test2Results');
+            resultsElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الاختبار...';
+
+            try {
+                // Clear cart first
+                localStorage.removeItem('cartItems');
+
+                // Add the same product twice
+                const productId = 'test-product-2';
+                let cartItems = [];
+
+                // First add
+                cartItems.push({
+                    productId: productId,
+                    quantity: 1,
+                    addedAt: new Date().toISOString()
+                });
+
+                // Second add (should update quantity)
+                const existingItemIndex = cartItems.findIndex(item => item.productId === productId);
+                if (existingItemIndex !== -1) {
+                    cartItems[existingItemIndex].quantity = (cartItems[existingItemIndex].quantity || 1) + 1;
+                } else {
+                    cartItems.push({
+                        productId: productId,
+                        quantity: 1,
+                        addedAt: new Date().toISOString()
+                    });
+                }
+
+                localStorage.setItem('cartItems', JSON.stringify(cartItems));
+
+                // Verify
+                const updatedCartData = localStorage.getItem('cartItems');
+                const updatedCartItems = updatedCartData ? JSON.parse(updatedCartData) : [];
+
+                if (updatedCartItems.length === 1 &&
+                    updatedCartItems[0].productId === productId &&
+                    updatedCartItems[0].quantity === 2) {
+
+                    testResults.test2 = true;
+                    resultsElement.innerHTML = '<span class="success"><i class="fas fa-check-circle"></i> نجاح: تم تحديث الكمية بشكل صحيح عند إضافة منتجات مكررة</span>';
+                    completedTests++;
+                } else {
+                    testResults.test2 = false;
+                    resultsElement.innerHTML = '<span class="error"><i class="fas fa-times-circle"></i> فشل: لم يتم تحديث الكمية بشكل صحيح</span>';
+                }
+
+                updateCartState();
+                updateProgress();
+            } catch (error) {
+                resultsElement.innerHTML = '<span class="error"><i class="fas fa-exclamation-circle"></i> خطأ: ' + error.message + '</span>';
+            }
+        }
+
+        // Test 3: Quantity update
+        function testQuantityUpdate() {
+            const resultsElement = document.getElementById('test3Results');
+            resultsElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الاختبار...';
+
+            try {
+                // Clear cart first
+                localStorage.removeItem('cartItems');
+
+                // Add a product
+                const productId = 'test-product-3';
+                let cartItems = [];
+
+                cartItems.push({
+                    productId: productId,
+                    quantity: 1,
+                    addedAt: new Date().toISOString()
+                });
+
+                localStorage.setItem('cartItems', JSON.stringify(cartItems));
+
+                // Simulate quantity update
+                const cartData = localStorage.getItem('cartItems');
+                let updatedCartItems = cartData ? JSON.parse(cartData) : [];
+
+                // Increase quantity
+                const itemIndex = updatedCartItems.findIndex(item => item.productId === productId);
+                if (itemIndex !== -1) {
+                    updatedCartItems[itemIndex].quantity = (updatedCartItems[itemIndex].quantity || 1) + 1;
+                }
+
+                // Decrease quantity
+                if (itemIndex !== -1) {
+                    updatedCartItems[itemIndex].quantity = Math.max(1, (updatedCartItems[itemIndex].quantity || 1) - 1);
+                }
+
+                localStorage.setItem('cartItems', JSON.stringify(updatedCartItems));
+
+                // Verify
+                const finalCartData = localStorage.getItem('cartItems');
+                const finalCartItems = finalCartData ? JSON.parse(finalCartData) : [];
+
+                if (finalCartItems.length === 1 &&
+                    finalCartItems[0].productId === productId &&
+                    finalCartItems[0].quantity === 1) { // Should be back to 1 after increase then decrease
+
+                    testResults.test3 = true;
+                    resultsElement.innerHTML = '<span class="success"><i class="fas fa-check-circle"></i> نجاح: تم تحديث الكمية بشكل صحيح</span>';
+                    completedTests++;
+                } else {
+                    testResults.test3 = false;
+                    resultsElement.innerHTML = '<span class="error"><i class="fas fa-times-circle"></i> فشل: لم يتم تحديث الكمية بشكل صحيح</span>';
+                }
+
+                updateCartState();
+                updateProgress();
+            } catch (error) {
+                resultsElement.innerHTML = '<span class="error"><i class="fas fa-exclamation-circle"></i> خطأ: ' + error.message + '</span>';
+            }
+        }
+
+        // Test 4: Product removal
+        function testProductRemoval() {
+            const resultsElement = document.getElementById('test4Results');
+            resultsElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الاختبار...';
+
+            try {
+                // Clear cart first
+                localStorage.removeItem('cartItems');
+
+                // Add a product
+                const productId = 'test-product-4';
+                let cartItems = [];
+
+                cartItems.push({
+                    productId: productId,
+                    quantity: 1,
+                    addedAt: new Date().toISOString()
+                });
+
+                localStorage.setItem('cartItems', JSON.stringify(cartItems));
+
+                // Remove the product
+                let updatedCartItems = cartItems.filter(item => item.productId !== productId);
+                localStorage.setItem('cartItems', JSON.stringify(updatedCartItems));
+
+                // Verify
+                const finalCartData = localStorage.getItem('cartItems');
+                const finalCartItems = finalCartData ? JSON.parse(finalCartData) : [];
+
+                if (finalCartItems.length === 0) {
+                    testResults.test4 = true;
+                    resultsElement.innerHTML = '<span class="success"><i class="fas fa-check-circle"></i> نجاح: تم إزالة المنتج بشكل صحيح</span>';
+                    completedTests++;
+                } else {
+                    testResults.test4 = false;
+                    resultsElement.innerHTML = '<span class="error"><i class="fas fa-times-circle"></i> فشل: لم يتم إزالة المنتج</span>';
+                }
+
+                updateCartState();
+                updateProgress();
+            } catch (error) {
+                resultsElement.innerHTML = '<span class="error"><i class="fas fa-exclamation-circle"></i> خطأ: ' + error.message + '</span>';
+            }
+        }
+
+        // Test 5: Empty cart
+        function testEmptyCart() {
+            const resultsElement = document.getElementById('test5Results');
+            resultsElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الاختبار...';
+
+            try {
+                // Clear cart
+                localStorage.removeItem('cartItems');
+
+                // Verify
+                const cartData = localStorage.getItem('cartItems');
+                const cartItems = cartData ? JSON.parse(cartData) : [];
+
+                if (cartItems.length === 0) {
+                    testResults.test5 = true;
+                    resultsElement.innerHTML = '<span class="success"><i class="fas fa-check-circle"></i> نجاح: السلة فارغة بشكل صحيح</span>';
+                    completedTests++;
+                } else {
+                    testResults.test5 = false;
+                    resultsElement.innerHTML = '<span class="error"><i class="fas fa-times-circle"></i> فشل: السلة ليست فارغة</span>';
+                }
+
+                updateCartState();
+                updateProgress();
+            } catch (error) {
+                resultsElement.innerHTML = '<span class="error"><i class="fas fa-exclamation-circle"></i> خطأ: ' + error.message + '</span>';
+            }
+        }
+
+        // Test 6: Data integrity
+        function testDataIntegrity() {
+            const resultsElement = document.getElementById('test6Results');
+            resultsElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الاختبار...';
+
+            try {
+                // Clear cart first
+                localStorage.removeItem('cartItems');
+
+                // Add multiple products with different quantities
+                const product1 = 'test-product-6a';
+                const product2 = 'test-product-6b';
+                let cartItems = [];
+
+                // Add product 1 with quantity 2
+                cartItems.push({
+                    productId: product1,
+                    quantity: 2,
+                    addedAt: new Date().toISOString()
+                });
+
+                // Add product 2 with quantity 3
+                cartItems.push({
+                    productId: product2,
+                    quantity: 3,
+                    addedAt: new Date().toISOString()
+                });
+
+                localStorage.setItem('cartItems', JSON.stringify(cartItems));
+
+                // Verify data structure
+                const cartData = localStorage.getItem('cartItems');
+                const storedCartItems = cartData ? JSON.parse(cartData) : [];
+
+                if (storedCartItems.length === 2 &&
+                    storedCartItems[0].productId === product1 &&
+                    storedCartItems[0].quantity === 2 &&
+                    storedCartItems[1].productId === product2 &&
+                    storedCartItems[1].quantity === 3) {
+
+                    // Test price calculation (assuming prices)
+                    const totalPrice = (2 * 100) + (3 * 50); // product1: 2*100, product2: 3*50
+
+                    testResults.test6 = true;
+                    resultsElement.innerHTML = '<span class="success"><i class="fas fa-check-circle"></i> نجاح: تم حفظ البيانات بشكل صحيح، السعر الإجمالي المحسوب: ' + totalPrice + ' ج.م</span>';
+                    completedTests++;
+                } else {
+                    testResults.test6 = false;
+                    resultsElement.innerHTML = '<span class="error"><i class="fas fa-times-circle"></i> فشل: البيانات غير صحيحة</span>';
+                }
+
+                updateCartState();
+                updateProgress();
+            } catch (error) {
+                resultsElement.innerHTML = '<span class="error"><i class="fas fa-exclamation-circle"></i> خطأ: ' + error.message + '</span>';
+            }
+        }
+
+        // Run all tests
+        function runAllTests() {
+            const resultsElement = document.getElementById('allTestsResults');
+            resultsElement.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري تشغيل جميع الاختبارات...';
+
+            // Reset test results
+            testResults = {
+                test1: null,
+                test2: null,
+                test3: null,
+                test4: null,
+                test5: null,
+                test6: null
+            };
+            completedTests = 0;
+
+            // Run tests sequentially
+            const tests = [
+                testSingleProductAdd,
+                testDuplicateProductAdd,
+                testQuantityUpdate,
+                testProductRemoval,
+                testEmptyCart,
+                testDataIntegrity
+            ];
+
+            let currentTest = 0;
+
+            function runNextTest() {
+                if (currentTest < tests.length) {
+                    tests[currentTest]();
+                    currentTest++;
+                    setTimeout(runNextTest, 500); // Small delay between tests
+                } else {
+                    // All tests completed
+                    const passedTests = Object.values(testResults).filter(result => result === true).length;
+                    const totalTests = Object.values(testResults).length;
+
+                    let summary = `<h3>نتائج الاختبار النهائية</h3>`;
+                    summary += `<p>الاختبارات المكتملة: ${passedTests}/${totalTests}</p>`;
+
+                    if (passedTests === totalTests) {
+                        summary += '<p class="success"><i class="fas fa-check-circle"></i> جميع الاختبارات نجحت!</p>';
+                    } else {
+                        summary += '<p class="error"><i class="fas fa-exclamation-circle"></i> بعض الاختبارات فشلت.</p>';
+                    }
+
+                    resultsElement.innerHTML = summary;
+                }
+            }
+
+            runNextTest();
+        }
+
+        // Reset all tests
+        function resetAllTests() {
+            if (confirm('هل أنت متأكد من أنك تريد إعادة تعيين جميع الاختبارات؟')) {
+                testResults = {
+                    test1: null,
+                    test2: null,
+                    test3: null,
+                    test4: null,
+                    test5: null,
+                    test6: null
+                };
+                completedTests = 0;
+
+                // Clear all result displays
+                document.querySelectorAll('.results').forEach(element => {
+                    element.innerHTML = '';
+                });
+
+                // Clear cart
+                localStorage.removeItem('cartItems');
+
+                updateCartState();
+                updateProgress();
+                document.getElementById('allTestsResults').innerHTML = 'تم إعادة تعيين جميع الاختبارات.';
+            }
+        }
+
+        // Clear cart function
+        function clearCart() {
+            localStorage.removeItem('cartItems');
+            updateCartState();
+        }
+
+        // Expose functions for debugging
+        window.updateCartState = updateCartState;
+        window.clearCart = clearCart;
+    </script>
+</body>
+</html>

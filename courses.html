@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/courses-carousel.css">
+    <!-- <link rel="stylesheet" href="css/all.min.css"> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Marhey:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="img/loogo.png">
+    <title>TWM3 | الكورسات</title>
+    <style>
+        :root {
+            --courses-bg: #e5e7eb;
+            --courses-glass-bg: rgba(255, 255, 255, 0.68);
+            --courses-glass-border: rgba(148, 163, 184, 0.45);
+            --courses-glass-shadow: 0 24px 60px rgba(15, 23, 42, 0.22);
+            --courses-surface: #ffffff;
+            --courses-surface-soft: rgba(255, 255, 255, 0.82);
+            --courses-border-subtle: rgba(148, 163, 184, 0.25);
+            --courses-border-strong: rgba(148, 163, 184, 0.55);
+            --courses-text-main: #020617;
+            --courses-text-muted: #6b7280;
+            --courses-primary: #2563eb;
+            --courses-primary-soft: rgba(37, 99, 235, 0.10);
+            --courses-primary-strong: rgba(37, 99, 235, 0.30);
+            --courses-radius-xl: 26px;
+            --courses-radius-lg: 20px;
+            --courses-radius-md: 14px;
+            --courses-shadow-soft: 0 20px 50px rgba(15, 23, 42, 0.10);
+            --courses-shadow-strong: 0 28px 70px rgba(15, 23, 42, 0.22);
+            --courses-transition-fast: 0.18s ease-out;
+            --courses-transition-medium: 0.28s ease;
+        }
+
+        /* دعم الوضع الليلي مع glassmorphism */
+        body.dark,
+        :root.dark-theme {
+            --courses-bg: #020617;
+            --courses-glass-bg: rgba(15, 23, 42, 0.74);
+            --courses-glass-border: rgba(148, 163, 184, 0.38);
+            --courses-glass-shadow: 0 26px 80px rgba(0, 0, 0, 0.88);
+            --courses-surface: rgba(15, 23, 42, 0.96);
+            --courses-surface-soft: rgba(15, 23, 42, 0.86);
+            --courses-border-subtle: rgba(148, 163, 184, 0.32);
+            --courses-border-strong: rgba(148, 163, 184, 0.70);
+            --courses-text-main: #e5e7eb;
+            --courses-text-muted: #9ca3af;
+            --courses-primary-soft: rgba(59, 130, 246, 0.24);
+            --courses-primary-strong: rgba(59, 130, 246, 0.55);
+            --courses-shadow-soft: 0 26px 70px rgba(15, 23, 42, 0.85);
+            --courses-shadow-strong: 0 30px 90px rgba(15, 23, 42, 0.96);
+        }
+
+        body {
+            background:
+                radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), transparent 55%),
+                radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.18), transparent 60%),
+                var(--courses-bg);
+        }
+
+        .courses-page {
+            min-height: 100vh;
+            padding: 118px 0 70px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+        }
+
+        .courses-shell {
+            max-width: 1240px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 0 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* هيدر القسم glass */
+        .courses-header {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 22px 24px 18px;
+            border-radius: var(--courses-radius-xl);
+            background:
+                radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), transparent 60%),
+                radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.18), transparent 55%),
+                var(--courses-glass-bg);
+            border: 1px solid var(--courses-glass-border);
+            box-shadow: var(--courses-glass-shadow);
+            backdrop-filter: blur(18px) saturate(150%);
+            -webkit-backdrop-filter: blur(18px) saturate(150%);
+            color: var(--courses-text-main);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .courses-header::before,
+        .courses-header::after {
+            content: "";
+            position: absolute;
+            border-radius: 999px;
+            filter: blur(26px);
+            opacity: 0.55;
+            pointer-events: none;
+        }
+
+        .courses-header::before {
+            width: 260px;
+            height: 260px;
+            top: -140px;
+            left: -80px;
+            background: radial-gradient(circle at center, rgba(59, 130, 246, 0.75), transparent 70%);
+        }
+
+        .courses-header::after {
+            width: 240px;
+            height: 240px;
+            bottom: -120px;
+            right: -60px;
+            background: radial-gradient(circle at center, rgba(16, 185, 129, 0.70), transparent 70%);
+        }
+
+        .courses-header-main {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px 26px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .courses-title-block h1 {
+            font-size: clamp(24px, 3vw, 30px);
+            font-weight: 800;
+            letter-spacing: .02em;
+            margin: 0 0 4px;
+        }
+
+        .courses-title-block p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--courses-text-muted);
+        }
+
+        .courses-metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--courses-text-main);
+        }
+
+        .courses-metric-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.45);
+            border: 1px solid rgba(148, 163, 184, 0.55);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        body.dark .courses-metric-pill,
+        :root.dark-theme .courses-metric-pill {
+            background: rgba(15, 23, 42, 0.72);
+            border-color: rgba(148, 163, 184, 0.55);
+        }
+
+        .courses-metric-pill i {
+            font-size: 13px;
+            color: #38bdf8;
+        }
+
+        /* شريط الفلترة والبحث glassy */
+        .courses-toolbar {
+            position: relative;
+            z-index: 1;
+            margin-top: 6px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .courses-search {
+            flex: 1 1 260px;
+            max-width: 420px;
+            position: relative;
+        }
+
+        .courses-search input {
+            width: 100%;
+            padding: 10px 40px 10px 12px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.7);
+            background: rgba(15, 23, 42, 0.04);
+            color: var(--courses-text-main);
+            font-size: 13px;
+            outline: none;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: border-color var(--courses-transition-fast),
+                        box-shadow var(--courses-transition-fast),
+                        background var(--courses-transition-fast);
+        }
+
+        body.dark .courses-search input,
+        :root.dark-theme .courses-search input {
+            background: rgba(15, 23, 42, 0.65);
+            color: #e5e7eb;
+        }
+
+        .courses-search input::placeholder {
+            color: rgba(148, 163, 184, 0.85);
+        }
+
+        .courses-search input:focus {
+            border-color: #60a5fa;
+            box-shadow: 0 0 0 1px rgba(96, 165, 250, 0.6);
+            background: rgba(15, 23, 42, 0.05);
+        }
+
+        .courses-search i {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(148, 163, 184, 0.9);
+            font-size: 14px;
+        }
+
+        .courses-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .filter-chip {
+            padding: 7px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            border: 1px solid rgba(148, 163, 184, 0.55);
+            background: rgba(255, 255, 255, 0.45);
+            color: var(--courses-text-main);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            transition: background var(--courses-transition-fast),
+                        border-color var(--courses-transition-fast),
+                        transform var(--courses-transition-fast);
+        }
+
+        body.dark .filter-chip,
+        :root.dark-theme .filter-chip {
+            background: rgba(15, 23, 42, 0.75);
+            color: #e5e7eb;
+        }
+
+        .filter-chip span.dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: rgba(148, 163, 184, 0.9);
+        }
+
+        .filter-chip.active {
+            border-color: rgba(96, 165, 250, 0.95);
+            background: rgba(37, 99, 235, 0.22);
+            transform: translateY(-1px);
+        }
+
+        .filter-chip.active span.dot {
+            background: #22c55e;
+        }
+
+        /* قسم الكورسات - كروت glass */
+        .courses-grid-shell {
+            margin-top: 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .courses-grid-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: var(--courses-text-muted);
+            padding: 0 4px;
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 18px;
+        }
+
+        .course-card {
+            position: relative;
+            border-radius: var(--courses-radius-lg);
+            background:
+                radial-gradient(circle at top left, rgba(59, 130, 246, 0.18), transparent 60%),
+                radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.16), transparent 60%),
+                var(--courses-glass-bg);
+            border: 1px solid var(--courses-glass-border);
+            box-shadow: var(--courses-shadow-soft);
+            padding: 14px 14px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            overflow: hidden;
+            backdrop-filter: blur(18px) saturate(150%);
+            -webkit-backdrop-filter: blur(18px) saturate(150%);
+            transition: transform var(--courses-transition-medium),
+                        box-shadow var(--courses-transition-medium),
+                        border-color var(--courses-transition-medium),
+                        background var(--courses-transition-medium);
+        }
+
+        .course-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.55), transparent 60%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--courses-transition-medium);
+        }
+
+        .course-card:hover {
+            transform: translateY(-5px) translateZ(0);
+            box-shadow: var(--courses-shadow-strong);
+            border-color: var(--courses-border-strong);
+        }
+
+        .course-card:hover::before {
+            opacity: 0.5;
+        }
+
+        .course-card-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .course-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 16px;
+            background: rgba(15, 23, 42, 0.12);
+            display: grid;
+            place-items: center;
+            color: var(--courses-primary);
+            flex-shrink: 0;
+            font-size: 18px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        body.dark .course-icon,
+        :root.dark-theme .course-icon {
+            background: rgba(15, 23, 42, 0.70);
+            color: #60a5fa;
+        }
+
+        .course-title-area {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .course-title-area h2 {
+            margin: 0 0 2px;
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--courses-text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .course-title-area .course-instructor {
+            margin: 0;
+            font-size: 12px;
+            color: var(--courses-text-muted);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .course-featured-badge {
+            position: relative;
+            z-index: 1;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.95), rgba(250, 204, 21, 0.98));
+            color: #78350f;
+            font-size: 11px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 8px 18px rgba(251, 191, 36, 0.55);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            white-space: nowrap;
+        }
+
+        .course-description {
+            font-size: 12px;
+            color: var(--courses-text-muted);
+            line-height: 1.7;
+            max-height: 3.8em;
+            overflow: hidden;
+        }
+
+        .course-meta-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            margin-top: 4px;
+            gap: 8px;
+        }
+
+        .course-price-pill {
+            padding: 5px 12px;
+            border-radius: 999px;
+            border: 1px solid var(--courses-primary-strong);
+            background: var(--courses-primary-soft);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--courses-text-main);
+            font-weight: 600;
+            white-space: nowrap;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .course-price-pill.free {
+            border-color: rgba(34, 197, 94, 0.9);
+            background: rgba(22, 163, 74, 0.12);
+            color: #16a34a;
+        }
+
+        .course-cta {
+            margin-top: 8px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .course-cta a {
+            flex: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 0;
+            border-radius: 999px;
+            border: none;
+            background: linear-gradient(135deg, var(--courses-primary), #1d4ed8);
+            color: #f9fafb;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform var(--courses-transition-fast),
+                        box-shadow var(--courses-transition-fast),
+                        background var(--courses-transition-fast);
+            box-shadow: 0 12px 30px rgba(37, 99, 235, 0.55);
+        }
+
+        .course-cta a:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 16px 36px rgba(37, 99, 235, 0.65);
+        }
+
+        .courses-state {
+            padding: 36px 16px;
+            text-align: center;
+            color: var(--courses-text-muted);
+            font-size: 14px;
+        }
+
+        .courses-spinner {
+            width: 38px;
+            height: 38px;
+            border-radius: 999px;
+            border: 3px solid rgba(148, 163, 184, 0.35);
+            border-top-color: var(--courses-primary);
+            margin: 0 auto 14px;
+            animation: courses-spin 0.8s linear infinite;
+        }
+
+        @keyframes courses-spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .courses-error {
+            color: #ef4444;
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .courses-header {
+                padding: 16px 16px 14px;
+            }
+
+            .courses-toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .courses-filters {
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .courses-page {
+                padding-top: 100px;
+            }
+
+            .courses-shell {
+                padding: 0 12px;
+            }
+
+            .courses-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .course-card {
+                padding: 12px 12px 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- -------------------------------------------Start Header-------------------------------- -->
+    <div dir="rtl" class="header">
+        <div class="container">
+            <div class="logo">
+                <a href="index.html"><img src="img/logo.png" alt="" /></a>
+            </div>
+            <div id="list" class="links">
+                <ul>
+                    <li><a href="index.html">الرئيسيه</a></li>
+                    <li><a href="courses.html">الكورسات </a></li>
+                    <li><a href="portfolio.html">مشاريعنا </a></li>
+                    <li class="nav-dropdown"><a href="roadmap.html">مسارات التعلم <i class="fa-solid fa-angle-down"></i></a>
+                        <ul class="nav-dropdown-items">
+                            <li><a href="frontendroadmap.html">Front End </a></li>
+                            <li><a href="backendroadmap.html">Back End</a></li>
+                            <li><a href="cybersecurityroadmap.html">Cyber security</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="bars">
+                <i id="bars" class="fa-solid fa-bars"></i>
+            </div>
+            <div class="icon">
+                <div id="colorMode" class="theme">
+                    <i class="fa-solid fa-moon moon"></i>
+                    <i class="fa-solid fa-sun sun"></i>
+                </div>
+                <a href="store.html" aria-label="المتجر" title="المتجر"><i class="fa-solid fa-store store"></i></a>
+                <a href="login.html" aria-label="تسجيل الدخول" title="تسجيل الدخول"><i class="fa-solid fa-user user"></i></a>
+            </div>
+        </div>
+    </div>
+    <!-- ---------------------------------------------End Header--------------------------------------- -->
+
+    <section class="courses-page">
+        <div class="courses-shell">
+            <header class="courses-header" aria-label="قائمة الكورسات">
+                <div class="courses-header-main">
+                    <div class="courses-title-block">
+                        <h1>الكورسات المتاحة</h1>
+                        <p>استكشف مكتبة الكورسات وتابع من حيث توقفت بسهولة.</p>
+                    </div>
+                    <div class="courses-metrics" id="coursesMetrics">
+                        <div class="courses-metric-pill">
+                            <i class="fa-solid fa-book-open"></i>
+                            <span id="totalCoursesLabel">0 كورس</span>
+                        </div>
+                        <div class="courses-metric-pill">
+                            <i class="fa-solid fa-star"></i>
+                            <span id="featuredCoursesLabel">لا توجد كورسات مميزة</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="courses-toolbar">
+                    <div class="courses-search">
+                        <input type="search" id="coursesSearch" placeholder="ابحث باسم الكورس أو المدرب..." aria-label="بحث عن كورس" />
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </div>
+                    <div class="courses-filters">
+                        <button class="filter-chip active" data-filter="all">
+                            <span class="dot"></span>
+                            الكل
+                        </button>
+                        <button class="filter-chip" data-filter="free">
+                            <span class="dot"></span>
+                            مجانـي
+                        </button>
+                        <button class="filter-chip" data-filter="paid">
+                            <span class="dot"></span>
+                            مدفوع
+                        </button>
+                        <button class="filter-chip" data-filter="featured">
+                            <span class="dot"></span>
+                            مميّز
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <div class="courses-grid-shell">
+                <div class="courses-grid-header">
+                    <span id="visibleCoursesLabel">جاري التحميل...</span>
+                    <span>يمكنك الضغط على أي كارت لبدء متابعة الكورس.</span>
+                </div>
+                <div id="coursesGrid" class="courses-grid">
+                    <div class="courses-state" id="coursesState">
+                        <div class="courses-spinner" aria-hidden="true"></div>
+                        <p>جاري تحميل الكورسات...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Start Footer  -->
+    <footer id="footer">
+        <div class="container">
+            <div class="social">
+                <h4>Social</h4>
+                <div class="img">
+                    <a href="index.html"><img src="img/logo.png" alt="" /></a>
+                </div>
+                <ul>
+                    <a target="_blank" href="https://facebook.com/teamworkm3">  <img src="img/Facebook-1.png" alt="" />   </a>
+                    <a target="_blank" href="https://youtube.com/@twm3"><img src="img/Youtube-1.png" alt="" />            </a>
+                    <a target="_blank" href="https://instagram.com/mo_hussien_20"><img src="img/Instagram-1.png"alt=""/>  </a>
+                    <a target="_blank" href="https://t.me/teamworkm3"><img src="img/Telegram-1.png" alt="" />             </a>
+                </ul>
+            </div>
+            <div class="pages">
+                <h4>pages</h4>
+                <ul>
+                    <li><a href="index.html">الرئيسيه</a></li>
+                    <li><a href="courses.html">الكورسات</a></li>
+                    <li><a href="portfolio.html">مشاريعنا</a></li>
+                    <li><a href="roadmap.html">مسارات التعلم</a></li>
+                </ul>
+            </div>
+            <div class="news">
+                <h4>Blog</h4>
+                <ul>
+                    <li><a target="_blank" href="blog-details.html"> ازالة قفل الهاتف</a></li>
+                    <li><a target="_blank" href="blog-details2.html">تغيير موقعك على الخريطه</a></li>
+                    <li><a target="_blank" href="blog-details3.html">الربح من ثغرات الويب</a></li>
+                    <li><a target="_blank" href="blog-details4.html"> ازاى تحمى نفسك من الاختراق</a></li>
+                </ul>
+            </div>
+        </div>
+        <p>© copy - all Rights Reserved, created by <span>❤</span> by twm3</p>
+        <div class="shape">
+            <img class="footer-shape1" src="img/footer-shape-1.svg" alt="" />
+            <img class="footer-shape2" src="img/footer-shape-2.svg" alt="" />
+        </div>
+    </footer>
+    <!-- End Footer  -->
+
+    <!-- Start up tp top  -->
+    <div class="up">
+        <i class="fa-solid fa-arrow-up"></i>
+    </div>
+    <!-- End up tp top  -->
+
+    <script src="app.js"></script>
+    <script src="js/ui-toast.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const grid = document.getElementById('coursesGrid');
+        const stateEl = document.getElementById('coursesState');
+        const searchInput = document.getElementById('coursesSearch');
+        const filterChips = document.querySelectorAll('.filter-chip');
+        const totalCoursesLabel = document.getElementById('totalCoursesLabel');
+        const featuredCoursesLabel = document.getElementById('featuredCoursesLabel');
+        const visibleCoursesLabel = document.getElementById('visibleCoursesLabel');
+
+        let allCourses = [];
+        let filteredCourses = [];
+        let activeFilter = 'all';
+
+        function renderCourses(courses) {
+            grid.innerHTML = '';
+            if (!courses.length) {
+                const empty = document.createElement('div');
+                empty.className = 'courses-state';
+                empty.innerHTML = '<p>لا توجد كورسات مطابقة لبحثك حالياً.</p>';
+                grid.appendChild(empty);
+                visibleCoursesLabel.textContent = '0 كورس ظاهر حالياً';
+                return;
+            }
+
+            courses.forEach(course => {
+                const icon = course.icon || 'fa-solid fa-book';
+                const title = course.title || 'بدون عنوان';
+                const description = course.description || '';
+                const instructor = course.instructor || 'غير محدد';
+                const priceValue = (course.price !== undefined && course.price !== null) ? course.price : 0;
+                const isFeatured = course.featured || false;
+                const isFree = course.isFree !== false; // default true
+                const link = `course-page.html?id=${course._id}`;
+
+                const card = document.createElement('article');
+                card.className = 'course-card';
+
+                card.innerHTML = `
+                    <div class="course-card-header">
+                        <div class="course-icon"><i class="${icon}"></i></div>
+                        <div class="course-title-area">
+                            <h2 title="${title}">${title}</h2>
+                            <p class="course-instructor"><i class="fa-solid fa-user"></i><span>${instructor}</span></p>
+                        </div>
+                        ${isFeatured ? '<div class="course-featured-badge"><i class="fa-solid fa-star"></i><span>كورس مميز</span></div>' : ''}
+                    </div>
+                    <p class="course-description">${description}</p>
+                    <div class="course-meta-row">
+                        <div class="course-price-pill ${isFree ? 'free' : ''}">
+                            <i class="fa-solid ${isFree ? 'fa-gift' : 'fa-tag'}"></i>
+                            <span>${isFree ? 'مجاني' : priceValue + ' جنيه'}</span>
+                        </div>
+                        <span class="course-lessons-count">${(course.units && course.units.length) ? course.units.length + ' وحدة تعليمية' : ''}</span>
+                    </div>
+                    <div class="course-cta">
+                        <a href="${link}">
+                            <i class="fa-solid fa-play"></i>
+                            <span>متابعة الكورس</span>
+                        </a>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+
+            visibleCoursesLabel.textContent = `${courses.length} كورس ظاهر حالياً`;
+        }
+
+        function applyFilters() {
+            const term = (searchInput.value || '').toLowerCase().trim();
+            let data = [...allCourses];
+
+            if (activeFilter === 'free') {
+                data = data.filter(c => c.isFree !== false);
+            } else if (activeFilter === 'paid') {
+                data = data.filter(c => c.isFree === false);
+            } else if (activeFilter === 'featured') {
+                data = data.filter(c => c.featured);
+            }
+
+            if (term) {
+                data = data.filter(c => {
+                    const title = (c.title || '').toLowerCase();
+                    const instructor = (c.instructor || '').toLowerCase();
+                    return title.includes(term) || instructor.includes(term);
+                });
+            }
+
+            filteredCourses = data;
+            renderCourses(filteredCourses);
+        }
+
+        try {
+            if (stateEl) {
+                stateEl.innerHTML = '<div class="courses-spinner" aria-hidden="true"></div><p>جاري تحميل الكورسات...</p>';
+            }
+
+            const res = await fetch('/api/courses');
+            let data = await res.json();
+            if (!res.ok) throw new Error((data && (data.error || data.message)) || 'فشل في تحميل الكورسات');
+
+            const courses = Array.isArray(data) ? data : (data.courses || []);
+            allCourses = courses;
+
+            const total = courses.length;
+            const featuredCount = courses.filter(c => c.featured).length;
+
+            totalCoursesLabel.textContent = total ? `${total} كورس` : 'لا توجد كورسات حالياً';
+            featuredCoursesLabel.textContent = featuredCount ? `${featuredCount} كورس مميز` : 'لا توجد كورسات مميزة';
+
+            stateEl && (stateEl.remove());
+
+            applyFilters();
+
+            // Show success toast
+            if (window.showToast && total > 0) {
+                window.showToast(`تم تحميل ${total} كورس بنجاح`, {
+                    type: 'success',
+                    timeout: 3000,
+                    title: 'تم التحميل',
+                    icon: 'fas fa-check-circle'
+                });
+            }
+        } catch (err) {
+            console.error('خطأ تحميل الكورسات:', err);
+            if (grid) {
+                grid.innerHTML = `
+                    <div class="courses-state courses-error">
+                        <p>حدث خطأ أثناء تحميل الكورسات: ${err.message}</p>
+                    </div>
+                `;
+            }
+            visibleCoursesLabel.textContent = 'تعذر تحميل الكورسات';
+
+            // Show error toast
+            if (window.showToast) {
+                window.showToast(err.message || 'فشل في تحميل الكورسات', {
+                    type: 'error',
+                    timeout: 5000,
+                    title: 'خطأ في التحميل',
+                    icon: 'fas fa-exclamation-circle'
+                });
+            }
+        }
+
+        // أحداث البحث
+        if (searchInput) {
+            searchInput.addEventListener('input', () => {
+                applyFilters();
+            });
+        }
+
+        // أحداث الفلتر
+        filterChips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                filterChips.forEach(c => c.classList.remove('active'));
+                chip.classList.add('active');
+                activeFilter = chip.getAttribute('data-filter');
+                applyFilters();
+            });
+        });
+    });
+    </script>
+</body>
+</html>

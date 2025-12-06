@@ -1,0 +1,451 @@
+/* Blogs Module - Modern Blog Management System */
+(function() {
+  const API_BASE = '';
+  
+  // قائمة التصنيفات المتاحة للمدونات
+  const BLOG_CATEGORIES = [
+    { value: 'programming', label: 'برمجة' },
+    { value: 'security', label: 'أمن سيبراني' },
+    { value: 'technology', label: 'تكنولوجيا' },
+    { value: 'tutorials', label: 'شروحات' },
+    { value: 'news', label: 'أخبار' },
+    { value: 'other', label: 'أخرى' }
+  ];
+
+  // محرر النصوص المتقدم
+  let editor = null;
+
+  const Blogs = {
+    init() {
+      // تهيئة محرر النصوص
+      this.initEditor();
+      
+      // ربط الأزرار والأحداث
+      const addBtn = document.getElementById('add-blog-button');
+      if (addBtn) {
+        addBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          this.openAddBlogModal();
+        });
+      }
+
+      // تهيئة النموذج
+      const form = document.getElementById('addBlogForm');
+      if (form) {
+        form.addEventListener('submit', this.handleBlogSubmit.bind(this));
+      }
+
+      // ربط أزرار الإغلاق
+      document.querySelectorAll('.modal .modal-close').forEach(btn => {
+        btn.addEventListener('click', () => this.closeBlogModal());
+      });
+
+      // تحميل المدونات
+      this.fetchBlogs();
+
+      // تهيئة معالج رفع الصور
+      this.initImageUpload();
+
+      // تهيئة معالج إضافة الفيديو
+      this.initVideoEmbed();
+    },
+
+    initEditor() {
+      // تهيئة Quill مع كافة الأدوات المتقدمة
+      editor = new Quill('#blogContent', {
+        theme: 'snow',
+        modules: {
+          toolbar: [
+            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ 'color': [] }, { 'background': [] }],
+            [{ 'font': [] }],
+            [{ 'align': [] }],
+            [{ 'direction': 'rtl' }],
+            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+            [{ 'script': 'sub'}, { 'script': 'super' }],
+            ['blockquote', 'code-block'],
+            ['link', 'image', 'video'],
+            ['clean']
+          ]
+        },
+        placeholder: 'اكتب محتوى المدونة هنا...',
+        direction: 'rtl'
+      });
+
+      // إضافة معالج تحميل الصور المخصص
+      const toolbar = editor.getModule('toolbar');
+      toolbar.addHandler('image', () => {
+        this.handleImageUpload();
+      });
+    },
+
+    initImageUpload() {
+      const dropzone = document.getElementById('blogImageDropzone');
+      if (!dropzone) return;
+
+      // معالجة السحب والإفلات
+      dropzone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+      });
+
+      dropzone.addEventListener('dragleave', () => {
+        dropzone.classList.remove('dragover');
+      });
+
+      dropzone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+        const files = e.dataTransfer.files;
+        if (files.length) this.uploadBlogImage(files[0]);
+      });
+
+      // معالجة اختيار الملف
+      const fileInput = document.getElementById('blogImageInput');
+      if (fileInput) {
+        fileInput.addEventListener('change', (e) => {
+          if (e.target.files.length) this.uploadBlogImage(e.target.files[0]);
+        });
+      }
+    },
+
+    initVideoEmbed() {
+      const videoUrlInput = document.getElementById('videoUrl');
+      const embedBtn = document.getElementById('embedVideo');
+      if (!videoUrlInput || !embedBtn) return;
+
+      embedBtn.addEventListener('click', () => {
+        const url = videoUrlInput.value.trim();
+        if (!url) return;
+
+        let embedCode = '';
+        
+        // دعم يوتيوب
+        if (url.includes('youtube.com') || url.includes('youtu.be')) {
+          const videoId = this.getYouTubeVideoId(url);
+          if (videoId) {
+            embedCode = '<iframe width="560" height="315" src="https://www.youtube.com/embed/' + videoId + '" frameborder="0" allowfullscreen></iframe>';
+          }
+        }
+        // دعم جوجل درايف
+        else if (url.includes('drive.google.com')) {
+          const fileId = this.getDriveFileId(url);
+          if (fileId) {
+            embedCode = '<iframe src="https://drive.google.com/file/d/' + fileId + '/preview" width="560" height="315"></iframe>';
+          }
+        }
+        // روابط الفيديو المباشرة
+        else if (url.match(/\.(mp4|webm|ogg)$/i)) {
+          embedCode = '<video width="560" height="315" controls><source src="' + url + '"></video>';
+        }
+
+        if (embedCode) {
+          editor.clipboard.dangerouslyPasteHTML(editor.getLength(), embedCode);
+          videoUrlInput.value = '';
+        } else {
+          alert('عذراً، الرابط غير مدعوم. يرجى استخدام رابط من يوتيوب أو جوجل درايف أو رابط فيديو مباشر.');
+        }
+      });
+    },
+
+    getYouTubeVideoId(url) {
+      const regex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/ ]{11})/i;
+      const match = url.match(regex);
+      return match ? match[1] : null;
+    },
+
+    getDriveFileId(url) {
+      const regex = /\/d\/([^\/]+)/;
+      const match = url.match(regex);
+      return match ? match[1] : null;
+    },
+
+    async uploadBlogImage(file) {
+      try {
+        const formData = new FormData();
+        formData.append('image', file);
+
+        const res = await fetch('/api/upload/blog-image', {
+          method: 'POST',
+          headers: {
+            'Authorization': \`Bearer \${localStorage.getItem('token')}\`
+          },
+          body: formData
+        });
+
+        if (!res.ok) throw new Error('فشل تحميل الصورة');
+
+        const data = await res.json();
+        const imageUrl = data.url;
+
+        // إضافة الصورة للمحرر
+        const range = editor.getSelection();
+        editor.insertEmbed(range.index, 'image', imageUrl);
+      } catch (err) {
+        console.error('Image upload failed:', err);
+        alert('فشل في تحميل الصورة. يرجى المحاولة مرة أخرى.');
+      }
+    },
+
+    async handleImageUpload() {
+      const input = document.createElement('input');
+      input.setAttribute('type', 'file');
+      input.setAttribute('accept', 'image/*');
+      input.click();
+
+      input.onchange = async () => {
+        const file = input.files[0];
+        if (file) {
+          await this.uploadBlogImage(file);
+        }
+      };
+    },
+
+    openAddBlogModal() {
+      const modal = document.getElementById('blogModal');
+      if (!modal) return;
+
+      // تحديث العنوان
+      const titleEl = document.getElementById('blogModalTitle');
+      if (titleEl) titleEl.textContent = 'إضافة مدونة جديدة';
+
+      // إعادة تعيين النموذج
+      const form = document.getElementById('addBlogForm');
+      if (form) form.reset();
+
+      // إعادة تعيين المحرر
+      if (editor) editor.setText('');
+
+      // إعادة تعيين معاينة الصورة
+      const preview = document.getElementById('blogImagePreview');
+      if (preview) preview.style.backgroundImage = '';
+
+      // تعيين التاريخ الافتراضي للنشر
+      const publishDate = document.getElementById('publishDate');
+      if (publishDate) {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        publishDate.value = tomorrow.toISOString().split('T')[0];
+      }
+
+      window.editingBlogId = null;
+      modal.style.display = 'flex';
+      modal.classList.add('show');
+      document.body.style.overflow = 'hidden';
+    },
+
+    openEditBlog(blogId) {
+      if (!blogId) return;
+      window.editingBlogId = blogId;
+
+      // تحميل بيانات المدونة
+      fetch('/api/blogs/' + blogId, {
+        headers: { Authorization: 'Bearer ' + localStorage.getItem('token') }
+      })
+      .then(r => r.json())
+      .then(blog => {
+        // تعبئة النموذج
+        document.getElementById('blogTitle').value = blog.title || '';
+        document.getElementById('blogDescription').value = blog.description || '';
+        editor.root.innerHTML = blog.content || '';
+        
+        // تحديث الصورة المصغرة
+        const preview = document.getElementById('blogImagePreview');
+        if (preview && blog.thumbnail) {
+          preview.style.backgroundImage = 'url(' + blog.thumbnail + ')';
+        }
+
+        // تحديث التصنيف
+        const categorySelect = document.getElementById('blogCategory');
+        if (categorySelect) categorySelect.value = blog.category || '';
+
+        // تحديث حالة النشر
+        const statusSelect = document.getElementById('blogStatus');
+        if (statusSelect) statusSelect.value = blog.status || 'draft';
+
+        // تحديث تاريخ النشر
+        const publishDate = document.getElementById('publishDate');
+        if (publishDate && blog.publishDate) {
+          publishDate.value = new Date(blog.publishDate).toISOString().split('T')[0];
+        }
+
+        // تحديث العنوان
+        const titleEl = document.getElementById('blogModalTitle');
+        if (titleEl) titleEl.textContent = 'تعديل المدونة';
+
+        // عرض المودال
+        const modal = document.getElementById('blogModal');
+        if (modal) {
+          modal.style.display = 'flex';
+          modal.classList.add('show');
+          document.body.style.overflow = 'hidden';
+        }
+      })
+      .catch(err => {
+        console.error('load blog failed', err);
+        alert('فشل في تحميل بيانات المدونة');
+      });
+    },
+
+    closeBlogModal() {
+      const modal = document.getElementById('blogModal');
+      if (modal) {
+        modal.style.display = 'none';
+        modal.classList.remove('show');
+        document.body.style.overflow = 'auto';
+      }
+      
+      // إعادة تعيين النموذج والمحرر
+      const form = document.getElementById('addBlogForm');
+      if (form) form.reset();
+      if (editor) editor.setText('');
+      
+      window.editingBlogId = null;
+    },
+
+    async handleBlogSubmit(e) {
+      e.preventDefault();
+      try {
+        // جمع البيانات من النموذج
+        const formData = {
+          title: document.getElementById('blogTitle').value.trim(),
+          description: document.getElementById('blogDescription').value.trim(),
+          content: editor.root.innerHTML,
+          category: document.getElementById('blogCategory').value,
+          status: document.getElementById('blogStatus').value,
+          publishDate: document.getElementById('publishDate').value
+        };
+
+        // التحقق من البيانات المطلوبة
+        if (!formData.title || !formData.content) {
+          alert('يرجى ملء جميع الحقول المطلوبة');
+          return;
+        }
+
+        // إرسال البيانات
+        const method = window.editingBlogId ? 'PUT' : 'POST';
+        const url = window.editingBlogId ? 
+          '/api/blogs/' + window.editingBlogId : '/api/blogs';
+
+        const res = await fetch(url, {
+          method,
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + localStorage.getItem('token')
+          },
+          body: JSON.stringify(formData)
+        });
+
+        if (!res.ok) throw new Error('فشل حفظ المدونة');
+
+        alert(window.editingBlogId ? 'تم تحديث المدونة' : 'تم إضافة المدونة');
+        this.closeBlogModal();
+        this.fetchBlogs();
+      } catch (err) {
+        console.error('Blog submit error:', err);
+        alert('حدث خطأ أثناء حفظ المدونة');
+      }
+    },
+
+    async fetchBlogs() {
+      try {
+        const res = await fetch('/api/blogs', {
+          headers: { Authorization: 'Bearer ' + localStorage.getItem('token') }
+        });
+        
+        if (!res.ok) throw new Error('فشل تحميل المدونات');
+        
+        const blogs = await res.json();
+        this.renderBlogs(blogs);
+      } catch (err) {
+        console.error('Fetch blogs error:', err);
+        alert('فشل في تحميل المدونات');
+      }
+    },
+
+    renderBlogs(blogs) {
+      const tbody = document.getElementById('blogs-table');
+      if (!tbody) return;
+
+      if (!Array.isArray(blogs) || blogs.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6">لا توجد مدونات</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = blogs.map((blog, idx) => {
+        const publishDate = blog.publishDate ? 
+          new Date(blog.publishDate).toLocaleDateString('ar-EG') : 'غير محدد';
+        
+        const status = {
+          'draft': 'مسودة',
+          'published': 'منشور',
+          'scheduled': 'مجدول',
+          'archived': 'مؤرشف'
+        }[blog.status] || blog.status;
+
+        return '<tr>' +
+          '<td>' + (idx + 1) + '</td>' +
+          '<td>' + this.escapeHtml(blog.title) + '</td>' +
+          '<td>' + this.escapeHtml(blog.description || '').substring(0, 100) + '...</td>' +
+          '<td>' + (blog.category ? getCategoryName(blog.category) : '---') + '</td>' +
+          '<td>' + status + '</td>' +
+          '<td>' + publishDate + '</td>' +
+          '<td>' +
+            '<button class="btn btn-secondary" onclick="window.Blogs.openEditBlog(\'' + blog._id + '\')">' +
+              '<i class="fas fa-edit"></i> تعديل' +
+            '</button>' +
+            '<button class="btn btn-danger" onclick="window.Blogs.deleteBlog(\'' + blog._id + '\')">' +
+              '<i class="fas fa-trash"></i> حذف' +
+            '</button>' +
+          '</td>' +
+        '</tr>';
+      }).join('');
+    },
+
+    async deleteBlog(blogId) {
+      if (!blogId) return;
+      if (!confirm('هل أنت متأكد من حذف هذه المدونة؟')) return;
+
+      try {
+        const res = await fetch(\`/api/blogs/\${blogId}\`, {
+          method: 'DELETE',
+          headers: { Authorization: 'Bearer ' + localStorage.getItem('token') }
+        });
+
+        if (!res.ok) throw new Error('فشل حذف المدونة');
+
+        alert('تم حذف المدونة');
+        this.fetchBlogs();
+      } catch (err) {
+        console.error('Delete blog error:', err);
+        alert('فشل في حذف المدونة');
+      }
+    },
+
+    escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+  };
+
+  // تصدير الوحدة
+  window.Blogs = Blogs;
+})();
+
+function getCategoryName(category) {
+  const categories = {
+    'programming': 'برمجة',
+    'security': 'أمن سيبراني',
+    'technology': 'تكنولوجيا',
+    'tutorials': 'شروحات',
+    'news': 'أخبار',
+    'other': 'أخرى'
+  };
+  return categories[category] || category;
+}

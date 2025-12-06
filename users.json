@@ -1,0 +1,27 @@
+[
+    {
+        "email": "keka@gmail.com",
+        "password": "011100",
+        "allowedCourses": [
+            "information gathering | OSINT",
+            "wifi hacking",
+            "sql injection | try hack me"
+        ]
+    },
+    {
+        "email": "mohamed@gmail.com",
+        "password": "000000",
+        "allowedCourses": [
+            "sql injection | try hack me",
+            "wifi hacking"
+        ]
+    },
+    {
+        "email": "example@example.com",
+        "password": "123456",
+        "allowedCourses": [
+            "wifi hacking",
+            "sql injection | try hack me"
+        ]
+    }
+]

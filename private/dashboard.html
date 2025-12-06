@@ -1,0 +1,2422 @@
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - TeamWork M3</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Quill Editor -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../css/dashboard.css">
+    <link rel="stylesheet" href="../../css/comments.css">
+
+    <script>
+      // التحقق من تسجيل الدخول والصلاحيات
+      (function () {
+        const user = JSON.parse(localStorage.getItem("user"));
+        const token = localStorage.getItem("token");
+
+        // تحقق من وجود المستخدم والتوكن
+        if (!user || !token) {
+          alert("يجب تسجيل الدخول أولاً!");
+          window.location.href = "../../login.html";
+          return;
+        }
+
+        // تحقق من صلاحيات المدير
+        if (!user.isAdmin) {
+          alert("غير مصرح لك بالدخول إلى لوحة التحكم!");
+          window.location.href = "../../alert.html";
+          return;
+        }
+
+        // تحديث اسم المدير في الواجهة
+        const adminNameElement = document.getElementById('admin-name');
+        if (adminNameElement) {
+          adminNameElement.textContent = user.name || 'مدير النظام';
+        }
+      })();
+    </script>
+    <style>
+/* New Unified Media Manager Styles */
+.media-manager {
+    padding: 20px;
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+}
+
+.media-manager h4 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+.media-manager .form-hint {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 20px;
+}
+
+.media-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+    animation: fadeIn 0.5s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.media-slot, .add-media-slot {
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+
+.media-slot:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.media-slot img, .media-slot video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.media-slot .media-type-icon {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.media-slot .remove-media-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background-color: #ef4444;
+    color: white;
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.media-slot:hover .remove-media-btn {
+    opacity: 1;
+}
+
+.link-preview {
+    padding: 12px;
+    background-color: #f3f4f6;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 100%;
+}
+
+.link-preview .link-icon {
+    font-size: 24px;
+    margin-bottom: 8px;
+    color: #4b5563;
+}
+
+.link-preview .link-url {
+    font-size: 12px;
+    color: #6b7280;
+    word-break: break-all;
+}
+
+.add-media-slot {
+    border: 2px dashed #d1d5db;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+}
+
+.add-media-slot:hover {
+    border-color: #4f46e5;
+    background-color: #f0f4ff;
+    color: #4f46e5;
+}
+
+.add-media-slot i {
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+/* Media Choice Modal */
+#mediaChoiceModal {
+  z-index: 100001;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.media-choice-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.media-choice-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 20px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 120px;
+}
+
+.media-choice-btn:hover {
+    border-color: #4f46e5;
+    background-color: #f0f4ff;
+    color: #4f46e5;
+}
+
+.media-choice-btn i {
+    font-size: 32px;
+}
+
+/* Link Input Modal */
+#linkInputModal {
+    z-index: 100001;
+}
+/* إصلاح الـ Modals */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.show {
+    display: flex !important;
+}
+
+.modal-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 90%;
+    max-height: 90%;
+    overflow-y: auto;
+    z-index: 10001;
+    position: relative;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: #666;
+}
+
+.modal-close:hover {
+    color: #000;
+}
+
+/* تأكد من أن الجسم لا يسمح بالتمرير عند فتح المودال */
+body.modal-open {
+    overflow: hidden;
+}
+
+/* Product-specific styles */
+.image-upload-section {
+    margin-top: 15px;
+}
+
+.image-upload-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.image-upload-slot {
+    aspect-ratio: 1;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.image-upload-slot:hover {
+    border-color: #4f46e5;
+    background-color: #f8f9ff;
+}
+
+.upload-placeholder {
+    text-align: center;
+    color: #666;
+}
+
+.upload-placeholder i {
+    font-size: 24px;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.upload-placeholder span {
+    font-size: 12px;
+}
+
+.image-upload-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.remove-image-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(239, 68, 68, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.2s;
+}
+
+.remove-image-btn:hover {
+    background: rgba(239, 68, 68, 1);
+}
+
+.product-thumb {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+.no-image {
+    width: 50px;
+    height: 50px;
+    background: #f5f5f5;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    font-size: 10px;
+    text-align: center;
+}
+
+.rating {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.rating i {
+    color: #ffd700;
+    font-size: 14px;
+}
+
+.rating span {
+    font-size: 12px;
+    color: #666;
+}
+
+.checkbox-group {
+    margin-top: 15px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+    font-weight: normal;
+}
+
+.checkbox-custom {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    position: relative;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkbox-custom::after {
+    content: '✓';
+    position: absolute;
+    top: -2px;
+    left: 1px;
+    color: #4f46e5;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.checkbox-label input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.radio-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    cursor: pointer;
+    font-weight: normal;
+    margin-bottom: 15px;
+}
+
+.radio-custom {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #ddd;
+    border-radius: 50%;
+    position: relative;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.radio-label input[type="radio"]:checked + .radio-custom::after {
+    content: '';
+    position: absolute;
+    top: 3px;
+    left: 3px;
+    width: 8px;
+    height: 8px;
+    background: #4f46e5;
+    border-radius: 50%;
+}
+
+.radio-label input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.pricing-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+@media (max-width: 768px) {
+    .image-upload-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Enhanced Product Modal Styles */
+.form-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+}
+
+.form-section h4 {
+    margin: 0 0 15px 0;
+    color: #2d3748;
+    font-size: 1.1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.form-section h4 i {
+    color: #4f46e5;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.form-hint {
+    color: #718096;
+    font-size: 0.875rem;
+    margin-top: 5px;
+    display: block;
+}
+
+.required {
+    color: #e53e3e;
+    font-weight: bold;
+}
+
+.optional {
+    color: #718096;
+    font-weight: normal;
+}
+
+/* Primary Image Styles */
+.primary-image-container {
+    position: relative;
+}
+
+.primary-image-slot {
+    width: 200px;
+    height: 200px;
+    border: 2px dashed #cbd5e0;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f7fafc;
+    position: relative;
+    overflow: hidden;
+}
+
+.primary-image-slot:hover {
+    border-color: #4f46e5;
+    background: #f0f4ff;
+}
+
+.primary-upload-placeholder {
+    text-align: center;
+    color: #718096;
+}
+
+.primary-upload-placeholder i {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    display: block;
+    color: #a0aec0;
+}
+
+.primary-upload-placeholder span {
+    font-weight: 500;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.primary-upload-placeholder small {
+    font-size: 0.75rem;
+    color: #a0aec0;
+}
+
+.primary-image-preview {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid #e2e8f0;
+}
+
+.primary-image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.remove-primary-image {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(239, 68, 68, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 12px;
+    transition: background-color 0.2s;
+}
+
+.remove-primary-image:hover {
+    background: rgba(239, 68, 68, 1);
+}
+
+.primary-badge {
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    background: linear-gradient(135deg, #ffd700, #ffb347);
+    color: #2d3748;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Additional Images Styles */
+.additional-images-container {
+    margin-top: 15px;
+}
+
+.additional-images-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 15px;
+}
+
+.add-image-slot {
+    aspect-ratio: 1;
+    border: 2px dashed #cbd5e0;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f7fafc;
+    color: #718096;
+}
+
+.add-image-slot:hover {
+    border-color: #4f46e5;
+    background: #f0f4ff;
+    color: #4f46e5;
+}
+
+.add-image-slot i {
+    font-size: 1.5rem;
+    margin-bottom: 4px;
+}
+
+.additional-image-slot {
+    position: relative;
+    aspect-ratio: 1;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid #e2e8f0;
+}
+
+.additional-image-slot img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.remove-additional-image {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: rgba(239, 68, 68, 0.9);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 10px;
+    transition: background-color 0.2s;
+}
+
+.remove-additional-image:hover {
+    background: rgba(239, 68, 68, 1);
+}
+
+/* Media Tabs */
+.media-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.media-tab {
+    padding: 8px 16px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    color: #718096;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.media-tab:hover {
+    border-color: #cbd5e0;
+    background: #f7fafc;
+}
+
+.media-tab.active {
+    border-color: #4f46e5;
+    background: #4f46e5;
+    color: white;
+}
+
+.media-tab i {
+    font-size: 0.875rem;
+}
+
+.media-panel {
+    display: none;
+}
+
+.media-panel.active {
+    display: block;
+}
+
+.no-media-message {
+    text-align: center;
+    padding: 30px;
+    color: #a0aec0;
+}
+
+.no-media-message i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+    display: block;
+}
+
+/* File Upload Styles */
+.file-upload-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.file-upload-btn {
+    padding: 8px 16px;
+    background: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.file-upload-btn:hover {
+    background: #4338ca;
+}
+
+.file-upload-name {
+    color: #718096;
+    font-size: 0.875rem;
+    flex: 1;
+}
+
+.video-preview, .youtube-preview {
+    margin-top: 12px;
+    position: relative;
+}
+
+.preview-frame {
+    width: 100%;
+    height: 200px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #f7fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a0aec0;
+}
+
+/* Settings Grid */
+.settings-grid {
+    display: grid;
+    gap: 15px;
+}
+
+.setting-item {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.setting-info strong {
+    display: block;
+    color: #2d3748;
+    margin-bottom: 4px;
+}
+
+.setting-info small {
+    color: #718096;
+    font-size: 0.875rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .media-tabs {
+        flex-direction: column;
+    }
+
+    .media-tab {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .additional-images-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .primary-image-slot, .primary-image-preview {
+        width: 150px;
+        height: 150px;
+    }
+}
+
+@media (max-width: 480px) {
+    .additional-images-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Upload Video Button Styling */
+.ql-toolbar .ql-uploadVideo {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #ccc;
+    background: white;
+    border-radius: 3px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #555;
+    font-size: 16px;
+    transition: all 0.2s;
+}
+
+.ql-toolbar .ql-uploadVideo:hover {
+    background: #f0f0f0;
+    color: #3498db;
+}
+
+.ql-toolbar .ql-uploadVideo i {
+    font-size: 14px;
+}
+
+/* --- Quill Editor Enhancements --- */
+/* Long Description Editor Container */
+#productLongDescription {
+    display: flex;
+    flex-direction: column;
+    min-height: 800px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: white;
+    resize: vertical;
+    overflow: hidden;
+}
+
+#productLongDescription .ql-toolbar {
+    flex-shrink: 0;
+    border-bottom: 1px solid #ccc;
+}
+
+#productLongDescription .ql-container {
+    flex: 1;
+    overflow-y: auto;
+}
+
+#productLongDescription .ql-editor {
+    min-height: 750px;
+}
+
+/* Media Preview in Editor - Small Rounded Thumbnails */
+#productLongDescription .ql-editor img,
+#productLongDescription .ql-editor video {
+    max-width: 150px;
+    max-height: 150px;
+    border-radius: 8px;
+    margin: 10px 5px;
+    object-fit: contain;
+    display: inline-block;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+}
+
+#productLongDescription .ql-editor img:hover,
+#productLongDescription .ql-editor video:hover {
+    border-color: #3498db;
+    box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+    transform: scale(1.05);
+}
+</style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="header-left">
+            <button class="menu-toggle" id="menu-toggle" aria-label="فتح القائمة">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="header-title">لوحة التحكم</h1>
+        </div>
+        
+        <div class="header-right">
+            <button class="theme-toggle" id="theme-toggle" aria-label="تبديل الوضع المظلم">
+                <i class="fas fa-moon"></i>
+            </button>
+            
+            <div class="user-actions">
+                <button class="action-btn" id="add-user-btn" title="إضافة مستخدم">
+                    <i class="fas fa-user-plus"></i>
+                </button>
+                <button class="action-btn" id="logout-btn" title="تسجيل الخروج">
+                    <i class="fas fa-sign-out-alt"></i>
+              </button>
+                <button class="action-btn" id="home-btn" title="الصفحة الرئيسية">
+                    <i class="fas fa-home"></i>
+              </button>
+            </div>
+      </div>
+    </header>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="admin-info">
+                <div class="admin-avatar">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div class="admin-details">
+                    <h3 id="admin-name">مدير النظام</h3>
+                    <p>لوحة التحكم</p>
+                </div>
+            </div>
+        </div>
+        
+      <ul class="sidebar-menu">
+        <li>
+                <a href="#users" class="menu-item active" data-section="users">
+            <i class="fas fa-users"></i>
+            <span>إدارة المستخدمين</span>
+          </a>
+        </li>
+        <li>
+                <a href="#courses" class="menu-item" data-section="courses">
+                    <i class="fas fa-graduation-cap"></i>
+            <span>إدارة الكورسات</span>
+          </a>
+        </li>
+        <li>
+                <a href="#products" class="menu-item" data-section="products">
+                    <i class="fas fa-shopping-bag"></i>
+            <span>إدارة المنتجات</span>
+          </a>
+        </li>
+        <li>
+                <a href="#comments" class="menu-item" data-section="comments">
+                    <i class="fas fa-comments"></i>
+                    <span>التعليقات</span>
+                </a>
+            </li>
+            <li>
+                <a href="#settings" class="menu-item" data-section="settings">
+            <i class="fas fa-cog"></i>
+            <span>الإعدادات</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Users Section -->
+        <section id="users-section" class="content-section active">
+            <div class="section-header">
+                <h2>إدارة المستخدمين</h2>
+                <button class="btn btn-primary" id="add-user-button">
+                    <i class="fas fa-plus"></i> إضافة مستخدم
+                </button>
+            </div>
+
+        <div class="table-controls">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="search" placeholder="ابحث بالمستخدم..." />
+                </div>
+                <select id="filter" class="filter-select" aria-label="تصفية المستخدمين">
+            <option value="all">جميع المستخدمين</option>
+            <option value="active">نشط</option>
+            <option value="inactive">غير نشط</option>
+                    <option value="admin">مديرين</option>
+          </select>
+        </div>
+
+            <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+                            <th>الصورة</th>
+              <th>الاسم</th>
+              <th>اسم المستخدم</th>
+              <th>البريد الإلكتروني</th>
+              <th>رقم الهاتف</th>
+              <th>الحالة</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="users-table">
+            <!-- سيتم تعبئة البيانات هنا -->
+          </tbody>
+        </table>
+            </div>
+      </section>
+
+        <!-- Courses Section -->
+        <section id="courses-section" class="content-section">
+            <div class="section-header">
+        <h2>إدارة الكورسات</h2>
+          <button class="btn btn-primary" id="add-course-button">
+            <i class="fas fa-plus"></i> إضافة كورس
+          </button>
+        </div>
+
+            <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>العنوان</th>
+              <th>الوصف</th>
+              <th>المدرب</th>
+              <th>المدة</th>
+              <th>السعر</th>
+              <th>التصنيف</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="courses-table">
+            <!-- سيتم تعبئة البيانات هنا -->
+          </tbody>
+        </table>
+            </div>
+      </section>
+
+        <!-- Products Section -->
+        <section id="products-section" class="content-section">
+            <div class="section-header">
+        <h2>إدارة المنتجات</h2>
+          <button class="btn btn-primary" id="add-product-button">
+            <i class="fas fa-plus"></i> إضافة منتج
+          </button>
+        </div>
+
+            <div class="table-controls">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="productSearch" placeholder="ابحث في المنتجات..." />
+                </div>
+                <select id="productFilter" class="filter-select" aria-label="تصفية المنتجات">
+            <option value="all">جميع المنتجات</option>
+            <option value="available">متوفرة</option>
+            <option value="unavailable">غير متوفرة</option>
+                    <option value="featured">مميزة</option>
+          </select>
+        </div>
+
+            <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>الصورة</th>
+              <th>الاسم</th>
+              <th>الوصف</th>
+              <th>السعر</th>
+              <th>التقييم</th>
+              <th>الفئة</th>
+              <th>الحالة</th>
+              <th>الإجراءات</th>
+            </tr>
+          </thead>
+          <tbody id="products-table">
+            <!-- سيتم تعبئة البيانات هنا -->
+          </tbody>
+        </table>
+            </div>
+      </section>
+
+        <!-- Comments Section -->
+        <section id="comments-section" class="content-section">
+            <div class="section-header">
+                <h2>إدارة التعليقات</h2>
+                <div class="section-actions">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="commentSearch" placeholder="بحث في التعليقات..." />
+                    </div>
+                    <select id="commentFilter" class="filter-select" aria-label="تصفية التعليقات">
+                        <option value="all">جميع التعليقات</option>
+                        <option value="pending">قيد المراجعة</option>
+                        <option value="approved">تمت الموافقة</option>
+                        <option value="rejected">مرفوض</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="comments-section">
+                <div id="comments-container">
+                    <!-- Example of new comment structure -->
+                    <div class="comment-item">
+                        <div class="comment-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="comment-content">
+                            <div class="comment-header">
+                                <h4 class="comment-author">اسم المستخدم</h4>
+                                <span class="comment-date">
+                                    <i class="fas fa-clock"></i>
+                                    منذ دقيقة
+                                </span>
+                            </div>
+                            <p class="comment-text">محتوى التعليق...</p>
+                            <div class="comment-meta">
+                                <span class="comment-blog">
+                                    <i class="fas fa-blog"></i>
+                                    اسم المدونة
+                                </span>
+                            </div>
+                            <div class="comment-actions">
+                                <button class="comment-action-btn approve">
+                                    <i class="fas fa-check"></i>
+                                    موافقة
+                                </button>
+                                <button class="comment-action-btn reject">
+                                    <i class="fas fa-times"></i>
+                                    رفض
+                                </button>
+                                <button class="comment-action-btn delete">
+                                    <i class="fas fa-trash"></i>
+                                    حذف
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pagination -->
+                <div class="comments-pagination">
+                    <button class="btn btn-secondary" id="prevPage">
+                        <i class="fas fa-chevron-right"></i>
+                        السابق
+                    </button>
+                    <span id="pageInfo">صفحة 1 من 1</span>
+                    <button class="btn btn-secondary" id="nextPage">
+                        التالي
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Settings Section -->
+        <section id="settings-section" class="content-section">
+            <div class="section-header">
+                <h2>الإعدادات</h2>
+          </div>
+
+            <div class="settings-grid">
+                <div class="settings-card">
+                    <div class="settings-icon">
+                        <i class="fas fa-palette"></i>
+                    </div>
+                    <h3>إعدادات المظهر</h3>
+                    <p>تخصيص ألوان وثيم الموقع</p>
+                    <button class="btn btn-secondary">تخصيص</button>
+          </div>
+
+                <div class="settings-card">
+                    <div class="settings-icon">
+                        <i class="fas fa-bell"></i>
+          </div>
+                    <h3>الإشعارات</h3>
+                    <p>إدارة إعدادات الإشعارات</p>
+                    <button class="btn btn-secondary">إعدادات</button>
+          </div>
+
+                <div class="settings-card">
+                    <div class="settings-icon">
+                        <i class="fas fa-shield-alt"></i>
+          </div>
+                    <h3>الأمان</h3>
+                    <p>إعدادات الأمان والحماية</p>
+                    <button class="btn btn-secondary">تأمين</button>
+      </div>
+
+        <!-- Counter Settings Card (added) -->
+        <div class="settings-card">
+          <div class="settings-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <h3>عداد المتدربين</h3>
+          <p>تحكم في إحصائيات المتدربين</p>
+          <button id="openCounterSettingsPrivate" class="btn btn-primary">تخصيص</button>
+        </div>
+
+        <!-- Admin messaging card -->
+        <div class="settings-card">
+          <div class="settings-icon">
+            <i class="fas fa-envelope"></i>
+          </div>
+          <h3>إرسال رسائل للمستخدمين</h3>
+          <p>أرسل رسالة جماعية أو لمستخدم معين</p>
+          <button id="openAdminMessages" class="btn btn-primary">فتح</button>
+        </div>
+    </div>
+        </section>
+    </main>
+
+
+
+    <!-- Add User Modal -->
+    <div id="addUserModal" class="modal">
+  <div class="modal-content">
+            <div class="modal-header">
+                <h3>إضافة مستخدم جديد</h3>
+                <button class="modal-close" onclick="closeAddModal()">×</button>
+      </div>
+            <form id="addUserForm">
+      <div class="form-group">
+                    <label for="userName">الاسم الكامل</label>
+                    <input type="text" id="userName" name="name" required />
+      </div>
+      <div class="form-group">
+                    <label for="userUsername">اسم المستخدم</label>
+                    <input type="text" id="userUsername" name="username" required />
+      </div>
+      <div class="form-group">
+                    <label for="userEmail">البريد الإلكتروني</label>
+                    <input type="email" id="userEmail" name="email" required />
+      </div>
+      <div class="form-group">
+                    <label for="userPassword">كلمة المرور</label>
+                    <input type="password" id="userPassword" name="password" required />
+      </div>
+      <div class="form-group">
+                    <label for="userPhone">رقم الهاتف</label>
+                    <input type="tel" id="userPhone" name="phone" />
+      </div>
+      <div class="form-group">
+                    <label for="userRole">الدور</label>
+                    <select id="userRole" name="role">
+                        <option value="user">مستخدم</option>
+                        <option value="admin">مدير</option>
+        </select>
+      </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeAddModal()">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">إضافة</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+    <!-- Edit User Modal -->
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>تعديل المستخدم</h3>
+                <button class="modal-close" onclick="closeEditModal()">×</button>
+    </div>
+            <form id="editUserForm">
+                <input type="hidden" id="editUserId" name="id" />
+      <div class="form-group">
+                    <label for="editUserName">الاسم الكامل</label>
+                    <input type="text" id="editUserName" name="name" required />
+      </div>
+      <div class="form-group">
+                    <label for="editUserUsername">اسم المستخدم</label>
+                    <input type="text" id="editUserUsername" name="username" required />
+      </div>
+      <div class="form-group">
+                    <label for="editUserEmail">البريد الإلكتروني</label>
+                    <input type="email" id="editUserEmail" name="email" required />
+    </div>
+      <div class="form-group">
+                    <label for="editUserPhone">رقم الهاتف</label>
+                    <input type="tel" id="editUserPhone" name="phone" />
+      </div>
+      <div class="form-group">
+                    <label for="editUserRole">الدور</label>
+                    <select id="editUserRole" name="role">
+                        <option value="user">مستخدم</option>
+                        <option value="admin">مدير</option>
+          </select>
+        </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>جاري التحميل...</p>
+        </div>
+      </div>
+
+    <!-- Course Content Modal -->
+    <div id="courseContentModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="courseContentModalTitle">Course Content</h3>
+          <button class="modal-close" onclick="closeCourseContentModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="section-actions">
+            <button id="add-unit-button" class="btn btn-primary" onclick="addUnitToCourse(window.currentCourseId)">
+              <i class="fas fa-plus"></i> إضافة وحدة جديدة
+            </button>
+          </div>
+          <div id="modulesContainer"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add Unit Modal -->
+    <div id="addUnitModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>إضافة وحدة جديدة</h3>
+          <button class="modal-close" onclick="closeAddUnitModal()">×</button>
+        </div>
+        <form id="addUnitForm">
+          <div class="form-group">
+            <label for="unitTitle">عنوان الوحدة</label>
+            <input type="text" id="unitTitle" required />
+          </div>
+          <div class="form-group">
+            <label for="unitDescription">وصف الوحدة</label>
+            <textarea id="unitDescription"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="unitOrder">ترتيب الوحدة</label>
+            <input type="number" id="unitOrder" min="1" value="1" />
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeAddUnitModal()">إلغاء</button>
+            <button type="submit" class="btn btn-primary">إضافة</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Add Lesson Modal -->
+    <div id="addLessonModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>إضافة / تعديل درس</h3>
+          <button class="modal-close" onclick="closeAddLessonModal()">×</button>
+        </div>
+        <form id="addLessonForm" enctype="multipart/form-data">
+          <div class="form-group">
+            <label for="lessonTitle">عنوان الدرس</label>
+            <input type="text" id="lessonTitle" required placeholder="أدخل عنوان الدرس..." />
+          </div>
+          <div class="form-group">
+            <label for="lessonDescription">وصف الدرس</label>
+            <textarea id="lessonDescription" rows="4" placeholder="أدخل وصفاً مختصراً للدرس..."></textarea>
+          </div>
+          <div class="form-group">
+            <label for="lessonDuration">مدة الدرس (دقائق)</label>
+            <input type="number" id="lessonDuration" min="1" value="30" />
+          </div>
+          <div class="form-group">
+            <label for="lessonType">نوع المحتوى</label>
+            <div class="content-type-selector">
+              <button type="button" class="content-type-btn active" data-type="video" onclick="selectContentType('video')">
+                <i class="fas fa-video"></i>
+                <span>فيديو</span>
+              </button>
+              <button type="button" class="content-type-btn" data-type="pdf" onclick="selectContentType('pdf')">
+                <i class="fas fa-file-pdf"></i>
+                <span>PDF</span>
+              </button>
+              <button type="button" class="content-type-btn" data-type="url" onclick="selectContentType('url')">
+                <i class="fas fa-link"></i>
+                <span>رابط خارجي</span>
+              </button>
+            </div>
+            <input type="hidden" id="lessonType" value="video" />
+          </div>
+          
+          <!-- Content input sections -->
+          <div id="videoInputSection" class="content-input-section active">
+            <div class="upload-option">
+              <div class="upload-header">
+                <i class="fas fa-upload"></i>
+                <span>رفع ملف فيديو</span>
+              </div>
+              <div class="upload-zone" id="videoDropZone">
+                <label for="videoFileInput" class="visually-hidden">اختر ملف فيديو</label>
+                <input type="file" id="videoFileInput" accept="video/mp4,video/quicktime" onchange="handleVideoFileSelected(event)" aria-label="اختر ملف فيديو" />
+                <div class="upload-placeholder">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                  <p>اسحب وأفلت ملف الفيديو هنا أو</p>
+                  <button type="button" class="btn btn-primary" onclick="document.getElementById('videoFileInput').click()">
+                    اختر ملف
+                  </button>
+                  <p class="upload-hint">MP4 أو MOV، بحد أقصى 100 ميجابايت</p>
+                </div>
+                <div class="upload-preview" id="videoPreview">
+                  <video controls></video>
+                  <button type="button" class="btn btn-danger btn-sm" onclick="removeVideo()">
+                    <i class="fas fa-trash"></i> حذف
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="separator">
+              <span>أو</span>
+            </div>
+            <div class="url-option">
+              <div class="url-header">
+                <i class="fas fa-link"></i>
+                <span>إضافة رابط فيديو</span>
+              </div>
+              <div class="url-input-group">
+                <input type="text" id="lessonVideoUrl" placeholder="أدخل رابط YouTube أو Google Drive..." />
+                <button type="button" class="btn btn-secondary" onclick="validateVideoUrl()">
+                  <i class="fas fa-check"></i> تحقق
+                </button>
+              </div>
+              <div class="url-preview" id="urlVideoPreview">
+                <div class="preview-frame"></div>
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeVideoUrl()">
+                  <i class="fas fa-trash"></i> حذف
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div id="pdfInputSection" class="content-input-section">
+            <div class="upload-option">
+              <div class="upload-header">
+                <i class="fas fa-file-pdf"></i>
+                <span>رفع ملف PDF</span>
+              </div>
+              <div class="upload-zone" id="pdfDropZone">
+                <label for="pdfFileInput" class="visually-hidden">اختر ملف PDF</label>
+                <input type="file" id="pdfFileInput" accept="application/pdf" onchange="handlePdfFileSelected(event)" aria-label="اختر ملف PDF" />
+                <div class="upload-placeholder">
+                  <i class="fas fa-file-upload"></i>
+                  <p>اسحب وأفلت ملف PDF هنا أو</p>
+                  <button type="button" class="btn btn-primary" onclick="document.getElementById('pdfFileInput').click()">
+                    اختر ملف
+                  </button>
+                  <p class="upload-hint">PDF فقط، بحد أقصى 50 ميجابايت</p>
+                </div>
+                <div class="upload-preview" id="pdfPreview">
+                  <div class="pdf-preview">
+                    <i class="fas fa-file-pdf"></i>
+                    <span class="filename"></span>
+                  </div>
+                  <button type="button" class="btn btn-danger btn-sm" onclick="removePdf()">
+                    <i class="fas fa-trash"></i> حذف
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="separator">
+              <span>أو</span>
+            </div>
+            <div class="url-option">
+              <div class="url-header">
+                <i class="fas fa-link"></i>
+                <span>إضافة رابط PDF</span>
+              </div>
+              <div class="url-input-group">
+                <input type="text" id="lessonPdfUrl" placeholder="أدخل رابط ملف PDF..." />
+                <button type="button" class="btn btn-secondary" onclick="validatePdfUrl()">
+                  <i class="fas fa-check"></i> تحقق
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div id="urlInputSection" class="content-input-section">
+            <div class="url-option">
+              <div class="url-header">
+                <i class="fas fa-link"></i>
+                <span>إضافة رابط خارجي</span>
+              </div>
+              <div class="url-input-group">
+                <input type="text" id="lessonExternalUrl" placeholder="أدخل الرابط الخارجي..." />
+                <button type="button" class="btn btn-secondary" onclick="validateExternalUrl()">
+                  <i class="fas fa-check"></i> تحقق
+                </button>
+              </div>
+              <p class="url-hint">يمكنك إضافة أي رابط خارجي مثل مقال، موقع تعليمي، أو أي محتوى مفيد</p>
+            </div>
+          </div>
+
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="lessonIsFree" />
+              <span>الدرس مجاني</span>
+              <small>سيتمكن المستخدمون من مشاهدة هذا الدرس بدون شراء الكورس</small>
+            </label>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeAddLessonModal()">إلغاء</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i>
+              <span>حفظ الدرس</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+    
+    <!-- Add/Edit Course Modal -->
+    <div id="courseModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 id="courseModalTitle">إضافة / تعديل كورس</h3>
+          <button class="modal-close" onclick="closeCourseModal()">×</button>
+        </div>
+        <form id="addCourseForm">
+          <div class="form-group">
+            <label for="courseTitle">عنوان الكورس</label>
+            <input type="text" id="courseTitle" required />
+          </div>
+          <div class="form-group">
+            <label for="courseDescription">وصف الكورس</label>
+            <textarea id="courseDescription"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="courseInstructor">المدرب</label>
+            <input type="text" id="courseInstructor" />
+          </div>
+          <div class="form-group">
+            <label for="courseDuration">المدة (ساعات)</label>
+            <input type="number" id="courseDuration" min="1" value="1" />
+          </div>
+          <div class="form-group">
+            <label for="courseIcon">أيقونة (FontAwesome)</label>
+            <input type="text" id="courseIcon" placeholder="fa-solid fa-book" />
+          </div>
+
+          <!-- Pricing Options -->
+          <div class="form-group">
+            <label>نوع التسعير</label>
+            <div class="pricing-options">
+              <label class="radio-label">
+                <input type="radio" name="pricingType" value="free" id="pricingFree" checked />
+                <span class="radio-custom"></span>
+                <span>مجاني</span>
+                <small>سيتمكن المستخدمون من الوصول للكورس بدون دفع</small>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="pricingType" value="paid" id="pricingPaid" />
+                <span class="radio-custom"></span>
+                <span>مدفوع</span>
+                <small>تحديد سعر للكورس</small>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group" id="priceInputGroup" style="display: none;">
+            <label for="coursePrice">السعر (جنيه مصري)</label>
+            <input type="number" id="coursePrice" min="0" value="0" step="0.01" />
+          </div>
+
+          <div class="form-group">
+            <label class="checkbox-label">
+              <input type="checkbox" id="courseFeatured" />
+              <span class="checkbox-custom"></span>
+              <span>كورس مميز</span>
+              <small>سيظهر الكورس بلون ذهبي مميز في الصفحة الرئيسية</small>
+            </label>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeCourseModal()">إلغاء</button>
+            <button type="submit" class="btn btn-primary">حفظ</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Enhanced Add Product Modal -->
+    <div id="productModal" class="modal">
+      <div class="modal-content" style="max-width: 900px;">
+        <div class="modal-header">
+          <h3 id="productModalTitle">إضافة / تعديل منتج</h3>
+          <button class="modal-close" onclick="closeProductModal()">×</button>
+        </div>
+        <form id="addProductForm" enctype="multipart/form-data">
+          <!-- Basic Information -->
+          <div class="form-section">
+            <h4><i class="fas fa-info-circle"></i> معلومات أساسية</h4>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="productName">اسم المنتج *</label>
+                <input type="text" id="productName" name="name" required />
+              </div>
+              <div class="form-group">
+                <label for="productCategory">الفئة</label>
+                <select id="productCategory" name="category">
+                  <option value="electronics">إلكترونيات</option>
+                  <option value="fashion">أزياء</option>
+                  <option value="books">كتب</option>
+                  <option value="home">المنزل والمطبخ</option>
+                  <option value="sports">رياضة وترفيه</option>
+                  <option value="beauty">العناية الشخصية</option>
+                  <option value="others">أخرى</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="productDescription">الوصف المختصر *</label>
+              <textarea id="productDescription" name="description" required rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="productLongDescription">الوصف التفصيلي (أضغط على زر الفيديو لإضافة فيديو):</label>
+              <div id="productLongDescription"></div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="productPrice">السعر *</label>
+                <input type="text" id="productPrice" name="price" required placeholder="0.00" />
+              </div>
+              <div class="form-group">
+                <label for="productRating">التقييم (0-5)</label>
+                <input type="number" id="productRating" name="rating" min="0" max="5" step="0.1" placeholder="0.0" />
+              </div>
+            </div>
+          </div>
+
+          <!-- Primary Image -->
+          <div class="form-section">
+            <h4><i class="fas fa-star"></i> الصورة الرئيسية <span class="required">*</span></h4>
+            <p class="form-hint">هذه الصورة ستظهر كصورة رئيسية للمنتج في المتجر والداشبورد</p>
+            <div class="primary-image-container">
+              <div class="primary-image-slot" id="primaryImageSlot">
+                <input type="file" id="primaryImage" name="image" accept="image/*" style="display:none;" />
+                <div class="primary-upload-placeholder">
+                  <i class="fas fa-camera"></i>
+                  <span>اختر الصورة الرئيسية</span>
+                  <small>يُفضل صورة عالية الجودة (800x800 بكسل على الأقل)</small>
+                </div>
+              </div>
+              <div class="primary-image-preview" id="primaryImagePreview" style="display:none;">
+                <img id="primaryImageImg" src="" alt="Primary product image" />
+                <button type="button" class="remove-primary-image" onclick="removePrimaryImage()">
+                  <i class="fas fa-times"></i>
+                </button>
+                <div class="primary-badge">الصورة الرئيسية</div>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- New Unified Media Manager -->
+          <div class="form-section media-manager">
+            <h4><i class="fas fa-photo-video"></i> الوسائط <span class="optional">(صور، فيديوهات، روابط)</span></h4>
+            <p class="form-hint">أضف حتى 20 صورة أو فيديو أو رابط. يمكنك السحب والإفلات لإعادة الترتيب.</p>
+            <div class="media-grid" id="mediaGrid">
+                <div class="add-media-slot">
+                    <i class="fas fa-plus"></i>
+                    <span>إضافة وسائط</span>
+                </div>
+            </div>
+          </div>
+
+          
+          <!-- Product Settings -->
+          <div class="form-section">
+            <h4><i class="fas fa-cog"></i> إعدادات المنتج</h4>
+            <div class="settings-grid">
+              <div class="setting-item">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="productInStock" name="inStock" checked />
+                  <span class="checkbox-custom"></span>
+                  <div class="setting-info">
+                    <strong>متوفر في المخزون</strong>
+                    <small>هل المنتج متوفر للشراء الآن؟</small>
+                  </div>
+                </label>
+              </div>
+              <div class="setting-item">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="productFeatured" name="featured" />
+                  <span class="checkbox-custom"></span>
+                  <div class="setting-info">
+                    <strong>منتج مميز</strong>
+                    <small>سيظهر المنتج بلون ذهبي مميز في المتجر</small>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeProductModal()">إلغاء</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i>
+              حفظ المنتج
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Link Input Modal -->
+    <div id="linkInputModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>إضافة رابط</h3>
+          <button class="modal-close" onclick="closeLinkInput()">×</button>
+        </div>
+        <form id="linkInputForm" novalidate>
+          <div class="form-group">
+            <label for="mediaLinkInput">أدخل الرابط</label>
+            <input type="url" id="mediaLinkInput" name="mediaLink" placeholder="https://example.com">
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" onclick="closeLinkInput()">إلغاء</button>
+            <button type="submit" class="btn btn-primary">إضافة الرابط</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Media Choice Modal -->
+    <div id="mediaChoiceModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>اختيار الوسائط</h3>
+          <button class="modal-close" onclick="closeMediaChoice()">×</button>
+        </div>
+        <div class="media-choice-buttons">
+          <button type="button" id="addImageBtn" class="media-choice-btn"><i class="fas fa-image"></i><span>صورة</span></button>
+          <button type="button" id="addVideoBtn" class="media-choice-btn"><i class="fas fa-video"></i><span>فيديو</span></button>
+          <button type="button" id="addLinkBtn" class="media-choice-btn"><i class="fas fa-link"></i><span>رابط</span></button>
+        </div>
+        <input type="file" id="media-file-input" style="display:none;" accept="image/*,video/*" />
+      </div>
+    </div>
+
+    <!-- Counter Modal for Private Dashboard -->
+    <div id="counterModalPrivate" class="modal" aria-hidden="true">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3>إعدادات عداد المتدربين</h3>
+          <button id="closeCounterModalPrivate" class="modal-close">&times;</button>
+        </div>
+        <form id="counterConfigFormPrivate" class="settings-form">
+          <div class="form-group">
+            <label for="baseCountPrivate">العدد الأساسي للمتدربين:</label>
+            <input type="number" id="baseCountPrivate" name="baseCount" min="0" required />
+          </div>
+          <div class="form-group">
+            <label for="dailyIncrementPrivate">الزيادة اليومية:</label>
+            <input type="number" id="dailyIncrementPrivate" name="dailyIncrement" min="0" required />
+          </div>
+          <div class="form-group">
+            <label for="startDatePrivate">تاريخ البدء:</label>
+            <input type="date" id="startDatePrivate" name="startDate" required />
+          </div>
+          <div class="preview-section">
+            <h3>معاينة العداد:</h3>
+            <div class="counter-preview"><span id="counterPreviewPrivate">0</span></div>
+          </div>
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" id="cancelCounterPrivate">إلغاء</button>
+            <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Admin Messaging Modal -->
+    <div id="adminMessagesModal" class="modal admin-message-modal" aria-hidden="true">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content admin-message-content">
+        <div class="modal-header">
+          <h3>
+            <i class="fas fa-paper-plane"></i>
+            إرسال رسالة للمستخدمين
+          </h3>
+          <button id="closeAdminMessages" class="modal-close">&times;</button>
+        </div>
+        <form id="adminMessageForm">
+          <!-- Recipients Section -->
+          <div class="form-section">
+            <label class="form-label">المستلمون</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" name="recipientType" value="all" id="toAll" checked>
+                <span class="radio-custom"></span>
+                <span>إرسال لجميع المستخدمين</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" name="recipientType" value="specific" id="toSpecific">
+                <span class="radio-custom"></span>
+                <span>إرسال لمستخدمين محددين</span>
+              </label>
+            </div>
+            <div class="form-group" id="recipientInputGroup" style="display:none;">
+              <input type="text" id="toRecipient" placeholder="أدخل أسماء المستخدمين أو البريد الإلكتروني مفصولة بفواصل (مثال: user1, user2, email@example.com)">
+              <small class="form-hint">يمكنك إدخال أسماء المستخدمين أو عناوين البريد الإلكتروني</small>
+            </div>
+          </div>
+
+          <!-- Content Type Section -->
+          <div class="form-section">
+            <label class="form-label">نوع المحتوى</label>
+            <div class="content-type-tabs">
+              <button type="button" class="content-tab active" data-type="text">
+                <i class="fas fa-font"></i> نص
+              </button>
+              <button type="button" class="content-tab" data-type="link">
+                <i class="fas fa-link"></i> رابط
+              </button>
+              <button type="button" class="content-tab" data-type="image">
+                <i class="fas fa-image"></i> صورة
+              </button>
+              <button type="button" class="content-tab" data-type="video">
+                <i class="fas fa-video"></i> فيديو يوتيوب
+              </button>
+            </div>
+
+            <!-- Text Content -->
+            <div class="content-panel active" id="contentText">
+              <div class="form-group">
+                <label>عنوان الرسالة</label>
+                <input type="text" id="adminSubject" placeholder="أدخل عنوان الرسالة">
+              </div>
+              <div class="form-group">
+                <label>نص الرسالة</label>
+                <textarea id="adminBody" rows="6" placeholder="أدخل نص الرسالة هنا..."></textarea>
+              </div>
+            </div>
+
+            <!-- Link Content -->
+            <div class="content-panel" id="contentLink" style="display:none;">
+              <div class="form-group">
+                <label>عنوان الرسالة</label>
+                <input type="text" id="adminSubjectLink" placeholder="أدخل عنوان الرسالة">
+              </div>
+              <div class="form-group">
+                <label>نص الرسالة</label>
+                <textarea id="adminBodyLink" rows="3" placeholder="أدخل نص الرسالة..."></textarea>
+              </div>
+              <div class="form-group">
+                <label>رابط</label>
+                <input type="url" id="adminLink" placeholder="https://example.com">
+              </div>
+            </div>
+
+            <!-- Image Content -->
+            <div class="content-panel" id="contentImage" style="display:none;">
+              <div class="form-group">
+                <label>عنوان الرسالة</label>
+                <input type="text" id="adminSubjectImage" placeholder="أدخل عنوان الرسالة">
+              </div>
+              <div class="form-group">
+                <label>نص الرسالة</label>
+                <textarea id="adminBodyImage" rows="3" placeholder="أدخل نص الرسالة..."></textarea>
+              </div>
+              <div class="form-group">
+                <label>رفع صورة من الجهاز</label>
+                <div class="file-upload-wrapper">
+                  <input type="file" id="adminImageFile" accept="image/*" style="display:none;">
+                  <button type="button" class="file-upload-btn" id="adminImageFileBtn">
+                    <i class="fas fa-upload"></i>
+                    اختر صورة
+                  </button>
+                  <span class="file-upload-name" id="adminImageFileName">لم يتم اختيار ملف</span>
+                </div>
+                <div id="adminImagePreview" class="image-preview" style="display:none; margin-top: 12px;">
+                  <img id="adminImagePreviewImg" src="" alt="Preview" style="max-width: 100%; max-height: 200px; border-radius: 8px;">
+                </div>
+              </div>
+              <div class="form-group" style="margin-top: 16px;">
+                <div style="text-align: center; color: var(--text-secondary); margin: 16px 0;">أو</div>
+                <label>رابط الصورة</label>
+                <input type="url" id="adminImageUrl" placeholder="https://example.com/image.jpg">
+                <small class="form-hint">أدخل رابط الصورة مباشرة</small>
+              </div>
+            </div>
+
+            <!-- Video Content -->
+            <div class="content-panel" id="contentVideo" style="display:none;">
+              <div class="form-group">
+                <label>عنوان الرسالة</label>
+                <input type="text" id="adminSubjectVideo" placeholder="أدخل عنوان الرسالة">
+              </div>
+              <div class="form-group">
+                <label>نص الرسالة</label>
+                <textarea id="adminBodyVideo" rows="3" placeholder="أدخل نص الرسالة..."></textarea>
+              </div>
+              <div class="form-group">
+                <label>رفع فيديو من الجهاز</label>
+                <div class="file-upload-wrapper">
+                  <input type="file" id="adminVideoFile" accept="video/*" style="display:none;">
+                  <button type="button" class="file-upload-btn" id="adminVideoFileBtn">
+                    <i class="fas fa-upload"></i>
+                    اختر فيديو
+                  </button>
+                  <span class="file-upload-name" id="adminVideoFileName">لم يتم اختيار ملف</span>
+                </div>
+                <div id="adminVideoPreview" class="video-preview" style="display:none; margin-top: 12px;">
+                  <video id="adminVideoPreviewVideo" src="" controls style="max-width: 100%; max-height: 300px; border-radius: 8px;"></video>
+                </div>
+                <small class="form-hint">يدعم MP4, MOV (حد أقصى 100 ميجابايت)</small>
+              </div>
+              <div class="form-group" style="margin-top: 16px;">
+                <div style="text-align: center; color: var(--text-secondary); margin: 16px 0;">أو</div>
+                <label>رابط فيديو يوتيوب</label>
+                <input type="url" id="adminVideoUrl" placeholder="https://www.youtube.com/watch?v=...">
+                <small class="form-hint">أدخل رابط فيديو يوتيوب كامل</small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Email Option -->
+          <div class="form-section">
+            <label class="checkbox-label">
+              <input type="checkbox" id="sendEmail" checked>
+              <span class="checkbox-custom"></span>
+              <span>
+                <strong>إرسال الرسالة إلى البريد الإلكتروني</strong>
+                <small>سيتم إرسال الرسالة إلى حساب المستخدم في المنصة وإلى بريده الإلكتروني في Gmail</small>
+              </span>
+            </label>
+          </div>
+
+          <!-- Actions -->
+          <div class="form-actions">
+            <button type="button" class="btn btn-secondary" id="cancelAdminMsg">إلغاء</button>
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-paper-plane"></i>
+              إرسال
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Scripts -->
+  <script src="../../app.js"></script>
+  <script src="../../js/ui-toast.js"></script>
+  <script src="../../js/alert-to-toast.js"></script>
+  <script src="courses.js"></script>
+  <script src="products.js"></script>
+  <script src="../../js/dashboard.js"></script>
+  <script src="dash.js"></script>
+  <script src="dash-boot.js"></script>
+  <script src="../../js/ui-toast.js"></script>
+  <script src="admin-messaging.js"></script>
+  <script src="../../js/messages-ui.js"></script>
+  <script src="../../js/notifications.js"></script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('DOMContentLoaded handler: start');
+      try {
+        // New Media Manager
+        const mediaGrid = document.getElementById('mediaGrid');
+        const mediaChoiceModal = document.getElementById('mediaChoiceModal');
+        const linkInputModal = document.getElementById('linkInputModal');
+        const mediaFileInput = document.getElementById('media-file-input');
+        const addImageBtn = document.getElementById('addImageBtn');
+        const addVideoBtn = document.getElementById('addVideoBtn');
+        const addLinkBtn = document.getElementById('addLinkBtn');
+        const linkInputForm = document.getElementById('linkInputForm');
+        const mediaLinkInput = document.getElementById('mediaLinkInput');
+        if (mediaLinkInput) {
+          // Ensure default is not required unless the modal is opened
+          mediaLinkInput.required = false;
+        }
+
+        window.mediaItems = [];
+        console.log('Media manager: initialized');
+        const MAX_MEDIA_ITEMS = 20;
+
+        window.openMediaChoice = function(e) {
+          console.log('openMediaChoice: called');
+            if (window.mediaItems.length >= MAX_MEDIA_ITEMS) {
+                alert(`لا يمكنك إضافة أكثر من ${MAX_MEDIA_ITEMS} عنصر.`);
+                return;
+            }
+            if (e && typeof e.stopPropagation === 'function') {
+                e.stopPropagation();
+            }
+          if(mediaChoiceModal) {
+            // Ensure modal is attached to body so overlay isn't clipped by parent containers
+            if (mediaChoiceModal.parentNode !== document.body) document.body.appendChild(mediaChoiceModal);
+                if (typeof openModal === 'function') {
+                  // delay opening slightly to avoid backdrop clicks closing the modal immediately
+                  setTimeout(() => {
+                    // Manually show the modal without closing other modals
+                    mediaChoiceModal.classList.add('show');
+                    mediaChoiceModal.style.display = 'flex';
+                    mediaChoiceModal.style.zIndex = '100005';
+                    document.body.classList.add('modal-open');
+                    // temporary ignore backdrop
+                    mediaChoiceModal.dataset.ignoreBackdropClick = 'true';
+                    setTimeout(() => delete mediaChoiceModal.dataset.ignoreBackdropClick, 250);
+                  }, 20);
+                } else {
+                  setTimeout(() => mediaChoiceModal.classList.add('show'), 20);
+                }
+            console.log('openMediaChoice: after add show class:', mediaChoiceModal.classList.toString());
+            try {
+              const cs = window.getComputedStyle(mediaChoiceModal);
+              console.log('openMediaChoice: computed display:', cs.display, 'visibility:', cs.visibility, 'opacity:', cs.opacity);
+              const rect = mediaChoiceModal.getBoundingClientRect();
+              console.log('openMediaChoice: rect', rect);
+            } catch (e) { console.warn('openMediaChoice: unable to compute style rect', e); }
+            // fallback: ensure visible via inline styles if still hidden
+            setTimeout(() => {
+              try {
+                const cs2 = window.getComputedStyle(mediaChoiceModal);
+                if (cs2.display === 'none' || cs2.visibility === 'hidden' || parseFloat(cs2.opacity) === 0) {
+                  console.warn('openMediaChoice: modal appears hidden despite .show, forcing inline style');
+                  mediaChoiceModal.style.display = 'flex';
+                  mediaChoiceModal.style.visibility = 'visible';
+                  mediaChoiceModal.style.opacity = '1';
+                  mediaChoiceModal.style.zIndex = '100002';
+                }
+              } catch (e) { /* ignore */ }
+            }, 50);
+          }
+        }
+
+        // Attach event listeners to pre-existing add-media-slot elements (static markup)
+        const staticAddSlots = document.querySelectorAll('.add-media-slot');
+        if (staticAddSlots && staticAddSlots.length) {
+            staticAddSlots.forEach(slot => {
+            slot.addEventListener('click', (e) => {
+              console.log('static add-media-slot clicked', slot, e);
+              if (typeof window.openMediaChoice === 'function') {
+                window.openMediaChoice(e);
+              } else if (typeof openMediaChoice === 'function') {
+                openMediaChoice(e);
+              } else {
+                console.warn('openMediaChoice not available when static add-media-slot clicked');
+              }
+            });
+          });
+        }
+
+        // Event delegation fallback on mediaGrid - catch clicks inside add-media-slot
+        if (mediaGrid) {
+          mediaGrid.addEventListener('click', (e) => {
+            const slot = e.target.closest('.add-media-slot');
+            if (slot) {
+              console.log('mediaGrid delegated click on add-media-slot', slot, e);
+              if (typeof window.openMediaChoice === 'function') window.openMediaChoice(e);
+            }
+          });
+        }
+
+        window.closeMediaChoice = function() {
+          if(mediaChoiceModal) {
+            // Manually remove show and clear inline styles
+            mediaChoiceModal.classList.remove('show');
+            console.log('closeMediaChoice: removed show, classList now:', mediaChoiceModal.classList.toString());
+            mediaChoiceModal.style.display = '';
+            mediaChoiceModal.style.visibility = '';
+            mediaChoiceModal.style.opacity = '';
+            mediaChoiceModal.style.zIndex = '';
+            // If there are no other open modals, remove modal-open from body
+            const openModals = document.querySelectorAll('.modal.show');
+            if (!openModals || openModals.length === 0) {
+                document.body.classList.remove('modal-open');
+            }
+          }
+        }
+
+        window.openLinkInput = function() {
+          window.closeMediaChoice();
+          if (typeof openModal === 'function') {
+            // Open link input without closing existing modals
+            if (linkInputModal) {
+              linkInputModal.classList.add('show');
+              linkInputModal.style.display = 'flex';
+              linkInputModal.style.zIndex = '100005';
+              document.body.classList.add('modal-open');
+              linkInputModal.dataset.ignoreBackdropClick = 'true';
+              setTimeout(() => delete linkInputModal.dataset.ignoreBackdropClick, 250);
+            }
+          } else if(linkInputModal) {
+            linkInputModal.classList.add('show');
+          }
+          if (mediaLinkInput) {
+            mediaLinkInput.required = true;
+            try { mediaLinkInput.focus(); } catch (e) {}
+          }
+        }
+
+        window.closeLinkInput = function() {
+          if (linkInputModal) {
+            linkInputModal.classList.remove('show');
+            linkInputModal.style.display = '';
+            linkInputModal.style.zIndex = '';
+            const openModals = document.querySelectorAll('.modal.show');
+            if (!openModals || openModals.length === 0) document.body.classList.remove('modal-open');
+          }
+          if (mediaLinkInput) {
+            mediaLinkInput.required = false;
+          }
+        }
+        if(addImageBtn){
+          addImageBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('addImageBtn clicked (no close)');
+            mediaFileInput.accept = 'image/*';
+            mediaFileInput.click();
+          });
+        }
+        if(addVideoBtn){
+          addVideoBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('addVideoBtn clicked (no close)');
+            mediaFileInput.accept = 'video/*';
+            mediaFileInput.click();
+          });
+        }
+
+        if(addLinkBtn){
+            addLinkBtn.addEventListener('click', () => {
+                openLinkInput();
+            });
+        }
+
+        if(mediaFileInput){
+            mediaFileInput.addEventListener('change', (e) => {
+                const files = e.target.files;
+                if (!files) return;
+            console.log('mediaFileInput change: files count', files.length);
+
+                for (let i = 0; i < files.length; i++) {
+                    if (window.mediaItems.length >= MAX_MEDIA_ITEMS) break;
+                    const file = files[i];
+                    const type = file.type.startsWith('image/') ? 'image' : 'video';
+                    const mediaItem = {
+                        id: Date.now() + Math.random(),
+                        type: type,
+                        file: file,
+                        previewUrl: URL.createObjectURL(file)
+                    };
+                    window.mediaItems.push(mediaItem);
+                }
+                  console.log('mediaFileInput: mediaItems length after push', window.mediaItems.length, window.mediaItems);
+                  renderMediaGrid();
+            });
+        }
+
+        if(linkInputForm){
+            linkInputForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const url = mediaLinkInput.value;
+                if (!url) return;
+
+                let type = 'link';
+                if (url.includes('youtube.com') || url.includes('youtu.be')) {
+                    type = 'youtube';
+                }
+
+                const mediaItem = {
+                    id: Date.now() + Math.random(),
+                    type: type,
+                    url: url
+                };
+                window.mediaItems.push(mediaItem);
+                renderMediaGrid();
+                closeLinkInput();
+                mediaLinkInput.value = '';
+            });
+        }
+
+        window.renderMediaGrid = function() {
+          console.log('renderMediaGrid: called, mediaItems length=', (Array.isArray(window.mediaItems) ? window.mediaItems.length : 0));
+            if(!mediaGrid) return;
+            mediaGrid.innerHTML = '';
+            if (Array.isArray(window.mediaItems)) {
+            window.mediaItems.forEach(item => {
+                const slot = document.createElement('div');
+                slot.className = 'media-slot';
+                slot.dataset.id = item.id;
+
+                if (item.type === 'image') {
+                    slot.innerHTML = `
+                        <img src="${item.previewUrl || item.url}" alt="Media">
+                        <div class="media-type-icon"><i class="fas fa-image"></i></div>
+                    `;
+                } else if (item.type === 'video') {
+                    slot.innerHTML = `
+                        <video src="${item.previewUrl || item.url}" muted playsinline></video>
+                        <div class="media-type-icon"><i class="fas fa-video"></i></div>
+                    `;
+                } else if (item.type === 'youtube') {
+                    const videoId = getYouTubeID(item.url);
+                    slot.innerHTML = `
+                        <img src="https://img.youtube.com/vi/${videoId}/0.jpg" alt="YouTube Video">
+                        <div class="media-type-icon"><i class="fab fa-youtube"></i></div>
+                    `;
+                } else {
+                    slot.innerHTML = `
+                        <div class="link-preview">
+                            <i class="fas fa-link link-icon"></i>
+                            <span class="link-url">${item.url}</span>
+                        </div>
+                    `;
+                }
+
+                slot.innerHTML += `<button type="button" class="remove-media-btn" onclick="removeMediaItem(${item.id})"><i class="fas fa-times"></i></button>`;
+                mediaGrid.appendChild(slot);
+            });
+            }
+
+            if (window.mediaItems.length < MAX_MEDIA_ITEMS) {
+                const addSlot = document.createElement('div');
+                addSlot.className = 'add-media-slot';
+                addSlot.innerHTML = `
+                  <i class="fas fa-plus"></i>
+                  <span>إضافة وسائط</span>
+                `;
+                // Ensure clicking anywhere on the add slot triggers the media choice
+                addSlot.addEventListener('click', (e) => {
+                  console.log('dynamic add-media-slot clicked', e);
+                  if (typeof window.openMediaChoice === 'function') window.openMediaChoice(e);
+                });
+                mediaGrid.appendChild(addSlot);
+            }
+            
+            const slots = mediaGrid.querySelectorAll('.media-slot');
+            Array.from(slots).forEach(slot => {
+                slot.style.animation = 'fadeIn 0.5s';
+            });
+        }
+
+        window.removeMediaItem = function(id) {
+          if (Array.isArray(window.mediaItems)) {
+            window.mediaItems = window.mediaItems.filter(item => item.id !== id);
+          } else {
+            window.mediaItems = [];
+          }
+          renderMediaGrid();
+        }
+
+        window.getYouTubeID = function(url){
+          var ID = '';
+          if (!url) return '';
+          // Ensure url is a string (sometimes an object or array might be passed)
+          if (typeof url !== 'string') {
+            try {
+              url = String(url);
+            } catch (e) {
+              return '';
+            }
+          }
+          url = url.replace(/(>|<)/gi,'').split(/(vi\/|v=|\/v\/|youtu\.be\/|\/embed\/)/);
+            if(url[2] !== undefined) {
+                ID = url[2].split(/[^0-9a-z_\-]/i);
+                ID = ID[0];
+            }
+            else {
+                ID = url;
+            }
+            return ID;
+        }
+      
+        console.log('Counter modal: initializing');
+        // Wire counter modal in private dashboard
+        (function(){
+            const openBtn = document.getElementById('openCounterSettingsPrivate');
+            const modal = document.getElementById('counterModalPrivate');
+            const closeBtn = document.getElementById('closeCounterModalPrivate');
+            const cancelBtn = document.getElementById('cancelCounterPrivate');
+
+            let _privatePreviewInterval = null;
+            function show(){
+            if(modal) modal.classList.add('show');
+            document.body.classList.add('modal-open');
+            loadConfig();
+            if(!_privatePreviewInterval){
+                _privatePreviewInterval = setInterval(updatePreview, 1000);
+            }
+            }
+            function hide(){
+            if(modal) modal.classList.remove('show');
+            document.body.classList.remove('modal-open');
+            if(_privatePreviewInterval){
+                clearInterval(_privatePreviewInterval);
+                _privatePreviewInterval = null;
+            }
+            }
+
+            openBtn && openBtn.addEventListener('click', (e)=>{ e.preventDefault(); show(); });
+            closeBtn && closeBtn.addEventListener('click', hide);
+            cancelBtn && cancelBtn.addEventListener('click', hide);
+            modal && modal.addEventListener('click', (e)=>{ if(e.target===modal) hide(); });
+
+            async function loadConfig(){
+            try{
+                const token = localStorage.getItem('token');
+                const headers = token? { 'Authorization': 'Bearer ' + token } : {};
+                const res = await fetch('/api/counter-config', { headers });
+                if(!res.ok) throw new Error('failed');
+                const cfg = await res.json();
+                document.getElementById('baseCountPrivate').value = cfg.baseCount || 0;
+                document.getElementById('dailyIncrementPrivate').value = cfg.dailyIncrement || 0;
+                const start = cfg.startDate ? new Date(Number(cfg.startDate)) : new Date();
+                document.getElementById('startDatePrivate').value = start.toISOString().split('T')[0];
+                updatePreview();
+            }catch(err){
+                console.error(err);
+            }
+            }
+
+            function updatePreview(){
+            const base = Number(document.getElementById('baseCountPrivate').value) || 0;
+            const inc = Number(document.getElementById('dailyIncrementPrivate').value) || 0;
+            const sd = document.getElementById('startDatePrivate').value;
+            if(!sd) return;
+            const startTs = new Date(sd).getTime();
+            const seconds = Math.max(0,(Date.now() - startTs)/1000);
+            const perSecond = inc / 86400;
+            const total = base + (seconds * perSecond);
+            document.getElementById('counterPreviewPrivate').textContent = new Intl.NumberFormat('en-US').format(Math.max(0,Math.floor(total))) + '+';
+            }
+
+            ['baseCountPrivate','dailyIncrementPrivate','startDatePrivate'].forEach(id=>{
+            const el = document.getElementById(id);
+            if (el && typeof el.addEventListener === 'function') {
+              el.addEventListener('input', updatePreview);
+              el.addEventListener('change', updatePreview);
+            }
+            });
+
+            const counterForm = document.getElementById('counterConfigFormPrivate');
+            if(counterForm){
+                counterForm.addEventListener('submit', async function(e){
+                    e.preventDefault();
+                    try{
+                        const baseCount = Number(document.getElementById('baseCountPrivate').value);
+                        const dailyIncrement = Number(document.getElementById('dailyIncrementPrivate').value);
+                        const startDate = new Date(document.getElementById('startDatePrivate').value).getTime();
+                        const token = localStorage.getItem('token');
+                        const headers = token? { 'Content-Type':'application/json','Authorization':'Bearer '+token } : { 'Content-Type':'application/json' };
+                        const res = await fetch('/api/counter-config', { method: 'PUT', headers, body: JSON.stringify({ baseCount,dailyIncrement,startDate }) });
+                        if(!res.ok) throw new Error('save failed');
+                        alert('تم حفظ الإعدادات');
+                        hide();
+                    }catch(err){
+                        console.error(err);
+                        alert('فشل الحفظ — تأكد من صلاحيات المدير');
+                    }
+                });
+            }
+            })();
+          console.log('Counter modal: initialized');
+        } catch (err) {
+          console.error('Error in DOMContentLoaded handler:', err);
+          // rethrow to preserve original behaviour in dev console if desired
+          throw err;
+        }
+    });
+  </script>
+</body>
+</html>

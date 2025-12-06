@@ -1,0 +1,220 @@
+[
+    {
+        "id": 1,
+        "type": "cybersecurity",
+        "title": "wifi hacking",
+        "icon": "fa-solid fa-wifi",
+        "description": "عملية منهجية لفحص وتحليل أمن شبكة الواي فاي بهدف تحديد الثغرات الأمنية وتقييم مدى قوة تدابير الحماية المستخدمة.",
+        "full_description": "اختبار اختراق الواي فاي هو جزء من اختبار الاختراق العام الذي يركز على تقييم أمان البنية التحتية اللاسلكية. يتضمن ذلك تقييم البروتوكولات، الأجهزة، التكوينات، وأي تطبيقات أو خدمات تعمل عبر الشبكة. عملية منهجية لفحص وتحليل أمن شبكة الواي فاي بهدف تحديد الثغرات الأمنية وتقييم مدى قوة تدابير الحماية المستخدمة.",
+        "lessons": [
+            {
+                "title": "lesson 1",
+                "link": "https://iframe.mediadelivery.net/play/342314/7400de10-b577-4dbd-9973-e51deb82b4a9"
+            },
+            {
+                "title": "lesson 2",
+                "link": "https://iframe.mediadelivery.net/play/342314/801a7984-ed08-4077-8cec-65a6488bcbc6"
+            },
+            {
+                "title": "lesson 3",
+                "link": "https://iframe.mediadelivery.net/play/342314/aba36fa0-4de7-4424-87db-eed42a89aba8"
+            },
+            {
+                "title": "lesson 4",
+                "link": "https://iframe.mediadelivery.net/play/342314/4099a5fd-ecc4-46c7-aae3-42c1c70e71c1"
+            },
+            {
+                "title": "lesson 5",
+                "link": "https://iframe.mediadelivery.net/play/342314/7fdab1d3-079c-4021-be5e-48d504f07cd1"
+            },
+            {
+                "title": "lesson 6",
+                "link": "https://iframe.mediadelivery.net/play/342314/5626c83d-20b9-4615-82c1-2192b7455ec0"
+            },
+            {
+                "title": "lesson 7",
+                "link": "https://iframe.mediadelivery.net/play/342314/562a744e-87a7-4832-8ea7-87fbc1c1a0f2"
+            },
+            {
+                "title": "lesson 8",
+                "link": "https://iframe.mediadelivery.net/play/342314/d1734420-65e6-4988-8af3-2fc04f832c59"
+            },
+            {
+                "title": "lesson 9",
+                "link": "https://iframe.mediadelivery.net/play/342314/56b839fc-2833-4037-9f51-e2754856c5e4"
+            },
+            {
+                "title": "lesson 10",
+                "link": "https://iframe.mediadelivery.net/play/342314/d6a4bc16-843f-4624-9cd4-1f60d648edca"
+            },
+            {
+                "title": "lesson 11",
+                "link": "https://iframe.mediadelivery.net/play/342314/44716285-9286-4f85-a3de-74811db358c0"
+            },
+            {
+                "title": "lesson 12",
+                "link": "https://iframe.mediadelivery.net/play/342314/4ca78d70-1f3a-4bf8-824d-e02d3e1b3470"
+            },
+            {
+                "title": "lesson 13",
+                "link": "https://iframe.mediadelivery.net/play/342314/264446c3-ed72-4614-b25e-c7afab3d2482"
+            },
+            {
+                "title": "lesson 14",
+                "link": "https://iframe.mediadelivery.net/play/342314/c6995de1-d68b-47a0-bfae-eaab530365ad"
+            },
+            {
+                "title": "lesson 15",
+                "link": "https://iframe.mediadelivery.net/play/342314/b3e0176b-e93d-4af9-875f-e78cfc5f5f67"
+            },
+            {
+                "title": "lesson 16",
+                "link": "https://iframe.mediadelivery.net/play/342314/151a7167-da34-40e8-ba1a-5a8498a77a20"
+            },
+            {
+                "title": "lesson 17",
+                "link": "https://iframe.mediadelivery.net/play/342314/949dab1d-9c35-4c12-b2ff-626377e62a4e"
+            },
+            {
+                "title": "lesson 18",
+                "link": "https://iframe.mediadelivery.net/play/342314/5f59ff1f-7f27-4db1-a308-3cfb40e9e8fa"
+            },
+            {
+                "title": "lesson 19",
+                "link": "https://iframe.mediadelivery.net/play/342314/bd6496e9-c547-4052-ad7b-c7d94d0b4b07"
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "type": "cybersecurity",
+        "title": "sql injection | try hack me",
+        "icon": "fa-solid fa-syringe",
+        "description": "SQL Injection is a cyber attack targeting databases by injecting malicious SQL commands into user input fields.",
+        "full_description": "SQL Injection is an exploitation of a vulnerability in web applications that fail to properly validate user inputs. Attackers inject SQL commands into application queries to make the database execute unwanted commands.",
+        "lessons": [
+            {
+                "title": "lesson 1",
+                "link": "https://iframe.mediadelivery.net/play/289361/f36d76a9-679b-4f60-ac52-1999cb1b2cf6"
+            },
+            {
+                "title": "lesson 2",
+                "link": "https://iframe.mediadelivery.net/play/289361/9f709752-bba4-4549-af1a-0bde9806ab9d"
+            },
+            {
+                "title": "lesson 3",
+                "link": "https://iframe.mediadelivery.net/play/289361/f77022d6-4291-47c6-b7d3-c22113c45c47"
+            },
+            {
+                "title": "lesson 4",
+                "link": "https://iframe.mediadelivery.net/play/289361/93dfdc01-76ec-452f-8a34-ea4c87c6d0db"
+            },
+            {
+                "title": "lesson 5",
+                "link": "https://iframe.mediadelivery.net/play/289361/bdee343f-9f66-4392-b2a6-7a748ed888dc"
+            },
+            {
+                "title": "lesson 6",
+                "link": "https://iframe.mediadelivery.net/play/289361/e2eb0a0a-560b-4323-ba11-632e6d262dd3"
+            },
+            {
+                "title": "lesson 7",
+                "link": "https://iframe.mediadelivery.net/play/289361/49bd5fb2-7b61-4a23-b559-99625c326eda"
+            },
+            {
+                "title": "lesson 8",
+                "link": "https://iframe.mediadelivery.net/play/289361/74eaaf91-ad97-4a6f-9c80-18e46bfbff79"
+            },
+            {
+                "title": "lesson 9",
+                "link": "https://iframe.mediadelivery.net/play/289361/0425c642-2e84-4dfa-a852-5d6cbcf92731"
+            },
+            {
+                "title": "lesson 10",
+                "link": "https://iframe.mediadelivery.net/play/289361/d3ab7e0f-d45e-4f00-a575-a02199a037a9"
+            },
+            {
+                "title": "lesson 11",
+                "link": "https://iframe.mediadelivery.net/play/289361/794a99e4-fcdb-4348-ae0d-8dd044826c82"
+            },
+            {
+                "title": "lesson 12",
+                "link": "https://iframe.mediadelivery.net/play/289361/aca20f0a-2ee6-4b9a-a1cc-e5b7362f05b7"
+            },
+            {
+                "title": "lesson 13",
+                "link": "https://iframe.mediadelivery.net/play/289361/78c7ac9b-ab82-489d-a43b-aa31ac52e537"
+            },
+            {
+                "title": "lesson 14",
+                "link": "https://iframe.mediadelivery.net/play/289361/c4bce21c-2f76-4651-a9ba-87987ec68c75"
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "type": "cybersecurity",
+        "title": "information gathering | OSINT",
+        "icon": "fa-solid fa-info",
+        "description": "جمع المعلومات الاستخباراتية من المصادر المتاحة للعامة بطريقة قانونية.",
+        "full_description": "عملية البحث عن المعلومات وتحليلها من المصادر المفتوحة مثل الإنترنت، الصحف، البيانات الحكومية، وسائل التواصل الاجتماعي، أو أي مصدر غير مغلق أو محمي. الهدف الأساسي من الـ OSINT هو استخلاص معلومات قيمة ومفيدة لدعم اتخاذ القرارات في سياقات مختلفة، بما في ذلك الأمن، الأعمال التجارية، أو الصحافة الاستقصائية.",
+        "lessons": [
+            {
+                "title": "lesson 1",
+                "link": "https://iframe.mediadelivery.net/play/318118/6cdf4aa8-d480-4f1c-8341-4305ec6d5c74"
+            },
+            {
+                "title": "lesson 2",
+                "link": "https://iframe.mediadelivery.net/play/318118/a0186b76-2c24-4d5f-a2dd-62c4883a3edd"
+            },
+            {
+                "title": "lesson 3",
+                "link": "https://iframe.mediadelivery.net/play/318118/b0fd4867-a2ee-479e-a864-3f39788b1b59"
+            },
+            {
+                "title": "lesson 4",
+                "link": "https://iframe.mediadelivery.net/play/318118/406fa017-f98e-4cad-ae8a-afaf29fcd5d2"
+            },
+            {
+                "title": "lesson 5",
+                "link": "https://iframe.mediadelivery.net/play/318118/3e4ee849-3ab6-4753-9422-b3459e32cfb1"
+            },
+            {
+                "title": "lesson 6",
+                "link": "https://iframe.mediadelivery.net/play/318118/e8857c32-0a03-4ba7-8157-69264040c1bf"
+            },
+            {
+                "title": "lesson 7",
+                "link": "https://iframe.mediadelivery.net/play/318118/30e18219-a0e8-43fa-b7da-530698f086c9"
+            },
+            {
+                "title": "lesson 8",
+                "link": "https://iframe.mediadelivery.net/play/318118/07a2f191-266a-4d41-8813-7a0f2c75a6a2"
+            },
+            {
+                "title": "lesson 9",
+                "link": "https://iframe.mediadelivery.net/play/318118/3e09d976-543a-47aa-9b3b-92001a819e5c"
+            },
+            {
+                "title": "lesson 10",
+                "link": "https://iframe.mediadelivery.net/play/318118/4df282e6-30fb-4753-9568-afe37cea7692"
+            },
+            {
+                "title": "lesson 11",
+                "link": "https://iframe.mediadelivery.net/play/318118/2d4d352f-5c37-4588-9ae6-4b326b18e5a3"
+            },
+            {
+                "title": "lesson 12",
+                "link": "https://iframe.mediadelivery.net/play/318118/d571c9d1-6ac0-4500-809c-5dac954197ef"
+            },
+            {
+                "title": "lesson 13",
+                "link": "https://iframe.mediadelivery.net/play/318118/e48f91c9-d523-408f-86a7-b5ed26a76683"
+            },
+            {
+                "title": "lesson 14",
+                "link": "https://iframe.mediadelivery.net/play/318118/a154effc-1153-4b4f-bc12-11763c297f33"
+            }
+        ]
+    }
+]

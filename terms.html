@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/courses-carousel.css">
+    <!-- <link rel="stylesheet" href="css/all.min.css"> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Marhey:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="img/loogo.png">
+    <style>
+        /* Modern Terms Page Styling */
+        :root {
+            --primary-color: #4a6bff;
+            --secondary-color: #f8f9fa;
+            --text-color: #333;
+            --light-gray: #f5f5f5;
+            --border-color: #e0e0e0;
+        }
+
+        .terms-container {
+            padding: 60px 20px;
+            max-width: 900px;
+            margin: 0 auto;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .terms-header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 30px 0;
+            border-bottom: 2px solid var(--primary-color);
+        }
+
+        .terms-header h1 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .terms-header p {
+            color: #666;
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .terms-section {
+            background-color: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid var(--primary-color);
+            transition: transform 0.3s ease;
+        }
+
+        .terms-section:hover {
+            transform: translateY(-2px);
+        }
+
+        .terms-section h2 {
+            color: var(--primary-color);
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .terms-section h2::before {
+            content: "●";
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        .terms-section p {
+            color: var(--text-color);
+            line-height: 1.8;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .terms-section ul {
+            padding-left: 20px;
+            margin-top: 15px;
+        }
+
+        .terms-section li {
+            color: var(--text-color);
+            line-height: 1.8;
+            margin-bottom: 10px;
+            position: relative;
+            padding-left: 15px;
+        }
+
+        .terms-section li::before {
+            content: "•";
+            color: var(--primary-color);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .consent-highlight {
+            background-color: #fff8e1;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+            margin: 20px 0;
+        }
+
+        .consent-highlight p {
+            margin: 0;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .last-updated {
+            text-align: center;
+            margin-top: 40px;
+            color: #888;
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+
+        .contact-info {
+            background-color: var(--light-gray);
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .contact-info ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .contact-info li {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding-left: 0;
+        }
+
+        .contact-info li::before {
+            display: none;
+        }
+
+        .contact-info i {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .terms-container {
+                padding: 40px 15px;
+            }
+
+            .terms-header h1 {
+                font-size: 2rem;
+            }
+
+            .terms-section {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div dir="rtl" class="header">
+        <div class="container">
+            <div class="logo">
+                <a href="index.html"><img src="img/logo.png" alt=""></a>
+            </div>
+            <div id="list" class="links">
+                <ul>
+                    <li><a href="index.html">الرئيسيه</a></li>
+                    <li><a href="courses.html">الكورسات </a></li>
+                    <li><a href="portfolio.html">مشاريعنا </a></li>
+                    <li><a href="roadmap.html">مسارات التعلم</a></li>
+                </ul>
+            </div>
+            <div class="bars">
+                <i id="bars" class="fa-solid fa-bars"></i>
+            </div>
+            <div class="icon">
+                <div id="colorMode" class="theme">
+                    <i class="fa-solid fa-moon moon"></i>
+                    <i class="fa-solid fa-sun sun"></i>
+                </div>
+                <a href="login.html"><i class="fa-solid fa-user user"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="terms-container">
+        <div class="terms-header">
+            <h1>شروط الاستخدام</h1>
+            <p>مرحبًا بك في TWM3. باستخدامك لمنصتنا وخدماتنا، فإنك توافق على الالتزام بشروط الاستخدام التالية.</p>
+        </div>
+
+        <div class="consent-highlight">
+            <p><strong>موافقة على التواصل عبر البريد الإلكتروني:</strong> بمجرد موافقتك وتسجيلك، فإنك توافق على أن نرسل لك رسائل عبر البريد الإلكتروني المسجل. هذا يشمل التحديثات الهامة، وعروض خاصة، ومعلومات حول خدماتنا.</p>
+        </div>
+
+        <section class="terms-section">
+            <h2>مقدمة</h2>
+            <p>مرحباً بك في TWM3. باستخدامك لموقعنا وخدماتنا، فإنك توافق على الالتزام بشروط الاستخدام التالية. هذه الشروط تحكم علاقة المستخدم بالمنصة وتحدد حقوق وواجبات كل طرف.</p>
+        </section>
+
+        <section class="terms-section">
+            <h2>الحساب</h2>
+            <ul>
+                <li>يجب أن تكون المعلومات التي تقدمها دقيقة وكاملة</li>
+                <li>أنت مسؤول عن الحفاظ على سرية حسابك</li>
+                <li>يحق لنا إنهاء أو تعليق حسابك في حالة انتهاك الشروط</li>
+                <li>يجب تحديث معلومات حسابك بانتظام</li>
+            </ul>
+        </section>
+
+        <section class="terms-section">
+            <h2>المحتوى والملكية الفكرية</h2>
+            <ul>
+                <li>جميع المحتوى على المنصة محمي بحقوق الملكية الفكرية</li>
+                <li>لا يجوز نسخ أو توزيع المحتوى دون إذن كتابي</li>
+                <li>المحتوى الذي تنشئه يجب أن يحترم حقوق الآخرين</li>
+                <li>نحتفظ بحق إزالة أي محتوى ينتهك حقوق الملكية الفكرية</li>
+            </ul>
+        </section>
+
+        <section class="terms-section">
+            <h2>قواعد السلوك</h2>
+            <p>يجب على المستخدمين:</p>
+            <ul>
+                <li>احترام حقوق وخصوصية الآخرين</li>
+                <li>عدم نشر محتوى مسيء أو غير قانوني</li>
+                <li>عدم استخدام المنصة لأغراض غير مشروعة</li>
+                <li>الالتزام بمعايير المجتمع الرقمي</li>
+            </ul>
+        </section>
+
+        <section class="terms-section">
+            <h2>المدفوعات والاشتراكات</h2>
+            <ul>
+                <li>جميع المدفوعات نهائية ما لم ينص على خلاف ذلك</li>
+                <li>نحتفظ بحق تغيير الأسعار مع إشعار مسبق</li>
+                <li>يمكن إلغاء الاشتراكات وفقاً لسياسة الإلغاء</li>
+                <li>يتم معالجة المدفوعات بشكل آمن عبر بوابات دفع موثوقة</li>
+            </ul>
+        </section>
+
+        <section class="terms-section">
+            <h2>إخلاء المسؤولية</h2>
+            <p>نقدم الخدمة "كما هي" دون أي ضمانات. لا نتحمل المسؤولية عن:</p>
+            <ul>
+                <li>أي أضرار مباشرة أو غير مباشرة</li>
+                <li>انقطاع الخدمة المؤقت</li>
+                <li>دقة المحتوى المقدم من المستخدمين</li>
+                <li>أي خسائر مالية أو بيانات</li>
+            </ul>
+        </section>
+
+        <section class="terms-section">
+            <h2>التعديلات</h2>
+            <p>نحتفظ بحق تعديل هذه الشروط في أي وقت. سيتم إخطار المستخدمين بالتغييرات الجوهرية عبر البريد الإلكتروني المسجل.</p>
+            <p>آخر تحديث: 5 ديسمبر 2025</p>
+        </section>
+
+        <section class="terms-section">
+            <h2>التواصل</h2>
+            <p>لأي استفسارات حول شروط الاستخدام:</p>
+            <div class="contact-info">
+                <ul>
+                    <li><i class="fas fa-envelope"></i> البريد الإلكتروني: twm3@twm3.org</li>
+                    <li><i class="fas fa-globe"></i> موقع الويب: www.twm3.org</li>
+                    <li><i class="fas fa-phone"></i> نموذج الاتصال على موقعنا</li>
+                </ul>
+            </div>
+        </section>
+
+        <div class="last-updated">
+            <p>تم تحديث هذه الشروط آخر مرة في 5 ديسمبر 2025</p>
+        </div>
+    </div>
+
+    <footer id="footer">
+        <div class="container">
+            <div class="social">
+                <h4>Social</h4>
+                <div class="img">
+                    <a href="index.html"><img src="img/logo.png" alt="" /></a>
+                </div>
+                <ul>
+                    <a target="_blank" href="https://facebook.com/teamworkm3"><img src="img/Facebook-1.png" alt="" /></a>
+                    <a target="_blank" href="https://youtube.com/@twm3"><img src="img/Youtube-1.png" alt="" /></a>
+                    <a target="_blank" href="https://instagram.com/mo_hussien_20"><img src="img/Instagram-1.png" alt="" /></a>
+                    <a target="_blank" href="https://t.me/teamworkm3"><img src="img/Telegram-1.png" alt="" /></a>
+                </ul>
+            </div>
+            <div class="pages">
+                <h4>pages</h4>
+                <ul>
+                    <li><a href="index.html">الرئيسيه</a></li>
+                    <li><a href="courses.html">الكورسات</a></li>
+                    <li><a href="portfolio.html">مشاريعنا</a></li>
+                    <li><a href="roadmap.html">مسارات التعلم</a></li>
+                </ul>
+            </div>
+            <div class="news">
+                <h4>Blog</h4>
+                <ul>
+                    <li><a href="blog-details.html">ازالة قفل الهاتف</a></li>
+                    <li><a href="blog-details2.html">تغيير موقعك على الخريطه</a></li>
+                    <li><a href="blog-details3.html">الربح من ثغرات الويب</a></li>
+                    <li><a href="blog-details4.html">ازاى تحمى نفسك من الاختراق</a></li>
+                </ul>
+            </div>
+        </div>
+        <p>© copy - all Rights Reserved, created by <span>❤</span> by twm3</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

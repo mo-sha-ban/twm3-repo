@@ -1,0 +1,18 @@
+[
+    {
+        "id": 1,
+        "title": "android hacking",
+        "description": "Learn how to hack Android applications.",
+        "price": 99.99,
+        "type": "security",
+        "icon": "fa fa-phone-square"
+    },
+    {
+        "id": 2,
+        "title": "wifi hacking",
+        "description": "Master the art of WiFi hacking.",
+        "price": 79.99,
+        "type": "security",
+        "icon": "fa fa-wifi"
+    }
+]
