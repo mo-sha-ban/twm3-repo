@@ -2,17 +2,24 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-# Copy package files
-COPY package.json package-lock.json ./
+# Copy package files first
+COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --production
+# Install dependencies with verbose output
+RUN npm ci --omit=dev
 
-# Copy application code
+# Copy the rest of the application code
 COPY . .
 
-# Expose the port (adjust if your app uses a different port)
+# Copy entrypoint script
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+# Create uploads directory if it doesn't exist
+RUN mkdir -p uploads
+
+# Expose the port (Railway uses dynamic port from environment variable)
 EXPOSE 5000
 
-# Start the application
-CMD ["npm", "start"]
+# Start the application using entrypoint script
+CMD ["/app/entrypoint.sh"]

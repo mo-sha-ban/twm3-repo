@@ -1,0 +1,70 @@
+# Railway ignore file - files not needed in production
+
+# Frontend files
+*.html
+css/
+img/
+js/
+Pages/
+assets/
+*.html
+
+# Development files
+test/
+*.test.js
+.vscode/
+.idea/
+.qodo/
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+README*
+DOCKER_*
+START_HERE*
+TROUBLESHOOTING.md
+DEPLOYMENT_*
+BACKEND_STATUS.md
+COMPLETION_SUMMARY.md
+CREDENTIALS_SUMMARY.md
+ENVIRONMENT_VARIABLES.md
+FILES_TO_UPDATE.md
+FINAL_SUMMARY.md
+HOSTING_SETUP.txt
+INDEX.md
+NEXT_STEPS.md
+PROFILE_README.md
+PROJECT_SUMMARY.md
+QUICK_GUIDE_AR.md
+UPDATES_README.md
+WHY_BACKEND_NOT_WORKING.md
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary
+tmp/
+temp/
+
+# Environment files (loaded at runtime)
+.env
+.env.local
+
+# Test/build artifacts
+build/
+dist/
+coverage/
+node_modules/.cache/
+
+# Package manager files
+npm-debug.log
+yarn-error.log

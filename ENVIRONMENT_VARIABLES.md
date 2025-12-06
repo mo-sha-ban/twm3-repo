@@ -58,7 +58,7 @@ GITHUB_CALLBACK_URL=http://localhost:5000/api/auth/github/callback
 FRONTEND_BASE_URL=http://localhost:5000
 ```
 - Development: يشير إلى localhost
-- Production: يشير إلى teamworkm3.com
+- Production: يشير إلى twm3.org
 
 ---
 
@@ -77,9 +77,9 @@ GITHUB_CALLBACK_URL=http://localhost:5000/api/auth/github/callback
 ```
 PORT=5000
 NODE_ENV=production
-FRONTEND_BASE_URL=https://teamworkm3.com
-GOOGLE_CALLBACK_URL=https://api.teamworkm3.com/api/auth/google/callback
-GITHUB_CALLBACK_URL=https://api.teamworkm3.com/api/auth/github/callback
+FRONTEND_BASE_URL=https://twm3.org
+GOOGLE_CALLBACK_URL=https://api.twm3.org/api/auth/google/callback
+GITHUB_CALLBACK_URL=https://api.twm3.org/api/auth/github/callback
 ```
 
 ---

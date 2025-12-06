@@ -1,0 +1,13 @@
+# Railway configuration for TWM3 Backend
+builder: dockerfile
+dockerfile: twm3-backend/Dockerfile
+
+# Service configuration
+services:
+  - name: twm3-backend
+    builder: dockerfile
+    dockerfile: twm3-backend/Dockerfile
+    
+# Environment variables (set in Railway dashboard or here)
+# PORT is automatically set by Railway
+# Other variables should be set in Railway dashboard for security
