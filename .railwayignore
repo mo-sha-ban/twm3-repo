@@ -1,29 +1,22 @@
-# Railway ignore file - files not needed in production
+# Railway ignore file - optimize build
 
-# Frontend files
+# Frontend files (not needed for backend)
 *.html
 css/
 img/
 js/
 Pages/
 assets/
-*.html
 
-# Development files
+# Development & testing
 test/
 *.test.js
 .vscode/
 .idea/
 .qodo/
 
-# Git
-.git
-.gitignore
-.gitattributes
-
-# Documentation
+# Documentation (not needed in deployment)
 *.md
-README*
 DOCKER_*
 START_HERE*
 TROUBLESHOOTING.md
@@ -42,8 +35,12 @@ PROJECT_SUMMARY.md
 QUICK_GUIDE_AR.md
 UPDATES_README.md
 WHY_BACKEND_NOT_WORKING.md
+URL_UPDATE_SUMMARY.md
 
-# OS files
+# Git & OS
+.git
+.gitignore
+.gitattributes
 .DS_Store
 Thumbs.db
 
@@ -51,20 +48,44 @@ Thumbs.db
 *.log
 logs/
 
-# Temporary
+# Temp files
 tmp/
 temp/
-
-# Environment files (loaded at runtime)
 .env
-.env.local
 
-# Test/build artifacts
+# Unnecessary config files
+htaccess
+websitepath.htaccess
+check-readiness.ps1
+check-readiness.sh
+restart-server.ps1
+rebuild-docker.ps1
+install-deps-docker.ps1
+test-docker-setup.ps1
+
+# Build artifacts
 build/
 dist/
 coverage/
 node_modules/.cache/
 
-# Package manager files
-npm-debug.log
-yarn-error.log
+# Additional frontend stuff
+user_data_deletion.html
+data-deletion.html
+data-deletion-status.html
+*.html
+
+# JSON data files (not needed runtime)
+courses.json
+data.json
+products.json
+paid-courses.json
+users.json
+deployment-config.json
+
+# Controllers/routes with special purposes
+controllers/
+routes/
+
+# These folders should be included: models/, middlewares/, public/, uploads/
+
