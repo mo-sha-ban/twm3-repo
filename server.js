@@ -63,7 +63,9 @@ app.use(helmet({
             connectSrc: [
                 "'self'",
                 "http://localhost:5000",
-                "https://api.teamworkm3.com",
+                "https://teamworkm3.com",
+                "https://api.twm3.org",
+                "https://twm3.org",
                 "https://cdn.plyr.io",
                 "https://noembed.com",
                 "https://www.youtube.com",
@@ -78,8 +80,8 @@ app.use(helmet({
     }
 }));
 app.use(cors({
-    origin: process.env.NODE_ENV === 'production' 
-        ? ['https://teamworkm3.com', 'https://www.teamworkm3.com', 'https://api.teamworkm3.com']
+    origin: process.env.NODE_ENV === 'production'
+        ? ['https://twm3.org', 'https://www.twm3.org', 'https://api.twm3.org', 'https://twm3.org']
         : ['http://localhost:5000', 'http://localhost:3000', 'http://127.0.0.1:3000', 'http://127.0.0.1:5000'],
     credentials: true
 }));
