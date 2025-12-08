@@ -433,17 +433,8 @@ function requireAuthToken(req, res, next) {
     }
 }
 
-// Serve static frontend files (but NOT /uploads - that's handled by custom route above)
-// IMPORTANT: This middleware must come AFTER the /uploads/:fileName route
-app.use(express.static(path.join(__dirname, ".."), {
-    extensions: ["html"],
-    setHeaders: (res, path) => {
-        // Ensure JS files have correct content type
-        if (path.endsWith('.js')) {
-            res.setHeader('Content-Type', 'text/javascript');
-        }
-    }
-}));
+// NOTE: Frontend is hosted separately on Hostinger, not served from this backend
+// Only API endpoints and uploads are served here
 
 // Special route for data deletion status page
 app.get("/data-deletion-status", (req, res) => {
