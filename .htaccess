@@ -16,11 +16,11 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 # Proxy API requests to Vercel backend
 # Redirect all /api/* requests to Vercel
 RewriteCond %{REQUEST_URI} ^/api/
-RewriteRule ^api/(.*)$ https://twm3.vercel.app/api/$1 [P,L]
+RewriteRule ^api/(.*)$ https://twm3-repo.vercel.app/api/$1 [P,L]
 
 # Proxy /uploads/* requests to Vercel (if backend serves uploads)
 RewriteCond %{REQUEST_URI} ^/uploads/
-RewriteRule ^uploads/(.*)$ https://twm3.vercel.app/uploads/$1 [P,L]
+RewriteRule ^uploads/(.*)$ https://twm3-repo.vercel.app/uploads/$1 [P,L]
 
 # Security Headers
 <IfModule mod_headers.c>
