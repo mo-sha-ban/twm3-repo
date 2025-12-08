@@ -1,0 +1,21 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./twm3-backend
+    container_name: twm3-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - ./twm3-backend/.env.production
+    volumes:
+      - ./twm3-backend/uploads:/app/uploads
+    restart: unless-stopped
+    networks:
+      - twm3-network
+
+networks:
+  twm3-network:
+    driver: bridge

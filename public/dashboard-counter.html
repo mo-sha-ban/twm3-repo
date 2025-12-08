@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Marhey:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="img/TransLogo.png">
+    <title>إدارة عداد المتدربين - TWM3 platform</title>
+</head>
+<body>
+    <div class="dash-header">
+        <div class="container">
+            <div class="text">
+                <a href="dashboard.html"><h3>إدارة عداد المتدربين</h3></a>
+            </div>
+            <div class="content">
+                <div class="icon">
+                    <div id="colorMode" class="theme">
+                        <i class="fa-solid fa-moon moon"></i>
+                        <i class="fa-solid fa-sun sun"></i>
+                    </div>
+                </div>
+                <div class="user">
+                    <img src="img/dash-img.jpg" alt="">
+                    <p>twm3</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="dash-content">
+        <div class="container">
+            <div class="counter-settings">
+                <h2>إعدادات عداد المتدربين</h2>
+                <form id="counterConfigForm" class="settings-form">
+                    <div class="form-group">
+                        <label for="baseCount">العدد الأساسي للمتدربين:</label>
+                        <input type="number" id="baseCount" name="baseCount" min="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="dailyIncrement">الزيادة اليومية:</label>
+                        <input type="number" id="dailyIncrement" name="dailyIncrement" min="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="startDate">تاريخ البدء:</label>
+                        <input type="date" id="startDate" name="startDate" required>
+                    </div>
+
+                    <div class="preview-section">
+                        <h3>معاينة العداد:</h3>
+                        <div class="counter-preview">
+                            <span id="counterPreview">0</span>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="save-btn">حفظ التغييرات</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="up">
+        <i class="fa-solid fa-arrow-up"></i>
+    </div>
+
+    <script src="js/counter-admin.js"></script>
+    <script src="dash.js"></script>
+</body>
+</html>

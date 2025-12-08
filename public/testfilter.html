@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>فلتر الكورسات</title>
+    <style>
+      .course {
+        display: block; /* إظهار جميع الكورسات بشكل افتراضي */
+      }
+      .hidden {
+        display: none; /* إخفاء الكورسات عند الحاجة */
+      }
+      .filter-button {
+        margin: 5px;
+        padding: 10px;
+        cursor: pointer;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        transition: background-color 0.3s; /* تأثير انتقال لون الخلفية */
+      }
+      .filter-button.active {
+        background-color: #0056b3; /* لون الخلفية عند اختيار الزر */
+        transform: scale(1.05); /* تأثير تكبير الزر المختار */
+      }
+    </style>
+  </head>
+  <body>
+    <h1>اختر الفلتر</h1>
+    <button class="filter-button" onclick="filterCourses('programming')">
+      برمجه
+    </button>
+    <button class="filter-button" onclick="filterCourses('cybersecurity')">
+      سايبر سكيورتي
+    </button>
+    <button class="filter-button" onclick="filterCourses('all')">الكل</button>
+
+    <div id="courses">
+      <div class="course programming">كورسات البرمجة 1</div>
+      <div class="course programming">كورسات البرمجة 2</div>
+      <div class="course cybersecurity">كورسات السايبر سكيورتي 1</div>
+      <div class="course cybersecurity">كورسات السايبر سكيورتي 2</div>
+      <div class="course programming">كورسات البرمجة 3</div>
+      <div class="course cybersecurity">كورسات السايبر سكيورتي 3</div>
+    </div>
+
+    <script>
+      function filterCourses(filter, button) {
+        const courses = document.querySelectorAll(".course");
+        courses.forEach((course) => {
+          if (filter === "all") {
+            course.classList.remove("hidden");
+          } else {
+            course.classList.toggle(
+              "hidden",
+              !course.classList.contains(filter)
+            );
+          }
+        });
+
+        // إزالة الكلاس "active" من جميع الأزرار
+        const buttons = document.querySelectorAll(".filter-button");
+        buttons.forEach((btn) => btn.classList.remove("active"));
+
+        // إضافة الكلاس "active" للزر المختار
+        button.classList.add("active");
+      }
+    </script>
+  </body>
+</html>

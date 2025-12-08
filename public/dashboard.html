@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/normalize.css">
+    <!-- <link rel="stylesheet" href="css/all.min.css"> -->
+    <link rel="stylesheet" href="https://cdn.quilljs.com/1.3.6/quill.snow.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Marhey:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="img/TransLogo.png">
+    <script src="js/socket.io.min.js"></script>
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <style>
+        .ql-toolbar { display: block !important; visibility: visible !important; }
+        .ql-container { border-bottom: 1px solid #ccc; border-left: 1px solid #ccc; border-right: 1px solid #ccc; }
+        #productDescription { border-top: 1px solid #ccc; }
+
+        /* --- Updated Styles for Quill Editor --- */
+
+        /* Editor container: Flexible height and resizable */
+        #productLongDescriptionContainer {
+            display: flex;
+            flex-direction: column;
+            min-height: 250px; /* Start smaller, let it grow */
+            max-height: 80vh; /* Don't take up the whole screen */
+            height: 400px; /* Default starting height */
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            resize: vertical; /* Allow user to resize vertically */
+            overflow: hidden; /* Important for resize to work well */
+        }
+        
+        #productLongDescription {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        #productLongDescription .ql-toolbar {
+            flex-shrink: 0;
+            border-bottom: 1px solid #ccc;
+        }
+        
+        #productLongDescription .ql-container {
+            flex: 1;
+            overflow-y: auto; /* Scroll inside the editor */
+        }
+        
+        #productLongDescription .ql-editor {
+            min-height: 200px; /* Ensure a minimum typing area */
+        }
+
+        /* 
+         * Media Preview in Editor: 
+         * - Targets img, video, and iframes for consistent styling.
+         * - Makes them small, inline thumbnails for better layout management.
+        */
+        #productLongDescription .ql-editor img,
+        #productLongDescription .ql-editor video,
+        #productLongDescription .ql-editor iframe {
+            max-width: 180px;
+            max-height: 120px;
+            border-radius: 8px;
+            margin: 10px 5px;
+            object-fit: cover; /* Changed from contain for better fill */
+            display: inline-block;
+            vertical-align: middle;
+            cursor: pointer;
+            border: 2px solid #ddd;
+            transition: all 0.2s;
+            background-color: #f0f0f0; /* Placeholder color for loading media */
+        }
+        
+        #productLongDescription .ql-editor img:hover,
+        #productLongDescription .ql-editor video:hover,
+        #productLongDescription .ql-editor iframe:hover {
+            border-color: #3498db;
+            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Add a "play" icon overlay for video embeds to make them identifiable */
+        #productLongDescription .ql-editor .ql-video {
+            position: relative;
+            display: inline-block;
+        }
+        #productLongDescription .ql-editor .ql-video::after {
+            content: '\f144'; /* FontAwesome play icon */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.8);
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+            pointer-events: none; /* Let clicks go to the video/iframe */
+        }
+        
+        /* Upload Video Button Styling */
+        .ql-toolbar .ql-uploadVideo {
+            width: 32px;
+            height: 32px;
+            border: 1px solid #ccc;
+            background: white;
+            border-radius: 3px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+        
+        .ql-toolbar .ql-uploadVideo:hover {
+            background: #f0f0f0;
+            color: #3498db;
+        }
+        
+        .ql-toolbar .ql-uploadVideo i {
+            font-size: 14px;
+        }
+    </style>
+    <title>TWM3 platform</title>
+</head>
+<body >
+    
+        <!-- -------------------------------------------Start Header-------------------------------- -->
+        <div class="dash-header">
+            <div class="container">
+                <div class="text">
+                    <a href="dashboard.html"><h3>Dashboard</h3></a>
+                </div>
+                <div class="content">
+                    <div class="icon">
+                        <div id="colorMode" class="theme">
+                            <i  class="fa-solid fa-moon moon"></i>
+                            <i  class="fa-solid fa-sun sun"></i>
+                        </div>
+                    </div>
+                    <div class="user">
+                        <img src="img/dash-img.jpg" alt="">
+                        <p>twm3</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- ---------------------------------------------End Header--------------------------------------- -->
+    
+        <!-- header message button badge (example) -->
+        <script>
+            // add notification badge if not present in header (for older header markup)
+            (function(){
+                const headerRight = document.querySelector('.dash-header .content');
+                if(!headerRight) return;
+                if(!headerRight.querySelector('.action-btn.envelope-btn')){
+                    const btn = document.createElement('button');
+                    btn.className = 'action-btn envelope-btn';
+                    btn.title = 'الرسائل';
+                    btn.innerHTML = '<i class="fas fa-envelope"></i><span class="notification-badge" style="display:none"></span>';
+                    headerRight.insertBefore(btn, headerRight.firstChild);
+                }
+            })();
+        </script>
+
+
+
+
+        <div class="dash-content">
+            <div class="container">
+                <div class="sidebar">
+                    <a href="#">
+                        <div class="icon">
+                            <i class="fa-solid fa-house"></i>
+                        </div>
+                        <div class="text">
+                            <p>home</p>
+                        </div>
+                    </a>
+
+
+                    <ul class="dash-down">
+                        <li>
+                            <a  href="#">
+                                <div class="icon">
+                                    <i class="fa-solid fa-users"></i>
+                                </div>
+                                <div class="text">
+                                    <p>mermbers</p>
+                                </div>
+                            </a>
+                            <ul class="dash-down-items">
+                                <a  href="#">
+                                    <div class="icon">
+                                        <i class="fa-solid fa-user-check"></i>
+                                    </div>
+                                    <div class="text">
+                                        <p>active members</p>
+                                    </div>
+                                </a>
+                                <a  href="#">
+                                    <div class="icon">
+                                        <i class="fa-solid fa-user-xmark"></i>
+                                    </div>
+                                    <div class="text">
+                                        <p>inctive members</p>
+                                    </div>
+                                </a>
+                                <a  href="#">
+                                    <div class="icon">
+                                        <i class="fa-solid fa-user-gear"></i>
+                                    </div>
+                                    <div class="text">
+                                        <p>admins</p>
+                                    </div>
+                                </a>
+                            </ul>
+                        </li>
+                    </ul>
+
+
+                    <ul class="dash-down">
+                        <li>
+                            <a  href="#">
+                                <div class="icon">
+                                    <i class="fa-solid fa-graduation-cap"></i>                                </div>
+                                <div class="text">
+                                    <p>Courses</p>
+                                </div>
+                            </a>
+                            <ul class="dash-down-items">
+                                <a  href="#">
+                                    <div class="icon">
+                                        <i class="fa-solid fa-pen-to-square"></i>
+                                    </div>
+                                    <div class="text">
+                                        <p>make a course</p>
+                                    </div>
+                                </a>
+                                <a  href="#">
+                                    <div class="icon">
+                                        <i class="fa-solid fa-globe"></i>
+                                    </div>
+                                    <div class="text">
+                                        <p>all courses</p>
+                                    </div>
+                                </a>
+                                <a  href="#">
+                                    <div class="icon">
+                                        <i class="fa-solid fa-music"></i>
+                                    </div>
+                                    <div class="text">
+                                        <p>playlists</p>
+                                    </div>
+                                </a>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <ul class="dash-down">
+                        <li>
+                            <a href="#">
+                                <div class="icon">
+                                    <i class="fa-solid fa-gear"></i>
+                                </div>
+                                <div class="text">
+                                    <p>settings</p>
+                                </div>
+                            </a>
+                            <ul class="dash-down-items">
+                                <li>
+                                    <a href="#" id="openCounterFromSidebar">
+                                        <div class="icon">
+                                            <i class="fa-solid fa-users-viewfinder"></i>
+                                        </div>
+                                        <div class="text">
+                                            <p>عداد المتدربين</p>
+                                        </div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+
+
+                <div class="dash-info">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>id</th>
+                                <th>first name</th>
+                                <th>last name</th>
+                                <th>user name</th>
+                                <th>email</th>
+                                <th>pass</th>
+                                <th>number</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>mostafa</td>
+                                <td>shaban</td>
+                                <td>moshabna</td>
+                                <td>mostafashaban@gmail.com</td>
+                                <td>***********</td>
+                                <td>+20xxxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>mostafa</td>
+                                <td>shaban</td>
+                                <td>moshabna</td>
+                                <td>mostafashaban@gmail.com</td>
+                                <td>***********</td>
+                                <td>+20xxxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>mostafa</td>
+                                <td>shaban</td>
+                                <td>moshabna</td>
+                                <td>mostafashaban@gmail.com</td>
+                                <td>***********</td>
+                                <td>+20xxxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <td>4</td>
+                                <td>mostafa</td>
+                                <td>shaban</td>
+                                <td>moshabna</td>
+                                <td>mostafashaban@gmail.com</td>
+                                <td>***********</td>
+                                <td>+20xxxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <td>5</td>
+                                <td>mostafa</td>
+                                <td>shaban</td>
+                                <td>moshabna</td>
+                                <td>mostafashaban@gmail.com</td>
+                                <td>***********</td>
+                                <td>+20xxxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <td>6</td>
+                                <td>mostafa</td>
+                                <td>shaban</td>
+                                <td>moshabna</td>
+                                <td>mostafashaban@gmail.com</td>
+                                <td>***********</td>
+                                <td>+20xxxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <td>7</td>
+                                <td>mostafa</td>
+                                <td>shaban</td>
+                                <td>moshabna</td>
+                                <td>mostafashaban@gmail.com</td>
+                                <td>***********</td>
+                                <td>+20xxxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <td>8</td>
+                                <td>mostafa</td>
+                                <td>shaban</td>
+                                <td>moshabna</td>
+                                <td>mostafashaban@gmail.com</td>
+                                <td>***********</td>
+                                <td>+20xxxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <td>9</td>
+                                <td>mostafa</td>
+                                <td>shaban</td>
+                                <td>moshabna</td>
+                                <td>mostafashaban@gmail.com</td>
+                                <td>***********</td>
+                                <td>+20xxxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <td>10</td>
+                                <td>mostafa</td>
+                                <td>shaban</td>
+                                <td>moshabna</td>
+                                <td>mostafashaban@gmail.com</td>
+                                <td>***********</td>
+                                <td>+20xxxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <td>11</td>
+                                <td>mostafa</td>
+                                <td>shaban</td>
+                                <td>moshabna</td>
+                                <td>mostafashaban@gmail.com</td>
+                                <td>***********</td>
+                                <td>+20xxxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <td>12</td>
+                                <td>mostafa</td>
+                                <td>shaban</td>
+                                <td>moshabna</td>
+                                <td>mostafashaban@gmail.com</td>
+                                <td>***********</td>
+                                <td>+20xxxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <td>13</td>
+                                <td>mostafa</td>
+                                <td>shaban</td>
+                                <td>moshabna</td>
+                                <td>mostafashaban@gmail.com</td>
+                                <td>***********</td>
+                                <td>+20xxxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <td>14</td>
+                                <td>mostafa</td>
+                                <td>shaban</td>
+                                <td>moshabna</td>
+                                <td>mostafashaban@gmail.com</td>
+                                <td>***********</td>
+                                <td>+20xxxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <td>15</td>
+                                <td>mostafa</td>
+                                <td>shaban</td>
+                                <td>moshabna</td>
+                                <td>mostafashaban@gmail.com</td>
+                                <td>***********</td>
+                                <td>+20xxxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <td>16</td>
+                                <td>mostafa</td>
+                                <td>shaban</td>
+                                <td>moshabna</td>
+                                <td>mostafashaban@gmail.com</td>
+                                <td>***********</td>
+                                <td>+20xxxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <td>17</td>
+                                <td>mostafa</td>
+                                <td>shaban</td>
+                                <td>moshabna</td>
+                                <td>mostafashaban@gmail.com</td>
+                                <td>***********</td>
+                                <td>+20xxxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <td>18</td>
+                                <td>mostafa</td>
+                                <td>shaban</td>
+                                <td>moshabna</td>
+                                <td>mostafashaban@gmail.com</td>
+                                <td>***********</td>
+                                <td>+20xxxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <td>19</td>
+                                <td>mostafa</td>
+                                <td>shaban</td>
+                                <td>moshabna</td>
+                                <td>mostafashaban@gmail.com</td>
+                                <td>***********</td>
+                                <td>+20xxxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <td>20</td>
+                                <td>mostafa</td>
+                                <td>shaban</td>
+                                <td>moshabna</td>
+                                <td>mostafashaban@gmail.com</td>
+                                <td>***********</td>
+                                <td>+20xxxxxxxx</td>
+                            </tr>
+                            <tr>
+                                <td>21</td>
+                                <td>mostafa</td>
+                                <td>shaban</td>
+                                <td>moshabna</td>
+                                <td>mostafashaban@gmail.com</td>
+                                <td>***********</td>
+                                <td>+20xxxxxxxx</td>
+                            </tr>
+                            
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Settings section embedded into dashboard -->
+                <section id="settings-section" class="content-section active" style="display: block; margin-top: 2rem;">
+                    <div class="section-header" style="display:flex; justify-content:space-between; align-items:center;">
+                        <h2>الإعدادات</h2>
+                        <button id="add-product-button" class="btn btn-primary">إضافة منتج</button>
+                    </div>
+
+                    <div class="settings-grid">
+                        <div class="settings-card">
+                            <div class="settings-icon">
+                                <i class="fas fa-palette"></i>
+                            </div>
+                            <h3>إعدادات المظهر</h3>
+                            <p>تخصيص ألوان وثيم الموقع</p>
+                            <button class="btn btn-secondary">تخصيص</button>
+                        </div>
+
+                        <div class="settings-card">
+                            <div class="settings-icon">
+                                <i class="fas fa-bell"></i>
+                            </div>
+                            <h3>الإشعارات</h3>
+                            <p>إدارة إعدادات الإشعارات</p>
+                            <button class="btn btn-secondary">إعدادات</button>
+                        </div>
+
+                        <div class="settings-card">
+                            <div class="settings-icon">
+                                <i class="fas fa-shield-alt"></i>
+                            </div>
+                            <h3>الأمان</h3>
+                            <p>إعدادات الأمان والحماية</p>
+                            <button class="btn btn-secondary">تأمين</button>
+                        </div>
+
+                        <!-- Counter card (opens inline modal) -->
+                        <div class="settings-card">
+                            <div class="settings-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <h3>عداد المتدربين</h3>
+                            <p>تحكم في إحصائيات المتدربين</p>
+                            <button id="openCounterSettings" class="btn btn-primary">تخصيص</button>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+
+        
+        
+        
+        
+        
+    <!-- Start up tp top  -->
+    <div class="up">
+        <i class="fa-solid fa-arrow-up"></i>
+    </div>
+    <!-- End up tp top  -->
+    
+
+    <!-- Counter Modal (inline editor for settings) -->
+    <div id="counterModal" class="modal" aria-hidden="true">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>إعدادات عداد المتدربين</h3>
+                <button id="closeCounterModal" class="modal-close">×</button>
+            </div>
+            <form id="counterConfigForm" class="settings-form" style="padding:1.5rem;">
+                <div class="form-group">
+                    <label for="baseCount">العدد الأساسي للمتدربين:</label>
+                    <input type="number" id="baseCount" name="baseCount" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="dailyIncrement">الزيادة اليومية:</label>
+                    <input type="number" id="dailyIncrement" name="dailyIncrement" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="startDate">تاريخ البدء:</label>
+                    <input type="date" id="startDate" name="startDate" required>
+                </div>
+                <div class="preview-section">
+                    <h3>معاينة العداد:</h3>
+                    <div class="counter-preview"><span id="counterPreview">0</span></div>
+                </div>
+                <button type="submit" class="save-btn">حفظ التغييرات</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/counter-admin.js"></script>
+    <script>
+        // Inline modal handling and form wiring for dashboard
+        (function(){
+            const openBtn = document.getElementById('openCounterSettings');
+            const sidebarOpen = document.getElementById('openCounterFromSidebar');
+            const modal = document.getElementById('counterModal');
+            const closeBtn = document.getElementById('closeCounterModal');
+
+            let _dashboardPreviewInterval = null;
+            function showModal(){
+                modal.classList.add('show');
+                modal.setAttribute('aria-hidden','false');
+                // load config into fields
+                loadConfig();
+                // start live per-second preview if not running
+                if(!_dashboardPreviewInterval){
+                    _dashboardPreviewInterval = setInterval(updatePreview, 1000);
+                }
+            }
+
+            function hideModal(){
+                modal.classList.remove('show');
+                modal.setAttribute('aria-hidden','true');
+                if(_dashboardPreviewInterval){
+                    clearInterval(_dashboardPreviewInterval);
+                    _dashboardPreviewInterval = null;
+                }
+            }
+
+            openBtn && openBtn.addEventListener('click', (e)=>{ e.preventDefault(); showModal(); });
+            sidebarOpen && sidebarOpen.addEventListener('click', (e)=>{ e.preventDefault(); showModal(); });
+            closeBtn && closeBtn.addEventListener('click', hideModal);
+            modal && modal.addEventListener('click', (e)=>{ if(e.target === modal) hideModal(); });
+
+            // Load config and populate form
+            async function loadConfig(){
+                try{
+                    const token = localStorage.getItem('token');
+                    const getHeaders = token ? { 'Authorization': 'Bearer ' + token } : {};
+                    const res = await fetch('/api/counter-config', { headers: getHeaders });
+                    if(!res.ok) throw new Error('فشل في جلب الإعدادات');
+                    const cfg = await res.json();
+                    document.getElementById('baseCount').value = cfg.baseCount || 0;
+                    document.getElementById('dailyIncrement').value = cfg.dailyIncrement || 0;
+                    const start = cfg.startDate ? new Date(Number(cfg.startDate)) : new Date();
+                    document.getElementById('startDate').value = start.toISOString().split('T')[0];
+                    updatePreview();
+                }catch(err){
+                    console.error(err);
+                    alert('حدث خطأ أثناء تحميل إعدادات العداد');
+                }
+            }
+
+            function updatePreview(){
+                const base = Number(document.getElementById('baseCount').value) || 0;
+                const inc = Number(document.getElementById('dailyIncrement').value) || 0;
+                const sd = document.getElementById('startDate').value;
+                if(!sd) return;
+                const startTs = new Date(sd).getTime();
+                const seconds = Math.max(0, (Date.now() - startTs) / 1000);
+                const perSecond = inc / 86400;
+                const total = base + (seconds * perSecond);
+                document.getElementById('counterPreview').textContent = new Intl.NumberFormat('en-US').format(Math.max(0, Math.floor(total))) + '+';
+            }
+
+            // wire inputs
+            ['baseCount','dailyIncrement','startDate'].forEach(id=>{
+                const el = document.getElementById(id);
+                el && el.addEventListener('input', updatePreview);
+                el && el.addEventListener('change', updatePreview);
+            });
+
+            // submit handler
+            document.getElementById('counterConfigForm').addEventListener('submit', async function(e){
+                e.preventDefault();
+                const baseCount = Number(document.getElementById('baseCount').value);
+                const dailyIncrement = Number(document.getElementById('dailyIncrement').value);
+                const startDate = new Date(document.getElementById('startDate').value).getTime();
+
+                try{
+                    const token = localStorage.getItem('token');
+                    const headers = token ? { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token } : { 'Content-Type': 'application/json' };
+                    const res = await fetch('/api/counter-config', {
+                        method: 'PUT',
+                        headers,
+                        body: JSON.stringify({ baseCount, dailyIncrement, startDate })
+                    });
+                    if(!res.ok){
+                        const data = await res.json().catch(()=>({}));
+                        throw new Error(data.error || 'فشل في حفظ الإعدادات');
+                    }
+                    alert('تم حفظ الإعدادات بنجاح');
+                    hideModal();
+                }catch(err){
+                    console.error(err);
+                    alert('حدث خطأ أثناء حفظ الإعدادات (تأكد من أنك أدمن ومسجل دخول)');
+                }
+            });
+        })();
+    </script>
+
+    <!-- Product Modal -->
+    <div id="productModal" class="modal" aria-hidden="true" style="display:none;">
+        <div class="modal-content" style="max-width:600px;">
+            <div class="modal-header">
+                <h3 id="productModalTitle">إضافة منتج جديد</h3>
+                <button class="modal-close" onclick="document.getElementById('productModal').style.display='none';">×</button>
+            </div>
+            <form id="addProductForm" style="padding:1.5rem;">
+                <div class="form-group">
+                    <label for="productName">اسم المنتج:</label>
+                    <input type="text" id="productName" required>
+                </div>
+                <div class="form-group">
+                    <label for="productDescription">الوصف المختصر:</label>
+                    <textarea id="productDescription" required rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="productLongDescription">الوصف التفصيلي (أضغط على زر الفيديو لإضافة فيديو):</label>
+                    <div id="productLongDescription"></div>
+                </div>
+                <div class="form-group">
+                    <label for="productPrice">السعر:</label>
+                    <input type="number" id="productPrice" required>
+                </div>
+                <div class="form-group">
+                    <label for="productCategory">الفئة:</label>
+                    <input type="text" id="productCategory">
+                </div>
+                <div class="form-group">
+                    <label for="productRating">التقييم:</label>
+                    <input type="number" id="productRating" min="0" max="5">
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="productInStock"> متوفر في المخزن
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="productFeatured"> منتج مميز
+                    </label>
+                </div>
+                
+                <!-- Primary Image -->
+                <div class="form-group">
+                    <label>الصورة الأساسية:</label>
+                    <div id="primaryImageSlot" style="border:2px dashed #ccc; padding:20px; text-align:center; cursor:pointer; background:#f9f9f9;">
+                        <i class="fas fa-image" style="font-size:2rem; color:#999;"></i>
+                        <p>اضغط لاختيار صورة أساسية</p>
+                    </div>
+                    <div id="primaryImagePreview" style="display:none; margin-top:10px;">
+                        <img id="primaryImageImg" alt="Primary product image" style="max-width:100%; max-height:200px; border-radius:4px;">
+                        <button type="button" onclick="removePrimaryImage()" class="btn btn-secondary" style="margin-top:10px;">حذف</button>
+                    </div>
+                    <input type="file" id="primaryImage" style="display:none;" accept="image/*">
+                </div>
+
+                <!-- Media/Attachments -->
+                <div class="form-group">
+                    <label>الوسائط (صور، فيديو، ملفات):</label>
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px;">
+                        <!-- Add Images Button -->
+                        <div class="add-media-slot" id="addImagesBtn" style="border:2px dashed #4CAF50; padding:20px; text-align:center; cursor:pointer; background:#f1f8f4;">
+                            <i class="fas fa-images" style="font-size:2rem; color:#4CAF50;"></i>
+                            <span style="display:block; margin-top:10px; color:#4CAF50; font-weight:bold;">إضافة صور</span>
+                            <small style="color:#4CAF50;">اختر عدة صور دفعة واحدة</small>
+                        </div>
+                        <!-- Add Videos Button -->
+                        <div class="add-media-slot" id="addVideosBtn" style="border:2px dashed #FF9800; padding:20px; text-align:center; cursor:pointer; background:#fff3f0;">
+                            <i class="fas fa-video" style="font-size:2rem; color:#FF9800;"></i>
+                            <span style="display:block; margin-top:10px; color:#FF9800; font-weight:bold;">إضافة فيديوهات</span>
+                            <small style="color:#FF9800;">اختر عدة فيديوهات دفعة واحدة</small>
+                        </div>
+                    </div>
+                    <div id="mediaGrid" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(100px, 1fr)); gap:10px; margin-top:15px;"></div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width:100%; margin-top:20px;">حفظ المنتج</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/ui-toast.js"></script>
+    <script src="js/alert-to-toast.js"></script>
+    <script src="dash.js"></script>
+    <script src="twm3-backend/private/products.js"></script>
+    <script src="js/messages-ui.js"></script>
+    <script src="js/notifications.js"></script>
+    <script>
+        // Helper functions for product modal
+        function openModal(id) {
+            const modal = document.getElementById(id);
+            if(modal) modal.style.display = 'block';
+        }
+        function closeModal(id) {
+            const modal = document.getElementById(id);
+            if(modal) modal.style.display = 'none';
+        }
+        function removePrimaryImage() {
+            const input = document.getElementById('primaryImage');
+            const slot = document.getElementById('primaryImageSlot');
+            const preview = document.getElementById('primaryImagePreview');
+            const img = document.getElementById('primaryImageImg');
+            if (input) input.value = '';
+            if (img) img.src = '';
+            if (slot) slot.style.display = 'block';
+            if (preview) preview.style.display = 'none';
+            window.primaryImageFile = null;
+            window.existingPrimaryImageUrl = null;
+        }
+
+        function setupPrimaryImageHandling() {
+            // This function is now defined in products.js, so we don't need to redefine it here
+            // Just ensure it's called after products.js loads
+            if (typeof window.setupPrimaryImageHandlingDone !== 'undefined') {
+                return;
+            }
+        }
+        // Don't call setupPrimaryImageHandling() here since it's called in products.js
+
+        // Render media grid function
+        window.renderMediaGrid = function() {
+            const grid = document.getElementById('mediaGrid');
+            if (!grid || !window.mediaItems) return;
+            grid.innerHTML = '';
+            window.mediaItems.forEach((item, idx) => {
+                const div = document.createElement('div');
+                div.style.cssText = 'position:relative; border:2px solid #ddd; border-radius:4px; overflow:hidden; background:#f5f5f5; height:100px;';
+                
+                // Create preview based on media type
+                if (item.type === 'image' && (item.previewUrl || item.url)) {
+                    const img = document.createElement('img');
+                    img.src = item.previewUrl || item.url;
+                    img.style.cssText = 'width:100%; height:100%; object-fit:cover;';
+                    img.title = 'صورة';
+                    div.appendChild(img);
+                } else if (item.type === 'video' && (item.previewUrl || item.url)) {
+                    // For videos, create a thumbnail with video icon overlay
+                    const videoContainer = document.createElement('div');
+                    videoContainer.style.cssText = 'width:100%; height:100%; position:relative; background:#000; display:flex; align-items:center; justify-content:center;';
+                    
+                    const icon = document.createElement('i');
+                    icon.className = 'fas fa-play-circle';
+                    icon.style.cssText = 'font-size:3rem; color:#fff; opacity:0.8;';
+                    videoContainer.appendChild(icon);
+                    div.appendChild(videoContainer);
+                } else {
+                    // Default icon for unknown types
+                    div.style.cssText += 'display:flex; align-items:center; justify-content:center;';
+                    const icon = document.createElement('i');
+                    icon.className = item.type === 'video' ? 'fas fa-video' : item.type === 'pdf' ? 'fas fa-file-pdf' : 'fas fa-file';
+                    icon.style.cssText = 'font-size:2rem; color:#999;';
+                    div.appendChild(icon);
+                }
+                
+                // Add type badge
+                const typeBadge = document.createElement('span');
+                typeBadge.style.cssText = 'position:absolute; bottom:2px; left:2px; background:rgba(0,0,0,0.7); color:#fff; padding:2px 6px; font-size:11px; border-radius:3px;';
+                typeBadge.textContent = item.type.toUpperCase();
+                div.appendChild(typeBadge);
+                
+                // Add remove button
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.textContent = '×';
+                removeBtn.style.cssText = 'position:absolute; top:0; right:0; background:red; color:white; border:none; width:24px; height:24px; cursor:pointer; font-size:16px; padding:0; line-height:24px;';
+                removeBtn.onclick = (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    window.mediaItems.splice(idx, 1);
+                    window.renderMediaGrid();
+                };
+                div.appendChild(removeBtn);
+                grid.appendChild(div);
+            });
+        };
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof initProducts === 'function') {
+                initProducts();
+            }
+        });
+    </script>
+    </body>
+    </html>

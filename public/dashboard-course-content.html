@@ -1,0 +1,149 @@
+<!-- ...existing dashboard header... -->
+<div class="course-content-page">
+  <h1>إدارة محتوى الكورس: <span id="courseTitle"></span></h1>
+  <div class="progress-bar-container">
+    <div id="progressBar" style="height:20px;background:#eee;border-radius:8px;overflow:hidden;">
+      <div id="progressFill" style="height:100%;width:0;background:#1e90ff;transition:width 0.5s;"></div>
+    </div>
+    <span id="progressText"></span>
+  </div>
+  <div id="unitsContainer">
+    <!-- سيتم عرض الوحدات والدروس هنا -->
+  </div>
+  <button id="addUnitBtn">إضافة وحدة جديدة</button>
+</div>
+
+<script>
+// جلب بيانات الكورس والوحدات والدروس
+async function loadCourseContent(courseId) {
+  // جلب بيانات الكورس والوحدات والدروس من API
+  const res = await fetch(`/api/courses/${courseId}/content`);
+  const data = await res.json();
+  document.getElementById('courseTitle').textContent = data.title;
+  renderUnits(data.units || []);
+  updateProgressBar(data.progress || 0, data.totalLessons || 1, data.completedLessons || 0);
+}
+
+function renderUnits(units) {
+  const container = document.getElementById('unitsContainer');
+  container.innerHTML = '';
+  units.forEach((unit, unitIdx) => {
+    const unitDiv = document.createElement('div');
+    unitDiv.className = 'unit-box';
+    unitDiv.innerHTML = `
+      <h2>الوحدة: ${unit.title}</h2>
+      <button onclick="addLesson(${unitIdx})">إضافة درس</button>
+      <div class="lessons-list">
+        ${unit.lessons.map((lesson, lessonIdx) => `
+          <div class="lesson-box">
+            <h3>الدرس: ${lesson.title}</h3>
+            <video src="${lesson.videoUrl}" controls style="max-width:300px;" onended="showNextLesson(${unitIdx},${lessonIdx})"></video>
+            <div>${lesson.description}</div>
+            <button onclick="editLesson(${unitIdx},${lessonIdx})">تعديل الدرس</button>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    container.appendChild(unitDiv);
+  });
+}
+
+function updateProgressBar(progress, total, completed) {
+  const percent = total ? Math.round((completed / total) * 100) : 0;
+  document.getElementById('progressFill').style.width = percent + '%';
+  document.getElementById('progressText').textContent = `تم إنهاء ${completed} من ${total} درس (${percent}%)`;
+}
+
+// إضافة وحدة جديدة
+document.getElementById('addUnitBtn').onclick = async function() {
+  const title = prompt('عنوان الوحدة الجديدة:');
+  if (!title) return;
+  const courseId = window.courseId;
+  await fetch(`/api/courses/${courseId}/unit`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+    body: JSON.stringify({ title })
+  });
+  loadCourseContent(courseId);
+};
+
+// إضافة درس جديد
+window.addLesson = async function(unitIdx) {
+  const courseId = window.courseId;
+  const units = window.currentUnits;
+  const unitId = units[unitIdx]._id;
+  const title = prompt('عنوان الدرس:');
+  const videoUrl = prompt('رابط الفيديو:');
+  const description = prompt('وصف الدرس:');
+  if (!title || !videoUrl) return;
+  await fetch(`/api/courses/unit/${unitId}/lesson`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+    body: JSON.stringify({ title, videoUrl, description })
+  });
+  loadCourseContent(courseId);
+};
+
+// تعديل درس
+window.editLesson = async function(unitIdx, lessonIdx) {
+  const courseId = window.courseId;
+  const units = window.currentUnits;
+  const unitId = units[unitIdx]._id;
+  const lesson = units[unitIdx].lessons[lessonIdx];
+  const title = prompt('عنوان الدرس:', lesson.title);
+  const videoUrl = prompt('رابط الفيديو:', lesson.videoUrl);
+  const description = prompt('وصف الدرس:', lesson.description);
+  if (!title || !videoUrl) return;
+  await fetch(`/api/courses/unit/${unitId}/lesson/${lesson._id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+    body: JSON.stringify({ title, videoUrl, description })
+  });
+  loadCourseContent(courseId);
+};
+
+// عند إنهاء الفيديو، حفظ التقدم
+window.showNextLesson = async function(unitIdx, lessonIdx) {
+  const courseId = window.courseId;
+  const units = window.currentUnits;
+  const lessonId = units[unitIdx].lessons[lessonIdx]._id;
+  await fetch('/api/courses/complete', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') },
+    body: JSON.stringify({ courseId, lessonId })
+  });
+  alert('تم إنهاء الدرس! هل تريد تشغيل الدرس التالي؟');
+  // يمكنك هنا تشغيل الدرس التالي تلقائياً
+};
+
+// عند تحميل الصفحة، احفظ معرف الكورس
+window.courseId = new URLSearchParams(window.location.search).get('id');
+loadCourseContent(window.courseId);
+
+// حفظ الوحدات في متغير عام
+function renderUnits(units) {
+  window.currentUnits = units;
+  const container = document.getElementById('unitsContainer');
+  container.innerHTML = '';
+  units.forEach((unit, unitIdx) => {
+    const unitDiv = document.createElement('div');
+    unitDiv.className = 'unit-box';
+    unitDiv.innerHTML = `
+      <h2>الوحدة: ${unit.title}</h2>
+      <button onclick="addLesson(${unitIdx})">إضافة درس</button>
+      <div class="lessons-list">
+        ${unit.lessons.map((lesson, lessonIdx) => `
+          <div class="lesson-box">
+            <h3>الدرس: ${lesson.title}</h3>
+            <video src="${lesson.videoUrl}" controls style="max-width:300px;" onended="showNextLesson(${unitIdx},${lessonIdx})"></video>
+            <div>${lesson.description}</div>
+            <button onclick="editLesson(${unitIdx},${lessonIdx})">تعديل الدرس</button>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    container.appendChild(unitDiv);
+  });
+}
+</script>
+<!-- ...existing dashboard footer... -->

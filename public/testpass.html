@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/style.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <form id="loginForm">
+      <input
+        id="login-email"
+        type="email"
+        placeholder="البريد الإلكتروني"
+        required
+      />
+      <input
+        id="login-password"
+        type="password"
+        placeholder="كلمة المرور"
+        required
+      />
+      <button type="submit">تسجيل الدخول</button>
+    </form>
+    <button type="button" id="logoutButton">تسجيل الخروج</button>
+
+    <h2>الدورات التي تمتلكها</h2>
+    <div id="paidCourse">
+      <div>
+        <h3>دورة في HTML</h3>
+        <p>وصف الدورة: هذه الدورة تتضمن معلومات عن HTML وكيفية تصميمها.</p>
+      </div>
+      <div>
+        <h3>دورة في CSS</h3>
+        <p>وصف الدورة: هذه الدورة تتضمن معلومات عن CSS وكيفية تصميمها.</p>
+      </div>
+      <div>
+        <h3>دورة في JavaScript</h3>
+        <p>
+          وصف الدورة: هذه الدورة تتضمن معلومات عن JavaScript وكيفية تصميمها.
+        </p>
+      </div>
+    </div>
+    <script src="paidCourses.js"></script>
+  </body>
+</html>

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>البروفايل - TeamWork M3</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="img/loogo.png">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/profile.css">
+    <link rel="stylesheet" href="css/messages.css">
+    <style>
+    /* Scoped styles for the new chat modal (modern, minimal) */
+    #newChatModal {
+        --modal-bg: #ffffff;
+        --backdrop: rgba(18,24,34,0.55);
+        --radius: 12px;
+        --gap: 16px;
+        --primary: #2563eb; /* blue-600 */
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1200;
+        direction: rtl;
+    }
+    #newChatModal.show { display: flex; }
+    #newChatModal .modal-backdrop {
+        position: absolute;
+        inset: 0;
+        background: var(--backdrop);
+        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(4px);
+        border-radius: var(--radius);
+    }
+    #newChatModal .modal-content {
+        position: relative; width: 100%; max-width: 520px; background: var(--modal-bg);
+        border-radius: var(--radius); box-shadow: 0 10px 30px rgba(2,6,23,0.35);
+        padding: 20px; box-sizing: border-box; z-index: 2;
+        font-family: 'Cairo', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    #newChatModal .modal-header { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    #newChatModal h3 { margin:0; font-size:1.05rem; font-weight:600; color:#0f172a }
+    #newChatModal .modal-close {
+        background: transparent; border: none; font-size:1.25rem; color: #475569; cursor:pointer; padding:6px; border-radius:8px;
+    }
+    #newChatModal .modal-close:hover { background: #f1f5f9 }
+    #newChatModal .form-group { display:flex; flex-direction:column; gap:6px; margin-top:10px }
+    #newChatModal label { font-size:0.9rem; color:#334155 }
+    #newChatModal input[type="text"], #newChatModal textarea {
+        width:100%; padding:10px 12px; border-radius:10px; border:1px solid #e6eef8; outline:none; font-size:0.95rem; background:#fbfdff;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+    }
+    #newChatModal textarea { resize:vertical; min-height:96px }
+    .modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:14px }
+    .btn { padding:8px 14px; border-radius:10px; font-weight:600; font-size:0.95rem; cursor:pointer; border:1px solid transparent }
+    .btn-primary { background: var(--bg-secondary); color: var(--text-color); border-color: var(--primary); }
+    .btn-primary:hover { filter:brightness(.95) }
+    .btn-outline { background: transparent; color:#0f172a; border-color: #e2e8f0 }
+    .btn-outline:hover { background:#f8fafc }
+
+    @media (max-width:520px){ #newChatModal .modal-content { margin: 16px; width: calc(100% - 32px) } }
+
+    /* Reset Progress Modal Styles */
+    #resetProgressModal {
+        --modal-bg: #ffffff;
+        --backdrop: rgba(18,24,34,0.55);
+        --radius: 12px;
+        --gap: 16px;
+        --primary: #2563eb; /* blue-600 */
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 1200;
+        direction: rtl;
+    }
+    #resetProgressModal.show { display: flex; }
+    #resetProgressModal .modal-backdrop {
+        position: absolute;
+        inset: 0;
+        background: var(--backdrop);
+        -webkit-backdrop-filter: blur(4px);
+        backdrop-filter: blur(4px);
+        border-radius: var(--radius);
+    }
+    #resetProgressModal .modal-content {
+        position: relative; width: 100%; max-width: 520px; background: var(--modal-bg);
+        border-radius: var(--radius); box-shadow: 0 10px 30px rgba(2,6,23,0.35);
+        padding: 20px; box-sizing: border-box; z-index: 2;
+        font-family: 'Cairo', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+    }
+    #resetProgressModal .modal-header { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+    #resetProgressModal h3 { margin:0; font-size:1.05rem; font-weight:600; color:#0f172a }
+    #resetProgressModal .modal-close {
+        background: transparent; border: none; font-size:1.25rem; color: #475569; cursor:pointer; padding:6px; border-radius:8px;
+    }
+    #resetProgressModal .modal-close:hover { background: #f1f5f9 }
+    #resetProgressModal .modal-body { margin: 16px 0; color: #334155; line-height: 1.6; }
+    #resetProgressModal .modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:14px }
+    </style>
+    
+    <!-- Socket.IO -->
+    <script src="js/socket.io.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <button class="menu-toggle" id="menu-toggle" aria-label="فتح القائمة">
+                <i class="fas fa-bars"></i>
+            </button>
+            <h1 class="header-title">البروفايل</h1>
+        </div>
+        
+        <div class="header-right">
+            <button class="theme-toggle" id="theme-toggle" aria-label="تبديل الوضع المظلم">
+                <i class="fas fa-moon"></i>
+            </button>
+            
+            <div class="user-actions">
+                <button class="action-btn" title="الإشعارات">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge"></span>
+                </button>
+                <button class="action-btn" title="الرسائل">
+                    <i class="fas fa-envelope"></i>
+                    <span class="notification-badge"></span>
+                </button>
+                <!-- <button class="action-btn" id="settings-btn" title="إعدادات الكورسات">
+                    <i class="fas fa-cog"></i>
+                </button> -->
+                <button class="action-btn" id="logout-btn" title="تسجيل الخروج">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+                <button class="action-btn" id="home-btn" title="الصفحة الرئيسية">
+                    <i class="fas fa-home"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <img src="../img/profile.png" alt="صورة البروفايل" class="profile-avatar" id="profile-avatar">
+            <label for="avatar-upload" style="display: none;">رفع صورة البروفايل</label>
+            <input type="file" id="avatar-upload" accept="image/*" aria-label="رفع صورة البروفايل">
+            <h2 class="profile-name" id="profile-name">اسم المستخدم</h2>
+            <p class="profile-role" id="profile-role">مستخدم</p>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <a href="#profile" class="menu-item active">
+                <i class="fas fa-user"></i>
+                البروفايل
+            </a>
+            <a href="#courses" class="menu-item">
+                <i class="fas fa-graduation-cap"></i>
+                الكورسات
+            </a>
+            <a href="#community" class="menu-item">
+                <i class="fas fa-users"></i>
+                المجتمع
+            </a>
+            <a href="#settings" class="menu-item">
+                <i class="fas fa-cog"></i>
+                الإعدادات
+            </a>
+            <a href="#store" class="menu-item">
+                <i class="fas fa-store"></i>
+                المتجر
+            </a>
+            <a href="#cart" class="menu-item">
+                <i class="fas fa-shopping-cart"></i>
+                السلة
+            </a>
+            <a href="#help" class="menu-item">
+                <i class="fas fa-question-circle"></i>
+                المساعدة
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-grid">
+            <!-- Identity Section -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                    <h2 class="card-title">معلومات الهوية</h2>
+                </div>
+                <div class="profile-actions" style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:8px;">
+                    <button id="edit-profile-btn" class="btn btn-primary" aria-label="تعديل البروفايل">تعديل الملف الشخصي</button>
+                </div>
+                <div class="identity-info" id="identity-info">
+                    <!-- سيتم تعبئة البيانات هنا -->
+                </div>
+            </div>
+
+            <!-- Community Section -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h2 class="card-title">تعليقاتي</h2>
+                </div>
+                <div id="community-content">
+                    <!-- سيتم تعبئة التعليقات هنا -->
+                </div>
+            </div>
+
+
+        </div>
+
+        <!-- Courses Section -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+                <h2 class="card-title">كورساتي</h2>
+            </div>
+            <div id="courses-content">
+                <!-- سيتم تعبئة الكورسات هنا -->
+            </div>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+    <script src="js/ui-toast.js"></script>
+    <script src="js/messages-ui.js"></script>
+    <script src="js/messaging.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/profile.js"></script>
+    <script src="js/profile-edit.js"></script>
+    <script>
+    // Reset Course Progress Modal functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        // Settings button click handler
+        const settingsBtn = document.getElementById('settings-btn');
+        const resetModal = document.getElementById('resetProgressModal');
+        const resetCloseBtn = document.getElementById('resetProgressClose');
+        const resetCancelBtn = document.getElementById('resetProgressCancel');
+        const resetConfirmBtn = document.getElementById('resetProgressConfirm');
+
+        if (settingsBtn && resetModal) {
+            settingsBtn.addEventListener('click', function() {
+                resetModal.classList.add('show');
+            });
+        }
+
+        function closeResetModal() {
+            if (resetModal) {
+                resetModal.classList.remove('show');
+            }
+        }
+
+        if (resetCloseBtn) {
+            resetCloseBtn.addEventListener('click', closeResetModal);
+        }
+
+        if (resetCancelBtn) {
+            resetCancelBtn.addEventListener('click', closeResetModal);
+        }
+
+        // Close modal when clicking outside
+        if (resetModal) {
+            resetModal.addEventListener('click', function(e) {
+                if (e.target === resetModal) {
+                    closeResetModal();
+                }
+            });
+        }
+
+        // Reset progress functionality
+        if (resetConfirmBtn) {
+            resetConfirmBtn.addEventListener('click', async function() {
+                try {
+                    const token = localStorage.getItem('token');
+                    const user = JSON.parse(localStorage.getItem('user'));
+
+                    if (!token || !user || !user._id) {
+                        showToast('خطأ', 'يجب تسجيل الدخول أولا', 'error');
+                        return;
+                    }
+
+                    const response = await fetch(`/api/progress/user/${user._id}/reset`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': 'Bearer ' + token,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.ok) {
+                        showToast('نجاح', 'تم إعادة تعيين تقدم جميع الكورسات إلى 0%', 'success');
+                        // Refresh the page to update course progress displays
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1500);
+                    } else {
+                        const errorData = await response.json();
+                        showToast('خطأ', errorData.message || 'فشل في إعادة تعيين التقدم', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error resetting progress:', error);
+                    showToast('خطأ', 'حدث خطأ أثناء إعادة تعيين التقدم', 'error');
+                } finally {
+                    closeResetModal();
+                }
+            });
+        }
+    });
+
+    // Toast notification function
+    function showToast(title, message, type = 'info') {
+        if (window.__TW_TOAST__) {
+            window.__TW_TOAST__.show({
+                title: title,
+                desc: message,
+                danger: type === 'error',
+                durationMs: 4000
+            });
+        } else {
+            alert(`${title}: ${message}`);
+        }
+    }
+    </script>
+    <script>
+    (function(){
+      async function fetchProgressSummary(){
+        const token = localStorage.getItem('token');
+        if(!token) return [];
+        try{
+          const res = await fetch('/api/courses/progress/summary', { headers: { Authorization: 'Bearer ' + token }});
+          if(!res.ok) return [];
+          return await res.json();
+        }catch(e){ console.error('progress summary fetch failed', e); return []; }
+      }
+      function updateCourseCards(summary){
+        if(!Array.isArray(summary) || summary.length===0) return;
+        // Prefer matching by data-course-id on each course card
+        const cards = document.querySelectorAll('[data-course-id]');
+        const byId = new Map(summary.filter(s=>s.courseId).map(s=> [String(s.courseId), s]));
+        cards.forEach(card => {
+          const cid = String(card.getAttribute('data-course-id'));
+          const s = byId.get(cid);
+          if(!s) return;
+          const percent = (typeof s.progressPercent==='number')? s.progressPercent : 0;
+          const label = card.querySelector('.course-progress .progress-label span:last-child');
+          const fill = card.querySelector('.course-progress .progress-bar .progress-fill');
+          if(label) label.textContent = percent + '%';
+          if(fill) fill.style.width = percent + '%';
+        });
+
+        // Fallback: try to match by title text if no data-course-id present
+        const titleCards = document.querySelectorAll('.course-card, .course-item');
+        titleCards.forEach(card => {
+          if(card.hasAttribute('data-course-id')) return; // already handled
+          const titleEl = card.querySelector('.course-title, h3, h4');
+          const name = titleEl && titleEl.textContent ? titleEl.textContent.trim() : '';
+          if(!name) return;
+          const s = summary.find(x => (x.courseTitle||'').trim() === name);
+          if(!s) return;
+          const percent = (typeof s.progressPercent==='number')? s.progressPercent : 0;
+          const label = card.querySelector('.course-progress .progress-label span:last-child');
+          const fill = card.querySelector('.course-progress .progress-bar .progress-fill');
+          if(label) label.textContent = percent + '%';
+          if(fill) fill.style.width = percent + '%';
+        });
+      }
+      async function initProgress(){
+        const summary = await fetchProgressSummary();
+        updateCourseCards(summary);
+      }
+      // Run after profile.js likely renders courses
+      if(document.readyState==='loading'){
+        document.addEventListener('DOMContentLoaded', ()=> setTimeout(initProgress, 300));
+      } else {
+        setTimeout(initProgress, 300);
+      }
+
+      // Observe dynamic changes (if profile.js re-renders)
+      const target = document.getElementById('courses-content');
+      if(target && 'MutationObserver' in window){
+        const obs = new MutationObserver(async () => {
+          const summary = await fetchProgressSummary();
+          updateCourseCards(summary);
+        });
+        obs.observe(target, { childList: true, subtree: true });
+      }
+    })();
+    </script>
+    
+    <!-- New Chat Modal (modern) -->
+    <div id="newChatModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="newChatTitle">
+        <div class="modal-backdrop"></div>
+    <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="newChatTitle">محادثة جديدة</h3>
+                <button id="newChatClose" class="modal-close" aria-label="إغلاق">×</button>
+            </div>
+            <form id="newChatForm">
+                <div class="form-group">
+                    <label for="newChatRecipient">اسم المستخدم أو البريد الإلكتروني</label>
+                    <input type="text" id="newChatRecipient" required placeholder="مثال: user@example.com أو username">
+                </div>
+                <div class="form-group">
+                    <label for="newChatMessage">الرسالة</label>
+                    <textarea id="newChatMessage" rows="4" required placeholder="أدخل رسالتك هنا..."></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" id="newChatCancel">إلغاء</button>
+                    <button type="submit" class="btn btn-primary">إرسال</button>
+                </div>
+            </form>
+        </div>
+        </div>
+    
+        <!-- Reset Course Progress Modal -->
+        <div id="resetProgressModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="resetProgressTitle">
+            <div class="modal-backdrop"></div>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="resetProgressTitle">إعادة تعيين تقدم الكورسات</h3>
+                    <button id="resetProgressClose" class="modal-close" aria-label="إغلاق">×</button>
+                </div>
+                <div class="modal-body">
+                    <p>هل أنت متأكد من رغبتك في إعادة تعيين تقدم جميع الكورسات إلى 0%؟</p>
+                    <p>سيتم الاحتفاظ بجميع الكورسات مرئية، ولكن سيتم إعادة تعيين التقدم إلى الصفر.</p>
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="btn btn-outline" id="resetProgressCancel">إلغاء</button>
+                    <button type="button" class="btn btn-primary" id="resetProgressConfirm">تأكيد إعادة التعيين</button>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>

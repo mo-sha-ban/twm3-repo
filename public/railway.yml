@@ -1,0 +1,9 @@
+# Railway configuration for TWM3 Backend
+# Railway auto-detects Node.js and runs npm start
+
+root: .
+buildCommand: "npm ci --omit=dev"
+startCommand: "npm start"
+# Environment variables (set in Railway dashboard or here)
+# PORT is automatically set by Railway
+# Other variables should be set in Railway dashboard for security
