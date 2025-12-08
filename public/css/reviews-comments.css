@@ -1,0 +1,105 @@
+/* Reviews and Comments Styles */
+
+/* Avatar Image */
+.reviewer-avatar-img,
+.commenter-avatar-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--primary-color);
+}
+
+/* Like Button Animation */
+.action-btn.like-btn {
+    transition: all var(--main-transition);
+    position: relative;
+}
+
+.action-btn.like-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Like animation class */
+.like-animating {
+    animation: likePulse 0.6s ease-out !important;
+}
+
+@keyframes likePulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.15);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Like button active state (already liked) */
+.action-btn.like-btn[data-liked="true"] {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%) !important;
+    color: white !important;
+    border-color: #ff5252 !important;
+}
+
+.action-btn.like-btn[data-liked="true"] i {
+    color: white !important;
+}
+
+.action-btn.like-btn[data-liked="true"]:hover {
+    background: linear-gradient(135deg, #ff5252 0%, #ff4040 100%) !important;
+    box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3) !important;
+}
+
+/* Like button inactive state */
+.action-btn.like-btn[data-liked="false"] {
+    background: rgba(33, 150, 243, 0.1);
+    color: var(--text-primary);
+    border: 1px solid var(--primary-color);
+}
+
+.action-btn.like-btn[data-liked="false"]:hover {
+    background: rgba(33, 150, 243, 0.2);
+    border-color: var(--primary-color);
+}
+
+/* Like count */
+.like-count {
+    font-weight: 600;
+    transition: all var(--main-transition);
+}
+
+/* Review and comment items */
+.review-item,
+.comment-item {
+    transition: all var(--main-transition);
+}
+
+.review-item:hover,
+.comment-item:hover {
+    transform: translateY(-2px);
+}
+
+/* Full date display */
+.review-date,
+.comment-date {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+/* Dark theme adjustments */
+.dark-theme .action-btn.like-btn[data-liked="false"] {
+    background: rgba(33, 150, 243, 0.05);
+    border-color: var(--primary-color);
+}
+
+.dark-theme .action-btn.like-btn[data-liked="false"]:hover {
+    background: rgba(33, 150, 243, 0.1);
+}
+
+.dark-theme .action-btn.like-btn[data-liked="true"] {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+}

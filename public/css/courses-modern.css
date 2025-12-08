@@ -1,0 +1,276 @@
+/* Modern Courses Page Styles */
+
+:root {
+    --courses-primary: #2196f3;
+    --courses-primary-dark: #1976d2;
+    --courses-bg: #080321;
+    --courses-card-bg: #051726;
+    --courses-text: white;
+    --courses-text-muted: #9aa0b4;
+    --courses-transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --courses-radius: 20px;
+    --courses-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    --courses-gradient: linear-gradient(135deg, #2196f3 0%, #1976d2 100%);
+}
+
+.dark-theme {
+    --courses-bg: #f8f9fa;
+    --courses-card-bg: #ffffff;
+    --courses-text: #080321;
+    --courses-text-muted: #6b7280;
+    --courses-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+}
+
+/* Courses Page Hero */
+.courses {
+    min-height: 100vh;
+    padding: 2rem 0 4rem;
+}
+
+.courses .main-title {
+    text-align: center;
+    margin-bottom: 3rem;
+    position: relative;
+}
+
+.courses .main-title h1 {
+    font-size: 4rem;
+    font-weight: 800;
+    background: var(--courses-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    animation: fadeInDown 0.6s ease-out;
+}
+
+@keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Courses Grid */
+.courses .container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2.5rem;
+    padding: 0 2rem;
+}
+
+.courses .box {
+    background: var(--courses-card-bg);
+    border-radius: var(--courses-radius);
+    overflow: hidden;
+    box-shadow: var(--courses-shadow);
+    border: 2px solid rgba(33, 150, 243, 0.1);
+    transition: all var(--courses-transition);
+    position: relative;
+    animation: fadeInUp 0.6s ease-out backwards;
+}
+
+.courses .box:nth-child(1) { animation-delay: 0.1s; }
+.courses .box:nth-child(2) { animation-delay: 0.2s; }
+.courses .box:nth-child(3) { animation-delay: 0.3s; }
+.courses .box:nth-child(4) { animation-delay: 0.4s; }
+.courses .box:nth-child(5) { animation-delay: 0.5s; }
+.courses .box:nth-child(6) { animation-delay: 0.6s; }
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.courses .box::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 5px;
+    background: var(--courses-gradient);
+    transform: scaleX(0);
+    transition: transform var(--courses-transition);
+}
+
+.courses .box:hover::before {
+    transform: scaleX(1);
+}
+
+.courses .box:hover {
+    transform: translateY(-10px);
+    border-color: rgba(33, 150, 243, 0.3);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+/* Featured Course Badge */
+.courses .box.featured {
+    border-color: #ffd700;
+    box-shadow: 0 10px 40px rgba(255, 215, 0, 0.3);
+}
+
+.courses .box.featured::after {
+    content: 'كورس مميز';
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+    color: #080321;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+    z-index: 10;
+}
+
+.courses .box .info {
+    padding: 2.5rem;
+    position: relative;
+    z-index: 5;
+}
+
+.courses .box .info i {
+    font-size: 4rem;
+    background: var(--courses-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1.5rem;
+    display: block;
+    transition: transform var(--courses-transition);
+}
+
+.courses .box:hover .info i {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.courses .box .info h2 {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--courses-text);
+    margin-bottom: 1rem;
+}
+
+.courses .box .info p {
+    color: var(--courses-text-muted);
+    line-height: 1.8;
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.courses .box .info a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    background: var(--courses-gradient);
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    font-weight: 700;
+    transition: all var(--courses-transition);
+    box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
+}
+
+.courses .box .info a::after {
+    content: '\f061';
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    transition: transform var(--courses-transition);
+}
+
+.courses .box .info a:hover {
+    transform: translateX(-5px);
+    box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
+}
+
+.courses .box .info a:hover::after {
+    transform: translateX(-5px);
+}
+
+/* Shape Decoration */
+.courses .box .shape {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    opacity: 0.05;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.courses .box .shape img {
+    width: 100%;
+    height: auto;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    .courses .container {
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .courses .main-title h1 {
+        font-size: 3rem;
+    }
+
+    .courses .container {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        padding: 0 1rem;
+    }
+
+    .courses .box .info {
+        padding: 2rem;
+    }
+
+    .courses .box .info i {
+        font-size: 3rem;
+    }
+
+    .courses .box .info h2 {
+        font-size: 1.75rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .courses .main-title h1 {
+        font-size: 2.5rem;
+    }
+
+    .courses .box .info {
+        padding: 1.5rem;
+    }
+
+    .courses .box .info i {
+        font-size: 2.5rem;
+    }
+
+    .courses .box .info h2 {
+        font-size: 1.5rem;
+    }
+
+    .courses .box .info a {
+        width: 100%;
+        justify-content: center;
+    }
+}
