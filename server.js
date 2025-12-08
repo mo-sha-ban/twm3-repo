@@ -31,9 +31,9 @@ const PORT = 5000;
 app.use(helmet({
     crossOriginResourcePolicy: { policy: 'cross-origin' },
             contentSecurityPolicy: {
-                useDefaults: true,
+                useDefaults: false, // Disable defaults to have full control
                 directives: {
-                    defaultSrc: ["'self'"],
+                    defaultSrc: ["'self'", "https://twm3.org", "https://www.twm3.org"],
                     scriptSrc: [
                         "'self'",
                         "'unsafe-inline'",
@@ -51,7 +51,9 @@ app.use(helmet({
                         "https://www.youtube.com",
                         "https://cdn.quilljs.com",
                         "https://www.google-analytics.com",
-                        "https://analytics.google.com"
+                        "https://analytics.google.com",
+                        "https://twm3.org",
+                        "https://www.twm3.org"
                     ],
             styleSrc: [
                 "'self'",
@@ -59,7 +61,9 @@ app.use(helmet({
                 "https://fonts.googleapis.com",
                 "https://cdn.plyr.io",
                 "https://cdnjs.cloudflare.com",
-                "https://cdn.quilljs.com"
+                "https://cdn.quilljs.com",
+                "https://twm3.org",
+                "https://www.twm3.org"
             ],
             imgSrc: ["'self'", "data:", "blob:", "https://*"],
             connectSrc: [
@@ -68,6 +72,7 @@ app.use(helmet({
                 "https://teamworkm3.com",
                 "https://api.twm3.org",
                 "https://twm3.org",
+                "https://www.twm3.org",
                 "https://cdn.plyr.io",
                 "https://noembed.com",
                 "https://www.youtube.com",
@@ -76,10 +81,12 @@ app.use(helmet({
                 "https://www.google-analytics.com",
                 "https://analytics.google.com"
             ],
-            frameSrc: ["'self'", "https://www.youtube.com", "https://www.youtube-nocookie.com"],
+            frameSrc: ["'self'", "https://www.youtube.com", "https://www.youtube-nocookie.com", "https://twm3.org", "https://www.twm3.org"],
             mediaSrc: ["'self'", "data:", "blob:", "https://cdn.plyr.io"],
             fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com", "https://use.fontawesome.com", "data:"],
-            scriptSrcAttr: ["'unsafe-inline'"]
+            scriptSrcAttr: ["'unsafe-inline'"],
+            // Add explicit CSP headers to override any cached policies
+            reportUri: "/csp-report"
         }
     }
 }));
@@ -106,6 +113,42 @@ app.use('/uploads/avatars', express.static(path.join(__dirname, 'public/uploads/
         res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
     }
 }));
+
+// CSP report endpoint
+app.post('/csp-report', (req, res) => {
+    console.log('CSP Violation Report:', req.body);
+    res.status(204).end();
+});
+
+// Add explicit CSP headers to override any cached policies
+app.use((req, res, next) => {
+    res.setHeader('Content-Security-Policy', `
+        default-src 'self' https://twm3.org https://www.twm3.org;
+        script-src 'self' 'unsafe-inline' blob: data: 'unsafe-eval'
+            https://cdn.plyr.io https://cdnjs.cloudflare.com https://cdn.jsdelivr.net
+            https://pagead2.googlesyndication.com https://www.googletagservices.com
+            https://www.googletagmanager.com https://cdn.jsdelivr.net/npm/@emailjs/browser
+            https://use.fontawesome.com https://www.youtube.com https://cdn.quilljs.com
+            https://www.google-analytics.com https://analytics.google.com
+            https://twm3.org https://www.twm3.org;
+        style-src 'self' 'unsafe-inline'
+            https://fonts.googleapis.com https://cdn.plyr.io https://cdnjs.cloudflare.com
+            https://cdn.quilljs.com https://twm3.org https://www.twm3.org;
+        img-src 'self' data: blob: https:;
+        connect-src 'self' http://localhost:5000 https://teamworkm3.com https://api.twm3.org
+            https://twm3.org https://www.twm3.org https://cdn.plyr.io https://noembed.com
+            https://www.youtube.com https://www.youtube-nocookie.com https://cdn.quilljs.com
+            https://www.google-analytics.com https://analytics.google.com;
+        frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com
+            https://twm3.org https://www.twm3.org;
+        media-src 'self' data: blob: https://cdn.plyr.io;
+        font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com
+            https://use.fontawesome.com data:;
+        script-src-attr 'unsafe-inline';
+        report-uri /csp-report
+    `.replace(/\s+/g, ' ').trim());
+    next();
+});
 app.use('/uploads/lesson-assets', express.static(path.join(__dirname, 'public/uploads/lesson-assets'), {
     setHeaders: (res) => {
         res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
