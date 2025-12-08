@@ -461,6 +461,18 @@ app.get("/", (req, res) => {
 // Serve static files from root directory for hosting platforms
 app.use(express.static(path.join(__dirname, '..')));
 
+// Serve CSS files
+app.use('/css', express.static(path.join(__dirname, '..', 'css')));
+
+// Serve JS files
+app.use('/js', express.static(path.join(__dirname, '..', 'js')));
+
+// Serve img files
+app.use('/img', express.static(path.join(__dirname, '..', 'img')));
+
+// Serve assets files
+app.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
+
 // Fallback for any other static file requests
 app.get('/index.html', (req, res) => {
     const indexPath = path.join(__dirname, '..', 'index.html');
@@ -468,6 +480,30 @@ app.get('/index.html', (req, res) => {
         res.sendFile(indexPath);
     } else {
         res.status(404).json({ error: 'Not Found' });
+    }
+});
+
+// Serve other HTML pages
+app.get('/:page', (req, res) => {
+    const pageName = req.params.page;
+    const pagePath = path.join(__dirname, '..', `${pageName}.html`);
+
+    if (fs.existsSync(pagePath)) {
+        res.sendFile(pagePath);
+    } else {
+        // Check if it's a page in Pages directory
+        const pagesPath = path.join(__dirname, '..', 'Pages', `${pageName}.html`);
+        if (fs.existsSync(pagesPath)) {
+            res.sendFile(pagesPath);
+        } else {
+            // Check if it's a course page
+            const coursePath = path.join(__dirname, '..', 'Pages', 'courses', `${pageName}.html`);
+            if (fs.existsSync(coursePath)) {
+                res.sendFile(coursePath);
+            } else {
+                res.status(404).json({ error: 'Page not found' });
+            }
+        }
     }
 });
 
