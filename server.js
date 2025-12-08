@@ -25,7 +25,24 @@ const helmet = require('helmet');
 require("dotenv").config();
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
+
+// Force HTTPS and secure headers for Vercel deployment
+app.use((req, res, next) => {
+    // Set security headers
+    res.setHeader('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+    res.setHeader('X-XSS-Protection', '1; mode=block');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+    // Force HTTPS on production
+    if (process.env.NODE_ENV === 'production' && !req.secure && req.get('X-Forwarded-Proto') !== 'https') {
+        return res.redirect(301, `https://${req.headers.host}${req.url}`);
+    }
+
+    next();
+});
 
 // Middleware
 app.use(helmet({
@@ -53,7 +70,8 @@ app.use(helmet({
                         "https://www.google-analytics.com",
                         "https://analytics.google.com",
                         "https://twm3.org",
-                        "https://www.twm3.org"
+                        "https://www.twm3.org",
+                        "https://infird.com"
                     ],
             styleSrc: [
                 "'self'",
@@ -130,7 +148,7 @@ app.use((req, res, next) => {
             https://www.googletagmanager.com https://cdn.jsdelivr.net/npm/@emailjs/browser
             https://use.fontawesome.com https://www.youtube.com https://cdn.quilljs.com
             https://www.google-analytics.com https://analytics.google.com
-            https://twm3.org https://www.twm3.org;
+            https://twm3.org https://www.twm3.org https://infird.com;
         style-src 'self' 'unsafe-inline'
             https://fonts.googleapis.com https://cdn.plyr.io https://cdnjs.cloudflare.com
             https://cdn.quilljs.com https://twm3.org https://www.twm3.org;
@@ -178,9 +196,9 @@ app.use('/assets', express.static(path.join(__dirname, 'public/assets'), {
 
 // Serve JS files with correct MIME type
 app.use('/js', express.static(path.join(__dirname, '..', 'js'), {
-    setHeaders: (res, path) => {
-        if (path.endsWith('.js')) {
-            res.setHeader('Content-Type', 'application/javascript');
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.js')) {
+            res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
         }
         res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
         res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
@@ -189,9 +207,9 @@ app.use('/js', express.static(path.join(__dirname, '..', 'js'), {
 
 // Serve CSS files with correct MIME type
 app.use('/css', express.static(path.join(__dirname, '..', 'css'), {
-    setHeaders: (res, path) => {
-        if (path.endsWith('.css')) {
-            res.setHeader('Content-Type', 'text/css');
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.css')) {
+            res.setHeader('Content-Type', 'text/css; charset=utf-8');
         }
         res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
         res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');

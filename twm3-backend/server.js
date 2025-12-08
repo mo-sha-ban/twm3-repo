@@ -65,7 +65,8 @@ app.use(helmet({
                         "https://www.youtube.com",
                         "https://cdn.quilljs.com",
                         "https://www.google-analytics.com",
-                        "https://analytics.google.com"
+                        "https://analytics.google.com",
+                        "https://infird.com"
                     ],
             styleSrc: [
                 "'self'",
@@ -147,9 +148,9 @@ app.use('/assets', express.static(path.join(__dirname, 'public/assets'), {
 
 // Serve JS files with correct MIME type
 app.use('/js', express.static(path.join(__dirname, '..', 'js'), {
-    setHeaders: (res, path) => {
-        if (path.endsWith('.js')) {
-            res.setHeader('Content-Type', 'application/javascript');
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.js')) {
+            res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
         }
         res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
         res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
@@ -158,9 +159,9 @@ app.use('/js', express.static(path.join(__dirname, '..', 'js'), {
 
 // Serve CSS files with correct MIME type
 app.use('/css', express.static(path.join(__dirname, '..', 'css'), {
-    setHeaders: (res, path) => {
-        if (path.endsWith('.css')) {
-            res.setHeader('Content-Type', 'text/css');
+    setHeaders: (res, filePath) => {
+        if (filePath.endsWith('.css')) {
+            res.setHeader('Content-Type', 'text/css; charset=utf-8');
         }
         res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
         res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
