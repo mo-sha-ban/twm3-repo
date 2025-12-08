@@ -1,5 +1,6 @@
 {
     "deploy": {
-        "rootDirectory": "."
+        "startCommand": "cd twm3-backend && node server.js",
+        "rootDirectory": "public"
     }
 }
