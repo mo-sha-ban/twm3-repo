@@ -24,6 +24,20 @@ const helmet = require('helmet');
 
 require("dotenv").config();
 
+// Set BASE_URL for OAuth callbacks based on deployment environment
+if (!process.env.BASE_URL) {
+    if (process.env.VERCEL_URL) {
+        // Vercel deployment
+        process.env.BASE_URL = `https://${process.env.VERCEL_URL}`;
+    } else if (process.env.RAILWAY_PUBLIC_DOMAIN) {
+        // Railway deployment
+        process.env.BASE_URL = `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`;
+    } else {
+        // Local development
+        process.env.BASE_URL = `http://localhost:${process.env.PORT || 5000}`;
+    }
+}
+
 const app = express();
 // اقرأ متغير البيئة PORT المُقدم من Railway، وإذا لم يكن موجوداً، استخدم القيمة 5000.
 const PORT = process.env.PORT || 5000;

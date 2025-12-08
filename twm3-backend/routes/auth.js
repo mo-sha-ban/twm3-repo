@@ -13,14 +13,14 @@ const router = express.Router();
 // OAuth config
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback';
+const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || process.env.BASE_URL + '/api/auth/google/callback' || 'http://localhost:5000/api/auth/google/callback';
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
-const GITHUB_CALLBACK_URL = process.env.GITHUB_CALLBACK_URL || 'http://localhost:5000/api/auth/github/callback';
+const GITHUB_CALLBACK_URL = process.env.GITHUB_CALLBACK_URL || process.env.BASE_URL + '/api/auth/github/callback' || 'http://localhost:5000/api/auth/github/callback';
 const FACEBOOK_CLIENT_ID = process.env.FACEBOOK_CLIENT_ID;
 const FACEBOOK_CLIENT_SECRET = process.env.FACEBOOK_CLIENT_SECRET;
-const FACEBOOK_CALLBACK_URL = process.env.FACEBOOK_CALLBACK_URL || 'http://localhost:5000/api/auth/facebook/callback';
-const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL || 'http://localhost:5000';
+const FACEBOOK_CALLBACK_URL = process.env.FACEBOOK_CALLBACK_URL || process.env.BASE_URL + '/api/auth/facebook/callback' || 'http://localhost:5000/api/auth/facebook/callback';
+const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL || process.env.BASE_URL || 'http://localhost:5000';
 
 // Google OAuth endpoints
 const { OAuth2Client } = require('google-auth-library');
