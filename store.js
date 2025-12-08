@@ -42,7 +42,7 @@
   async function loadProducts() {
     try {
       console.log('Loading products from API...');
-      const response = await fetch('https://twm3-repo-production.up.railway.app/api/products');
+      const response = await fetch('/api/products');
 
       if (!response.ok) {
         throw new Error('فشل في تحميل المنتجات');
