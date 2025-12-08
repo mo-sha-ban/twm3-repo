@@ -447,8 +447,28 @@ app.get("/data-deletion-status.html", (req, res) => {
 });
 
 // Redirect root to frontend (on Hostinger)
+// But also serve static files if needed for hosting platforms like Vercel
 app.get("/", (req, res) => {
-    res.redirect("https://twm3.org");
+    // Try to serve index.html if it exists (for static hosting)
+    const indexPath = path.join(__dirname, '..', 'index.html');
+    if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+    } else {
+        res.redirect("https://twm3.org");
+    }
+});
+
+// Serve static files from root directory for hosting platforms
+app.use(express.static(path.join(__dirname, '..')));
+
+// Fallback for any other static file requests
+app.get('/index.html', (req, res) => {
+    const indexPath = path.join(__dirname, '..', 'index.html');
+    if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+    } else {
+        res.status(404).json({ error: 'Not Found' });
+    }
 });
 
 // Routes

@@ -4,6 +4,7 @@
   "main": "twm3-backend/server.js",
   "scripts": {
     "start": "cd twm3-backend && node server.js",
+    "vercel-build": "cd twm3-backend && npm install && cd ..",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

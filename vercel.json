@@ -1,0 +1,22 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "twm3-backend/server.js",
+            "use": "@vercel/node"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/(.*)",
+            "dest": "twm3-backend/server.js"
+        },
+        {
+            "src": "/index.html",
+            "dest": "/index.html",
+            "headers": {
+                "Cache-Control": "public, max-age=0, must-revalidate"
+            }
+        }
+    ]
+}
