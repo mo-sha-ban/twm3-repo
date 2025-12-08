@@ -160,6 +160,17 @@ router.get('/auth/google/callback', async (req, res) => {
         if (state) {
             redirectUrl += '&state=' + encodeURIComponent(state);
         }
+
+        console.log('🔗 OAuth redirecting to:', redirectUrl);
+        console.log('📍 FRONTEND_BASE_URL:', FRONTEND_BASE_URL);
+        console.log('🌐 BASE_URL:', process.env.BASE_URL);
+
+        // Ensure we redirect to the correct domain
+        if (redirectUrl.includes('localhost') && process.env.BASE_URL && !process.env.BASE_URL.includes('localhost')) {
+            redirectUrl = redirectUrl.replace('http://localhost:5000', process.env.BASE_URL);
+            console.log('🔄 Fixed redirect URL to:', redirectUrl);
+        }
+
         return res.redirect(redirectUrl);
     } catch (err) {
         console.error('Error in /auth/google/callback', err);
@@ -294,6 +305,17 @@ router.get('/auth/github/callback', async (req, res) => {
         if (state) {
             redirectUrl += '&state=' + encodeURIComponent(state);
         }
+
+        console.log('🔗 GitHub OAuth redirecting to:', redirectUrl);
+        console.log('📍 FRONTEND_BASE_URL:', FRONTEND_BASE_URL);
+        console.log('🌐 BASE_URL:', process.env.BASE_URL);
+
+        // Ensure we redirect to the correct domain
+        if (redirectUrl.includes('localhost') && process.env.BASE_URL && !process.env.BASE_URL.includes('localhost')) {
+            redirectUrl = redirectUrl.replace('http://localhost:5000', process.env.BASE_URL);
+            console.log('🔄 Fixed GitHub redirect URL to:', redirectUrl);
+        }
+
         return res.redirect(redirectUrl);
     } catch (err) {
         console.error('Error in /auth/github/callback', err);
