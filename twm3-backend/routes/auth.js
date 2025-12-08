@@ -13,14 +13,14 @@ const router = express.Router();
 // OAuth config
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || process.env.BASE_URL + '/api/auth/google/callback' || 'http://localhost:5000/api/auth/google/callback';
+const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || process.env.BASE_URL + '/api/auth/google/callback' || 'https://twm3.org/api/auth/google/callback';
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
-const GITHUB_CALLBACK_URL = process.env.GITHUB_CALLBACK_URL || process.env.BASE_URL + '/api/auth/github/callback' || 'http://localhost:5000/api/auth/github/callback';
+const GITHUB_CALLBACK_URL = process.env.GITHUB_CALLBACK_URL || process.env.BASE_URL + '/api/auth/github/callback' || 'https://twm3.org/api/auth/github/callback';
 const FACEBOOK_CLIENT_ID = process.env.FACEBOOK_CLIENT_ID;
 const FACEBOOK_CLIENT_SECRET = process.env.FACEBOOK_CLIENT_SECRET;
-const FACEBOOK_CALLBACK_URL = process.env.FACEBOOK_CALLBACK_URL || process.env.BASE_URL + '/api/auth/facebook/callback' || 'http://localhost:5000/api/auth/facebook/callback';
-const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL || process.env.BASE_URL || 'http://localhost:5000';
+const FACEBOOK_CALLBACK_URL = process.env.FACEBOOK_CALLBACK_URL || process.env.BASE_URL + '/api/auth/facebook/callback' || 'https://twm3.org/api/auth/facebook/callback';
+const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL || process.env.BASE_URL || 'https://twm3.org';
 
 // Google OAuth endpoints
 const { OAuth2Client } = require('google-auth-library');
@@ -39,6 +39,10 @@ router.get('/auth/facebook/callback', (req, res) => {
 // Google OAuth route
 router.get('/auth/google', (req, res) => {
     try {
+        console.log('🔑 Google OAuth initiated with callback URL:', GOOGLE_CALLBACK_URL);
+        console.log('🌐 Frontend base URL:', FRONTEND_BASE_URL);
+        console.log('📍 Current BASE_URL:', process.env.BASE_URL);
+
         const scope = [
             'openid',
             'email',
@@ -56,6 +60,7 @@ router.get('/auth/google', (req, res) => {
         // carry state if provided (e.g., state=signup)
         if (req.query && req.query.state) params.state = String(req.query.state);
         const authUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' + querystring.stringify(params);
+        console.log('🔗 Redirecting to Google OAuth URL:', authUrl);
         return res.redirect(authUrl);
     } catch (err) {
         console.error('Error in /auth/google', err);
