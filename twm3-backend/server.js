@@ -455,9 +455,9 @@ app.get("/data-deletion-status.html", (req, res) => {
     res.sendFile(path.join(__dirname, "..", "data-deletion-status.html"));
 });
 
-// Redirect root to index.html
+// Redirect root to frontend (on Hostinger)
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "..", "index.html"));
+    res.redirect("https://twm3.org");
 });
 
 // Routes
