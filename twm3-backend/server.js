@@ -63,7 +63,9 @@ app.use(helmet({
                         "https://cdn.jsdelivr.net/npm/@emailjs/browser",
                         "https://use.fontawesome.com",
                         "https://www.youtube.com",
-                        "https://cdn.quilljs.com"
+                        "https://cdn.quilljs.com",
+                        "https://www.google-analytics.com",
+                        "https://analytics.google.com"
                     ],
             styleSrc: [
                 "'self'",
@@ -82,7 +84,9 @@ app.use(helmet({
                 "https://noembed.com",
                 "https://www.youtube.com",
                 "https://www.youtube-nocookie.com",
-                "https://cdn.quilljs.com"
+                "https://cdn.quilljs.com",
+                "https://www.google-analytics.com",
+                "https://analytics.google.com"
             ],
             frameSrc: ["'self'", "https://www.youtube.com", "https://www.youtube-nocookie.com"],
             mediaSrc: ["'self'", "data:", "blob:", "https://cdn.plyr.io"],
@@ -136,6 +140,28 @@ app.use('/uploads/videos', express.static(path.join(__dirname, 'public/uploads/v
 // Serve static assets from public/assets
 app.use('/assets', express.static(path.join(__dirname, 'public/assets'), {
     setHeaders: (res) => {
+        res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+}));
+
+// Serve JS files with correct MIME type
+app.use('/js', express.static(path.join(__dirname, '..', 'js'), {
+    setHeaders: (res, path) => {
+        if (path.endsWith('.js')) {
+            res.setHeader('Content-Type', 'application/javascript');
+        }
+        res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    }
+}));
+
+// Serve CSS files with correct MIME type
+app.use('/css', express.static(path.join(__dirname, '..', 'css'), {
+    setHeaders: (res, path) => {
+        if (path.endsWith('.css')) {
+            res.setHeader('Content-Type', 'text/css');
+        }
         res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
         res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
     }
