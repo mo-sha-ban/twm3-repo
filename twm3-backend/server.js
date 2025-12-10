@@ -487,65 +487,20 @@ app.get("/data-deletion-status.html", (req, res) => {
     res.sendFile(path.join(__dirname, "..", "data-deletion-status.html"));
 });
 
-// Redirect root to frontend (on Hostinger)
-// But also serve static files if needed for hosting platforms like Vercel
+// Redirect root to frontend (on Vercel)
 app.get("/", (req, res) => {
-    // Try to serve index.html if it exists (for static hosting)
-    const indexPath = path.join(__dirname, '..', 'index.html');
-    if (fs.existsSync(indexPath)) {
-        res.sendFile(indexPath);
-    } else {
-        res.redirect("https://twm3.org");
-    }
+    res.redirect("https://twm3.org");
 });
 
-// Serve static files from root directory for hosting platforms
-app.use(express.static(path.join(__dirname, '..')));
-
-// Serve CSS files
-app.use('/css', express.static(path.join(__dirname, '..', 'css')));
-
-// Serve JS files
-app.use('/js', express.static(path.join(__dirname, '..', 'js')));
-
-// Serve img files
-app.use('/img', express.static(path.join(__dirname, '..', 'img')));
-
-// Serve assets files
-app.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
-
-// Fallback for any other static file requests
-app.get('/index.html', (req, res) => {
-    const indexPath = path.join(__dirname, '..', 'index.html');
-    if (fs.existsSync(indexPath)) {
-        res.sendFile(indexPath);
-    } else {
-        res.status(404).json({ error: 'Not Found' });
+// NOTE: Frontend is hosted on Vercel, this backend only serves API endpoints and uploads
+// Any request for non-API paths returns 404
+app.use((req, res, next) => {
+    // Allow API and upload routes to pass through
+    if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+        return next();
     }
-});
-
-// Serve other HTML pages
-app.get('/:page', (req, res) => {
-    const pageName = req.params.page;
-    const pagePath = path.join(__dirname, '..', `${pageName}.html`);
-
-    if (fs.existsSync(pagePath)) {
-        res.sendFile(pagePath);
-    } else {
-        // Check if it's a page in Pages directory
-        const pagesPath = path.join(__dirname, '..', 'Pages', `${pageName}.html`);
-        if (fs.existsSync(pagesPath)) {
-            res.sendFile(pagesPath);
-        } else {
-            // Check if it's a course page
-            const coursePath = path.join(__dirname, '..', 'Pages', 'courses', `${pageName}.html`);
-            if (fs.existsSync(coursePath)) {
-                res.sendFile(coursePath);
-            } else {
-                res.status(404).json({ error: 'Page not found' });
-            }
-        }
-    }
+    // Everything else gets 404
+    res.status(404).json({ error: 'Not Found - Frontend is hosted on Vercel' });
 });
 
 // Routes
