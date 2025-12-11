@@ -26,7 +26,8 @@ require("dotenv").config();
 
 const app = express();
 // اقرأ متغير البيئة PORT المُقدم من Railway، وإذا لم يكن موجوداً، استخدم القيمة 5000.
-const PORT = process.env.PORT || 5000;
+// Honor platform-provided port (Railway/Vercel/etc.) and fall back to 5000 locally
+const PORT = Number(process.env.PORT || process.env.RAILWAY_PORT || process.env.RAILWAY_TCP_PORT || 5000);
 // Middleware
 app.use(helmet({
     crossOriginResourcePolicy: { policy: 'cross-origin' },
@@ -2036,7 +2037,7 @@ const startServer = async () => {
         await mongoose.connect(process.env.MONGO_URI);
         console.log("MongoDB connected");
 
-        const port = parseInt(process.env.PORT || PORT || 5000, 10);
+        const port = Number(PORT);
         const maxRetries = 5;
         let attempt = 0;
 
