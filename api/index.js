@@ -228,27 +228,7 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Final catch-all: serve SPA routing
-app.use((req, res) => {
-    // If it's an API call, return 404
-    if (req.path.startsWith('/api') || req.path.startsWith('/auth') || req.path.startsWith('/upload')) {
-        return res.status(404).json({ error: 'Not Found' });
-    }
-    
-    // Otherwise try to serve the file, or fall back to index.html
-    const filePath = path.join(__dirname, '..', req.path);
-    
-    // Check if file exists
-    try {
-        if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
-            res.sendFile(filePath);
-        } else {
-            res.sendFile(path.join(__dirname, '../index.html'));
-        }
-    } catch (err) {
-        res.sendFile(path.join(__dirname, '../index.html'));
-    }
-});
+
 
 // Export app for Vercel Serverless Functions
 module.exports = app;
