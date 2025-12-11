@@ -42,6 +42,30 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
 
+// Public endpoint for getting all courses (without auth)
+app.get('/api/courses', async (req, res) => {
+    try {
+        const Course = require('../twm3-backend/models/Course');
+        const courses = await Course.find().select('title description instructor duration price category icon featured isFree').lean();
+        res.json(courses || []);
+    } catch (err) {
+        console.error('Error fetching courses:', err);
+        res.status(500).json({ error: 'Failed to fetch courses' });
+    }
+});
+
+// Public endpoint for getting all products
+app.get('/api/products', async (req, res) => {
+    try {
+        const Product = require('../twm3-backend/models/Product');
+        const products = await Product.find().lean();
+        res.json(products || []);
+    } catch (err) {
+        console.error('Error fetching products:', err);
+        res.status(500).json({ error: 'Failed to fetch products' });
+    }
+});
+
 // Import API Routes from twm3-backend
 try {
     const authRoutes = require('../twm3-backend/routes/auth');
