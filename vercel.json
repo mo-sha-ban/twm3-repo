@@ -8,31 +8,8 @@
     ],
     "routes": [
         {
-            "src": "/api/(.*)",
-            "dest": "twm3-backend/server.js"
-        },
-        {
-            "src": "/auth/(.*)",
-            "dest": "twm3-backend/server.js"
-        },
-        {
-            "handle": "filesystem"
-        },
-        {
             "src": "/(.*)",
-            "dest": "/index.html"
+            "dest": "twm3-backend/server.js"
         }
-    ],
-    "env": {
-        "GOOGLE_CLIENT_ID": "@google-client-id",
-        "GOOGLE_CLIENT_SECRET": "@google-client-secret",
-        "GITHUB_CLIENT_ID": "@github-client-id",
-        "GITHUB_CLIENT_SECRET": "@github-client-secret",
-        "JWT_SECRET": "@jwt-secret",
-        "MONGO_URI": "@mongo-uri",
-        "FRONTEND_BASE_URL": "https://twm3.org",
-        "NODE_ENV": "production"
-    },
-    "cleanUrls": true,
-    "trailingSlash": false
+    ]
 }
