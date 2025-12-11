@@ -465,8 +465,18 @@ app.get("/api/health", (req, res) => {
     });
 });
 
-// Serve frontend on root (redirect to deployed frontend if specified)
+// Root health response (avoid redirect so platform health checks succeed)
 app.get("/", (req, res) => {
+    res.json({
+        message: "TWM3 Backend is running successfully",
+        status: "active",
+        timestamp: new Date(),
+        env: process.env.NODE_ENV
+    });
+});
+
+// Optional frontend redirect (explicit path to avoid breaking health checks)
+app.get("/frontend", (req, res) => {
     const frontendUrl = process.env.FRONTEND_BASE_URL;
     if (frontendUrl) {
         return res.redirect(frontendUrl);
