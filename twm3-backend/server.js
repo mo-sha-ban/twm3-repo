@@ -455,9 +455,14 @@ app.get("/data-deletion-status.html", (req, res) => {
     res.sendFile(path.join(__dirname, "..", "data-deletion-status.html"));
 });
 
-// Redirect root to index.html
+// Redirect root to status checks
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "..", "index.html"));
+    res.json({ 
+        message: "TWM3 Backend is running successfully", 
+        status: "active",
+        timestamp: new Date(),
+        env: process.env.NODE_ENV
+    });
 });
 
 // Routes
