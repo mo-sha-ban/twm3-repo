@@ -15,13 +15,18 @@ app.use(cors());
 app.use(express.json());
 
 // Database connection
-mongoose.connect(process.env.MONGO_URI)
+mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/twm3')
     .then(() => console.log("MongoDB connected"))
     .catch(err => console.error("MongoDB connection error:", err));
 
 // Basic route
-app.get('/api', (req, res) => {
-    res.json({ message: 'API is working!' });
+app.get('/', (req, res) => {
+    res.json({ message: 'TWM3 API is working!' });
+});
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+    res.json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
 
 // Export for Vercel

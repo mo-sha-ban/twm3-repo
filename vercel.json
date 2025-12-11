@@ -16,10 +16,7 @@
         },
         {
             "src": "/(.*)",
-            "dest": "/$1",
-            "headers": {
-                "Cache-Control": "public, max-age=0, must-revalidate"
-            }
+            "dest": "/$1"
         }
     ],
     "headers": [
