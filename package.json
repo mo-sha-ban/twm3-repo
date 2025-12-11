@@ -7,7 +7,7 @@
     "start": "node twm3-backend/server.js"
   },
   "engines": {
-    "node": ">=18 <19"
+    "node": "24.x"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",
