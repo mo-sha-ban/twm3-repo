@@ -32,7 +32,13 @@ const config = {
 };
 ```
 
-### 2. Verify File Uploads on Hostinger
+### 2. Update .htaccess (CRITICAL)
+I have created a new **`.htaccess`** file for you.
+1.  **Delete** any files named `htaccess` (without dot) or `websitepath.htaccess` from your Hostinger `public_html`.
+2.  **Upload** the new `.htaccess` file to `public_html`.
+    *   *Note: If you can't see the file in your computer, ensure "Show hidden files" is enabled.*
+
+### 3. Verify File Locations (The cause of "MIME type" errors)
 The error `index.html:1 Refused to execute script... MIME type ('text/html')` means the browser tried to load a `.js` file but got an HTML page (usually a 404 Not Found page) instead.
 
 **Please check the following on Hostinger File Manager:**
