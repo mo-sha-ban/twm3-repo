@@ -101,6 +101,21 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'OK' });
 });
 
+// 404 - Not Found and error handler
+app.use((err, req, res, next) => {
+    console.error('Error:', err.message);
+    res.status(500).json({ error: 'Internal Server Error', message: err.message });
+});
+
+app.use((req, res) => {
+    // If no route matched and it's not an API call, serve index.html
+    if (!req.path.startsWith('/api')) {
+        res.sendFile(path.join(__dirname, '../index.html'));
+    } else {
+        res.status(404).json({ error: 'Not Found' });
+    }
+});
+
 // Export app for Vercel Serverless Functions
 module.exports = app;
 
