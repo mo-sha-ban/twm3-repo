@@ -59,7 +59,7 @@ class CoursesCarousel {
   async loadCourses() {
     try {
       // Try to load from API first
-      const res = await fetch('/api/courses');
+      const res = await fetch(`${window.appConfig.API_BASE_URL}/api/courses`);
       if (res.ok) {
         const data = await res.json();
         this.courses = Array.isArray(data) ? data : (data.courses || []);

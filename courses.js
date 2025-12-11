@@ -1,6 +1,6 @@
 /* Clean Courses module — single source of truth for course UI/actions */
 (function () {
-  const API_BASE = '';
+  const API_BASE = window.appConfig.API_BASE_URL;
 
   // قائمة التصنيفات المتاحة للاستخدام في الفلاتر والنموذج
   const CATEGORY_LIST = [
