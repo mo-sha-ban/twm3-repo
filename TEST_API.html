@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار API</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        h1 {
+            color: #667eea;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .button-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: white;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary {
+            background: #667eea;
+        }
+        
+        .btn-success {
+            background: #48bb78;
+        }
+        
+        .btn-info {
+            background: #4299e1;
+        }
+        
+        .btn-warning {
+            background: #ed8936;
+        }
+        
+        .result {
+            background: #f7fafc;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+        }
+        
+        .result.success {
+            border-right: 4px solid #48bb78;
+        }
+        
+        .result.error {
+            border-right: 4px solid #f56565;
+        }
+        
+        .result h3 {
+            margin-bottom: 10px;
+            color: #2d3748;
+        }
+        
+        pre {
+            background: #2d3748;
+            color: #68d391;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            direction: ltr;
+            text-align: left;
+        }
+        
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .status.success {
+            background: #c6f6d5;
+            color: #22543d;
+        }
+        
+        .status.error {
+            background: #fed7d7;
+            color: #742a2a;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 اختبار API</h1>
+        
+        <div class="input-group">
+            <label for="apiUrl">رابط API (Vercel أو Railway):</label>
+            <input type="text" id="apiUrl" placeholder="https://your-project.vercel.app" value="">
+        </div>
+        
+        <div class="button-group">
+            <button class="btn-primary" onclick="testHealth()">اختبار Health Check</button>
+            <button class="btn-success" onclick="testCounter()">اختبار Counter Config</button>
+            <button class="btn-info" onclick="testCourses()">اختبار Courses API</button>
+            <button class="btn-warning" onclick="testProducts()">اختبار Products API</button>
+        </div>
+        
+        <div id="result" class="result">
+            <h3>النتيجة:</h3>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+    
+    <script>
+        function getApiUrl() {
+            const url = document.getElementById('apiUrl').value.trim();
+            if (!url) {
+                alert('الرجاء إدخال رابط API');
+                return null;
+            }
+            return url.endsWith('/') ? url.slice(0, -1) : url;
+        }
+        
+        function showResult(success, data) {
+            const result = document.getElementById('result');
+            const content = document.getElementById('resultContent');
+            
+            result.className = 'result show ' + (success ? 'success' : 'error');
+            
+            const statusClass = success ? 'success' : 'error';
+            const statusText = success ? '✅ نجح' : '❌ فشل';
+            
+            content.innerHTML = `
+                <span class="status ${statusClass}">${statusText}</span>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+        }
+        
+        async function testEndpoint(endpoint, description) {
+            const baseUrl = getApiUrl();
+            if (!baseUrl) return;
+            
+            const url = `${baseUrl}${endpoint}`;
+            console.log(`Testing: ${url}`);
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult(true, {
+                        description: description,
+                        status: response.status,
+                        data: data
+                    });
+                } else {
+                    showResult(false, {
+                        description: description,
+                        status: response.status,
+                        error: data
+                    });
+                }
+            } catch (error) {
+                showResult(false, {
+                    description: description,
+                    error: error.message,
+                    details: 'تأكد من أن الرابط صحيح وأن CORS مفعل'
+                });
+            }
+        }
+        
+        function testHealth() {
+            testEndpoint('/health', 'Health Check Endpoint');
+        }
+        
+        function testCounter() {
+            testEndpoint('/api/counter-config', 'Counter Configuration Endpoint');
+        }
+        
+        function testCourses() {
+            testEndpoint('/api/courses', 'Courses API Endpoint');
+        }
+        
+        function testProducts() {
+            testEndpoint('/api/products', 'Products API Endpoint');
+        }
+        
+        // Auto-detect API URL from current domain
+        window.onload = function() {
+            // Try to detect if we're on a known domain
+            const hostname = window.location.hostname;
+            if (hostname.includes('vercel.app')) {
+                document.getElementById('apiUrl').value = window.location.origin;
+            } else if (hostname.includes('railway.app')) {
+                document.getElementById('apiUrl').value = window.location.origin;
+            }
+        };
+    </script>
+</body>
+</html>
