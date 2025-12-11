@@ -1,272 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>اختبار الميزات - TeamWork M3</title>
-
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <!-- Favicon -->
-    <link rel="icon" href="img/loogo.png">
-
-    <style>
-        body {
-            font-family: 'Cairo', sans-serif;
-            background: #f8fafc;
-            color: #1e293b;
-            line-height: 1.6;
-            padding: 2rem;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #6366f1;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
-
-        .test-container {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            border: 1px solid #e2e8f0;
-        }
-
-        .test-section {
-            margin-bottom: 2rem;
-            padding: 1.5rem;
-            background: #f1f5f9;
-            border-radius: 8px;
-            border-left: 4px solid #6366f1;
-        }
-
-        .test-section h2 {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 1rem;
-        }
-
-        .test-steps {
-            list-style: none;
-            padding-left: 0;
-        }
-
-        .test-steps li {
-            padding: 0.75rem;
-            margin-bottom: 0.5rem;
-            background: white;
-            border-radius: 6px;
-            border-left: 3px solid #8b5cf6;
-        }
-
-        .test-steps li.completed {
-            background: #d1fae5;
-            border-left-color: #10b981;
-        }
-
-        .test-steps li.failed {
-            background: #fee2e2;
-            border-left-color: #ef4444;
-        }
-
-        .test-button {
-            background: #6366f1;
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            margin-top: 1rem;
-            transition: all 0.3s ease;
-        }
-
-        .test-button:hover {
-            background: #4f46e5;
-            transform: translateY(-1px);
-        }
-
-        .test-button:disabled {
-            background: #cbd5e1;
-            cursor: not-allowed;
-        }
-
-        .result-message {
-            margin-top: 1rem;
-            padding: 1rem;
-            border-radius: 8px;
-            display: none;
-        }
-
-        .success {
-            background: #d1fae5;
-            color: #065f46;
-            border-left: 4px solid #10b981;
-        }
-
-        .error {
-            background: #fee2e2;
-            color: #991b1b;
-            border-left: 4px solid #ef4444;
-        }
-
-        .info {
-            background: #dbeafe;
-            color: #1e40af;
-            border-left: 4px solid #3b82f6;
-        }
-    </style>
-</head>
-<body>
-    <h1>اختبار الميزات الجديدة</h1>
-
-    <div class="test-container">
-        <!-- Test 1: Reset Course Progress Feature -->
-        <div class="test-section">
-            <h2>✅ ميزة إعادة تعيين تقدم الكورسات</h2>
-            <p>تم تنفيذ الميزة بنجاح:</p>
-            <ul class="test-steps">
-                <li class="completed">✅ تم إضافة زر الإعدادات في شريط الأدوات</li>
-                <li class="completed">✅ تم إنشاء مودال تأكيد إعادة التعيين</li>
-                <li class="completed">✅ تم ربط المودال بوظيفة إعادة التعيين</li>
-                <li class="completed">✅ تم تنفيذ الاتصال بالـ API لإعادة تعيين التقدم</li>
-                <li class="completed">✅ تم إضافة إشعارات النجاح/الفشل</li>
-                <li class="completed">✅ تم تحديث العرض بعد إعادة التعيين</li>
-            </ul>
-            <p>يمكنك اختبار هذه الميزة عن طريق:</p>
-            <ol>
-                <li>الذهاب إلى صفحة البروفايل</li>
-                <li>النقر على أيقونة الإعدادات (⚙️) في شريط الأدوات العلوي</li>
-                <li>سيظهر مودال تأكيد إعادة التعيين</li>
-                <li>النقر على "تأكيد إعادة التعيين" لإعادة جميع الكورسات إلى 0%</li>
-            </ol>
-        </div>
-
-        <!-- Test 2: Sidebar Icons -->
-        <div class="test-section">
-            <h2>✅ أيقونات الشريط الجانبي الجديدة</h2>
-            <p>تم تنفيذ الميزة بنجاح:</p>
-            <ul class="test-steps">
-                <li class="completed">✅ تم إضافة أيقونة المتجر (🏪) في الشريط الجانبي</li>
-                <li class="completed">✅ تم إضافة أيقونة السلة (🛒) في الشريط الجانبي</li>
-                <li class="completed">✅ تم ربط الأيقونات بالصفحات المناسبة</li>
-                <li class="completed">✅ تم الحفاظ على تصميم الشريط الجانبي الحالي</li>
-            </ul>
-            <p>يمكنك اختبار هذه الميزة عن طريق:</p>
-            <ol>
-                <li>الذهاب إلى صفحة البروفايل</li>
-                <li>فتح الشريط الجانبي بالنقر على أيقونة القائمة</li>
-                <li>ستجد أيقونتين جديدتين: "المتجر" و"السلة"</li>
-                <li>النقر على أيقونة المتجر سيأخذك إلى store.html</li>
-                <li>النقر على أيقونة السلة سيأخذك إلى cart.html</li>
-            </ol>
-        </div>
-
-        <!-- Test 3: Cart Page -->
-        <div class="test-section">
-            <h2>✅ صفحة السلة الجديدة</h2>
-            <p>تم تنفيذ الميزة بنجاح:</p>
-            <ul class="test-steps">
-                <li class="completed">✅ تم إنشاء صفحة سلة مشتريات جديدة (cart.html)</li>
-                <li class="completed">✅ تم تنفيذ عرض المنتجات في السلة</li>
-                <li class="completed">✅ تم تنفيذ وظيفة إضافة/إزالة المنتجات</li>
-                <li class="completed">✅ تم تنفيذ حساب المجموع والضرائب</li>
-                <li class="completed">✅ تم تنفيذ عملية إتمام الشراء</li>
-                <li class="completed">✅ تم ربط السلة بنظام التخزين المحلي</li>
-                <li class="completed">✅ تم إضافة إشعارات النجاح/الفشل</li>
-            </ul>
-            <p>يمكنك اختبار هذه الميزة عن طريق:</p>
-            <ol>
-                <li>الذهاب إلى صفحة المتجر (store.html)</li>
-                <li>النقر على "إضافة للسلة" على أي منتج</li>
-                <li>الذهاب إلى صفحة السلة (cart.html)</li>
-                <li>ستجد المنتجات التي أضفتها مع خيارات التحكم</li>
-                <li>يمكنك زيادة/إنقاص الكمية أو إزالة المنتجات</li>
-                <li>النقر على "إتمام الشراء" لإكمال عملية الشراء</li>
-            </ol>
-        </div>
-
-        <!-- Test 4: Integration Test -->
-        <div class="test-section">
-            <h2>🔄 اختبار التكامل الكامل</h2>
-            <p>اختبار سير العمل الكامل:</p>
-            <ol>
-                <li>الذهاب إلى صفحة البروفايل</li>
-                <li>النقر على أيقونة المتجر في الشريط الجانبي</li>
-                <li>في صفحة المتجر، إضافة منتج إلى السلة</li>
-                <li>العودة إلى صفحة البروفايل</li>
-                <li>النقر على أيقونة السلة في الشريط الجانبي</li>
-                <li>ستجد المنتج في سلة المشتريات</li>
-                <li>يمكنك إتمام عملية الشراء أو العودة إلى المتجر</li>
-                <li>في صفحة البروفايل، يمكنك إعادة تعيين تقدم الكورسات إذا أردت</li>
-            </ol>
-
-            <button class="test-button" id="testIntegrationBtn">
-                <i class="fas fa-play"></i> اختبار سير العمل
-            </button>
-
-            <div class="result-message info" id="integrationResult">
-                <p>يمكنك اختبار سير العمل يدويًا عن طريق اتباع الخطوات أعلاه.</p>
-                <p>تم تنفيذ جميع الميزات المطلوبة بنجاح:</p>
-                <ul>
-                    <li>✅ إعادة تعيين تقدم الكورسات مع مودال تأكيد</li>
-                    <li>✅ أيقونات المتجر والسلة في الشريط الجانبي</li>
-                    <li>✅ صفحة سلة مشتريات كاملة مع وظيفة الشراء</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Show integration test result
-            const integrationBtn = document.getElementById('testIntegrationBtn');
-            const integrationResult = document.getElementById('integrationResult');
-
-            if (integrationBtn && integrationResult) {
-                integrationBtn.addEventListener('click', function() {
-                    integrationResult.style.display = 'block';
-                    integrationBtn.disabled = true;
-                    integrationBtn.textContent = 'تم العرض';
-                });
-            }
-        });
-
-        // Simple toast function for testing
-        function showToast(message, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = `toast toast-${type}`;
-            toast.style.position = 'fixed';
-            toast.style.bottom = '20px';
-            toast.style.right = '20px';
-            toast.style.padding = '12px 20px';
-            toast.style.borderRadius = '8px';
-            toast.style.background = type === 'success' ? '#10b981' :
-                                    type === 'error' ? '#ef4444' : '#3b82f6';
-            toast.style.color = 'white';
-            toast.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
-            toast.style.zIndex = '1000';
-            toast.textContent = message;
-
-            document.body.appendChild(toast);
-
-            setTimeout(() => {
-                toast.remove();
-            }, 3000);
-        }
-    </script>
-</body>
-</html>
