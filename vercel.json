@@ -25,7 +25,7 @@
         },
         {
             "src": "/(.*)",
-            "dest": "twm3-backend/server.js"
+            "dest": "/index.html"
         }
     ]
 }
