@@ -1206,7 +1206,7 @@ async function fetchCourses() {
         const fd = new FormData();
         fd.append('file', file);
         const token = localStorage.getItem('token') || '';
-        const res = await fetch('http://localhost:5000/api/uploads/lesson-asset', {
+        const res = await fetch('https://twm3-repo-production.up.railway.app/api/uploads/lesson-asset', {
           method: 'POST',
           headers: token ? { 'Authorization': 'Bearer ' + token } : {},
           body: fd

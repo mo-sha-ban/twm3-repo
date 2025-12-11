@@ -1,0 +1,32 @@
+{
+  "name": "twm3-backend",
+  "version": "1.0.0",
+  "description": "TWM3 Educational Platform Backend",
+  "main": "twm3-backend/server.js",
+  "scripts": {
+    "start": "node twm3-backend/server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "connect-mongo": "^5.1.0",
+    "cors": "^2.8.5",
+    "csrf-csrf": "^4.0.2",
+    "csurf": "^1.10.0",
+    "dotenv": "^16.6.1",
+    "express": "^5.1.0",
+    "express-rate-limit": "^7.5.1",
+    "express-session": "^1.18.1",
+    "google-auth-library": "^10.4.2",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.14.2",
+    "multer": "^2.0.1",
+    "node-fetch": "^2.7.0",
+    "nodemailer": "^6.9.7",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1"
+  }
+}

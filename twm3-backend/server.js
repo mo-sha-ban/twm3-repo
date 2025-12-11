@@ -79,7 +79,7 @@ app.use(helmet({
 }));
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
-        ? ['https://twm3.org', 'https://www.twm3.org', 'https://api.twm3.org']
+        ? ['https://twm3.org', 'https://www.twm3.org', 'https://api.twm3.org', 'https://twm3-repo-production.up.railway.app']
         : ['http://localhost:5000', 'http://localhost:3000', 'http://127.0.0.1:3000', 'http://127.0.0.1:5000'],
     credentials: true
 }));

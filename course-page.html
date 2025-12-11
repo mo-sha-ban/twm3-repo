@@ -2190,7 +2190,7 @@
                     </div>
                 `;
 
-                let response = await fetch(`http://localhost:5000/api/courses/${courseId}`);
+                let response = await fetch(`https://twm3-repo-production.up.railway.app/api/courses/${courseId}`);
                 if (!response.ok) {
                     response = await fetch(`https://api.teamworkm3.com/api/courses/${courseId}`);
                 }

@@ -1,6 +1,6 @@
 // Settings Page JavaScript
 
-const API_BASE = '/api';
+const API_BASE = 'https://twm3-repo-production.up.railway.app/api';
 let currentUser = null;
 
 // Initialize page

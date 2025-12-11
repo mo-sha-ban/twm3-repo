@@ -441,7 +441,7 @@ function getFullAvatarUrl(avatarUrl) {
     if (/^https?:\/\//i.test(avatarUrl)) return avatarUrl;
 
     // Some stored avatarUrl may already include leading slash; ensure single slash
-    const origin = window.location.origin && window.location.origin.includes('localhost:5000') ? window.location.origin : 'http://localhost:5000';
+    const origin = 'https://twm3-repo-production.up.railway.app';
     if (avatarUrl.startsWith('/')) return origin + avatarUrl;
     return origin + '/' + avatarUrl;
 }
