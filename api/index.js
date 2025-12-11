@@ -5,15 +5,9 @@ const path = require('path');
 const fs = require('fs');
 const dotenv = require('dotenv');
 
-// Load environment variables
 require("dotenv").config();
 
 const app = express();
-
-// Log startup
-console.log('🚀 Starting TWM3 API Server...');
-console.log('📍 Environment:', process.env.NODE_ENV || 'development');
-console.log('📁 Directory:', __dirname);
 
 // Middleware Configuration
 app.use(helmet({
@@ -68,11 +62,9 @@ app.use(helmet({
 
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
-        ? ['https://twm3.org', 'https://www.twm3.org', 'https://api.twm3.org', 'https://twm3-repo.vercel.app']
+        ? ['https://twm3.org', 'https://www.twm3.org', 'https://api.twm3.org']
         : ['http://localhost:5000', 'http://localhost:3000', 'http://127.0.0.1:3000', 'http://127.0.0.1:5000'],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    credentials: true
 }));
 
 app.use(express.json());
@@ -118,33 +110,25 @@ app.use('/img', express.static(path.join(__dirname, '../img')));
 app.use('/assets', express.static(path.join(__dirname, '../assets')));
 app.use('/pdfjs', express.static(path.join(__dirname, '../pdfjs')));
 
-// Import and use routes from twm3-backend (only if available)
-let routesLoaded = false;
+// Import and use routes from twm3-backend
 try {
-    // Check if twm3-backend exists
-    if (fs.existsSync(path.join(__dirname, '../twm3-backend'))) {
-        const blogRoutes = require('../twm3-backend/routes/blogRoutes');
-        const commentRoutes = require('../twm3-backend/routes/commentRoutes');
-        const messageRoutes = require('../twm3-backend/routes/messageRoutes');
-        const notificationRoutes = require('../twm3-backend/routes/notificationRoutes');
-        const courseRoutes = require('../twm3-backend/routes/courseRoutes');
-        const productRoutes = require('../twm3-backend/routes/productRoutes');
-        const dataDeletionRoutes = require('../twm3-backend/routes/dataDeletion');
-        
-        app.use('/api/blogs', blogRoutes);
-        app.use('/api/comments', commentRoutes);
-        app.use('/api/messages', messageRoutes);
-        app.use('/api/notifications', notificationRoutes);
-        app.use('/api/courses', courseRoutes);
-        app.use('/api/products', productRoutes);
-        app.use('/api/delete', dataDeletionRoutes);
-        
-        routesLoaded = true;
-        console.log('✅ Backend routes loaded successfully');
-    }
+    const blogRoutes = require('../twm3-backend/routes/blogRoutes');
+    const commentRoutes = require('../twm3-backend/routes/commentRoutes');
+    const messageRoutes = require('../twm3-backend/routes/messageRoutes');
+    const notificationRoutes = require('../twm3-backend/routes/notificationRoutes');
+    const courseRoutes = require('../twm3-backend/routes/courseRoutes');
+    const productRoutes = require('../twm3-backend/routes/productRoutes');
+    const dataDeletionRoutes = require('../twm3-backend/routes/dataDeletion');
+    
+    app.use('/api/blogs', blogRoutes);
+    app.use('/api/comments', commentRoutes);
+    app.use('/api/messages', messageRoutes);
+    app.use('/api/notifications', notificationRoutes);
+    app.use('/api/courses', courseRoutes);
+    app.use('/api/products', productRoutes);
+    app.use('/api/delete', dataDeletionRoutes);
 } catch (err) {
-    console.warn('⚠️ Backend routes could not be loaded:', err.message);
-    console.warn('Using fallback endpoints instead');
+    console.warn('Some routes could not be loaded:', err.message);
 }
 
 // Health check endpoint
@@ -152,83 +136,33 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'OK' });
 });
 
-// Counter config endpoint
-app.get('/api/counter-config', (req, res) => {
-    res.json({
-        baseCount: 50000,
-        dailyIncrement: 20,
-        startDate: new Date('2024-01-01').getTime()
-    });
-});
-
-// Fallback endpoints (if backend routes not loaded)
-if (!routesLoaded) {
-    console.log('📦 Setting up fallback API endpoints');
-    
-    // Courses endpoint
-    app.get('/api/courses', (req, res) => {
-        const coursesPath = path.join(__dirname, '../courses.json');
-        try {
-            if (fs.existsSync(coursesPath)) {
-                const courses = JSON.parse(fs.readFileSync(coursesPath, 'utf8'));
-                res.json(courses);
-            } else {
-                res.json([]);
-            }
-        } catch (error) {
-            console.error('Error reading courses:', error);
-            res.json([]);
-        }
-    });
-    
-    // Products endpoint
-    app.get('/api/products', (req, res) => {
-        const productsPath = path.join(__dirname, '../products.json');
-        try {
-            if (fs.existsSync(productsPath)) {
-                const products = JSON.parse(fs.readFileSync(productsPath, 'utf8'));
-                res.json(products);
-            } else {
-                res.json([]);
-            }
-        } catch (error) {
-            console.error('Error reading products:', error);
-            res.json([]);
-        }
-    });
-    
-    // Blogs endpoint
-    app.get('/api/blogs', (req, res) => {
-        res.json([]);
-    });
-    
-    // Messages endpoint
-    app.get('/api/messages', (req, res) => {
-        res.json([]);
-    });
-    
-    // Notifications endpoint
-    app.get('/api/notifications', (req, res) => {
-        res.json([]);
-    });
-    
-    // Comments endpoint
-    app.get('/api/comments', (req, res) => {
-        res.json([]);
-    });
-}
-
-// Error handler middleware
+// 404 - Error handler (must be before final catch-all)
 app.use((err, req, res, next) => {
-    console.error('❌ Error:', err.message);
-    console.error(err.stack);
-    res.status(500).json({ 
-        error: 'Internal Server Error', 
-        message: process.env.NODE_ENV === 'production' ? 'Something went wrong' : err.message 
-    });
+    console.error('Error:', err.message);
+    res.status(500).json({ error: 'Internal Server Error', message: err.message });
 });
 
-
+// Final catch-all: serve SPA routing
+app.use((req, res) => {
+    // If it's an API call, return 404
+    if (req.path.startsWith('/api') || req.path.startsWith('/auth') || req.path.startsWith('/upload')) {
+        return res.status(404).json({ error: 'Not Found' });
+    }
+    
+    // Otherwise try to serve the file, or fall back to index.html
+    const filePath = path.join(__dirname, '..', req.path);
+    
+    // Check if file exists
+    try {
+        if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+            res.sendFile(filePath);
+        } else {
+            res.sendFile(path.join(__dirname, '../index.html'));
+        }
+    } catch (err) {
+        res.sendFile(path.join(__dirname, '../index.html'));
+    }
+});
 
 // Export app for Vercel Serverless Functions
 module.exports = app;

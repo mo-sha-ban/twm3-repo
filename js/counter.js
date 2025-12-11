@@ -31,19 +31,13 @@ function updateCounterDisplay() {
 // Load config from server if available
 async function loadCounterConfig() {
     try {
-        // Use API_CONFIG if available, otherwise fallback to relative path
-        const apiUrl = typeof API_CONFIG !== 'undefined' 
-            ? `${API_CONFIG.API_BASE_URL}/counter-config`
-            : '/api/counter-config';
-            
-        const response = await fetch(apiUrl);
+        const response = await fetch('/api/counter-config');
         if (response.ok) {
             const config = await response.json();
             counterConfig = { ...counterConfig, ...config };
         }
     } catch (error) {
         console.error('Failed to load counter configuration:', error);
-        // Continue with default config
     }
 }
 
