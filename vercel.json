@@ -1,10 +1,5 @@
 {
     "version": 2,
-    "functions": {
-        "twm3-backend/server.js": {
-            "includeFiles": "**/*"
-        }
-    },
     "builds": [
         {
             "src": "twm3-backend/server.js",
@@ -13,32 +8,16 @@
     ],
     "routes": [
         {
-            "src": "/(css|js|img|pdfjs|assets|Pages|scripts|uploads)/(.*)",
-            "dest": "/$1/$2"
-        },
-        {
-            "src": "/(.*)\\.json",
-            "dest": "/$1.json"
-        },
-        {
-            "src": "/(.*)\\.html",
-            "dest": "/$1.html"
-        },
-        {
             "src": "/api/(.*)",
-            "dest": "/twm3-backend/server.js"
+            "dest": "twm3-backend/server.js"
         },
         {
             "src": "/auth/(.*)",
-            "dest": "/twm3-backend/server.js"
-        },
-        {
-            "src": "/(?!api|auth|_vercel|favicon\\.ico).*",
-            "dest": "/index.html"
+            "dest": "twm3-backend/server.js"
         },
         {
             "src": "/(.*)",
-            "dest": "/twm3-backend/server.js"
+            "dest": "/index.html"
         }
     ],
     "env": {
