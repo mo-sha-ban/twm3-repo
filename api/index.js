@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const path = require('path');
+const fs = require('fs');
 const dotenv = require('dotenv');
 
 require("dotenv").config();
@@ -70,10 +71,13 @@ app.use(express.json());
 
 // Serve static files from parent directory (Vercel root)
 app.use(express.static(path.join(__dirname, '..')));
+
+// Explicit routes for static directories
 app.use('/css', express.static(path.join(__dirname, '../css')));
 app.use('/js', express.static(path.join(__dirname, '../js')));
 app.use('/img', express.static(path.join(__dirname, '../img')));
 app.use('/assets', express.static(path.join(__dirname, '../assets')));
+app.use('/pdfjs', express.static(path.join(__dirname, '../pdfjs')));
 
 // Import and use routes from twm3-backend
 try {
@@ -101,18 +105,31 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'OK' });
 });
 
-// 404 - Not Found and error handler
+// 404 - Error handler (must be before final catch-all)
 app.use((err, req, res, next) => {
     console.error('Error:', err.message);
     res.status(500).json({ error: 'Internal Server Error', message: err.message });
 });
 
+// Final catch-all: serve SPA routing
 app.use((req, res) => {
-    // If no route matched and it's not an API call, serve index.html
-    if (!req.path.startsWith('/api')) {
+    // If it's an API call, return 404
+    if (req.path.startsWith('/api') || req.path.startsWith('/auth') || req.path.startsWith('/upload')) {
+        return res.status(404).json({ error: 'Not Found' });
+    }
+    
+    // Otherwise try to serve the file, or fall back to index.html
+    const filePath = path.join(__dirname, '..', req.path);
+    
+    // Check if file exists
+    try {
+        if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+            res.sendFile(filePath);
+        } else {
+            res.sendFile(path.join(__dirname, '../index.html'));
+        }
+    } catch (err) {
         res.sendFile(path.join(__dirname, '../index.html'));
-    } else {
-        res.status(404).json({ error: 'Not Found' });
     }
 });
 
