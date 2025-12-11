@@ -2000,44 +2000,51 @@ io.on('connection', (socket) => {
     });
 });
 
-// Start server بعد التأكد من اتصال قاعدة البيانات
-mongoose.connect(process.env.MONGO_URI)
-    .then(async () => {
+// Start server optimization for Vercel
+const startServer = async () => {
+    try {
+        await mongoose.connect(process.env.MONGO_URI);
         console.log("MongoDB connected");
-        
 
-        
-        const port = parseInt(process.env.PORT || PORT || 5000, 10);
-        const maxRetries = 5;
-        let attempt = 0;
+        // Only listen if we are in a direct node process (not Vercel)
+        if (require.main === module) {
+            const port = parseInt(process.env.PORT || PORT || 5000, 10);
+            const maxRetries = 5;
+            let attempt = 0;
 
-        function tryListen(p) {
-            // attach an error handler for this attempt only
-            server.once('error', (err) => {
-                if (err && err.code === 'EADDRINUSE') {
-                    attempt++;
-                    if (attempt <= maxRetries) {
-                        const nextPort = p + 1;
-                        console.warn(`Port ${p} in use; trying port ${nextPort} (attempt ${attempt}/${maxRetries})`);
-                        tryListen(nextPort);
+            function tryListen(p) {
+                server.once('error', (err) => {
+                    if (err && err.code === 'EADDRINUSE') {
+                        attempt++;
+                        if (attempt <= maxRetries) {
+                            const nextPort = p + 1;
+                            console.warn(`Port ${p} in use; trying port ${nextPort} (attempt ${attempt}/${maxRetries})`);
+                            tryListen(nextPort);
+                        } else {
+                            console.error(`Port ${p} still in use after ${maxRetries} attempts; exiting.`);
+                            process.exit(1);
+                        }
                     } else {
-                        console.error(`Port ${p} still in use after ${maxRetries} attempts; exiting.`);
+                        console.error('Server listen error:', err);
                         process.exit(1);
                     }
-                } else {
-                    console.error('Server listen error:', err);
-                    process.exit(1);
-                }
-            });
+                });
 
-            server.listen(p, () => {
-                console.log(`Server is running on http://localhost:${p}`);
-            });
+                server.listen(p, () => {
+                    console.log(`Server is running on http://localhost:${p}`);
+                });
+            }
+            tryListen(port);
         }
-
-        tryListen(port);
-    })
-    .catch(err => {
+    } catch (err) {
         console.error("MongoDB connection error:", err);
-        process.exit(1);
-    });
+        // Don't exit process on Vercel, just log
+        if (require.main === module) process.exit(1);
+    }
+};
+
+// Start connection immediately
+startServer();
+
+// Export for Vercel
+module.exports = app;
