@@ -16,6 +16,9 @@
             "dest": "twm3-backend/server.js"
         },
         {
+            "handle": "filesystem"
+        },
+        {
             "src": "/(.*)",
             "dest": "/index.html"
         }
