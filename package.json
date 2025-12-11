@@ -1,6 +1,5 @@
 {
-  "name": "twm3-frontend",
+  "name": "twm3-platform",
   "version": "1.0.0",
-  "description": "TWM3 Educational Platform - Frontend",
   "private": true
 }
