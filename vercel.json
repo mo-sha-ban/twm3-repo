@@ -1,10 +1,5 @@
 {
     "version": 2,
-    "functions": {
-        "twm3-backend/server.js": {
-            "includeFiles": "**/*"
-        }
-    },
     "builds": [
         {
             "src": "twm3-backend/server.js",
