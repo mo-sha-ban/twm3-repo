@@ -93,11 +93,6 @@ app.get('/health', (req, res) => {
     res.status(200).json({ status: 'OK' });
 });
 
-// Default endpoint
-app.get('/', (req, res) => {
-    res.status(200).json({ message: 'API is running' });
-});
-
 // Export app for Vercel Serverless Functions
 module.exports = app;
 
