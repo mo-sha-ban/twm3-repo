@@ -522,8 +522,43 @@ function requireAuthToken(req, res, next) {
     }
 }
 
-// NOTE: Static files are served by Vercel, not by this Express app
-// This is a backend-only API server
+// Serve static frontend files (but NOT /uploads - that's handled by custom route above)
+// IMPORTANT: This middleware must come AFTER the /uploads/:fileName route
+app.use(express.static(path.join(__dirname, ".."), {
+    extensions: ["html"],
+    setHeaders: (res, path) => {
+        // Ensure JS files have correct content type
+        if (path.endsWith('.js')) {
+            res.setHeader('Content-Type', 'application/javascript');
+        }
+    }
+}));
+
+// Serve store.js and other root JS files with correct MIME type
+app.use(express.static(path.join(__dirname, ".."), {
+    setHeaders: (res, path) => {
+        if (path.endsWith('.js')) {
+            res.setHeader('Content-Type', 'application/javascript');
+        } else if (path.endsWith('.css')) {
+            res.setHeader('Content-Type', 'text/css');
+        }
+    }
+}));
+
+// Special route for data deletion status page
+app.get("/data-deletion-status", (req, res) => {
+    res.sendFile(path.join(__dirname, "..", "data-deletion-status.html"));
+});
+
+// Special route for data deletion status page with .html extension
+app.get("/data-deletion-status.html", (req, res) => {
+    res.sendFile(path.join(__dirname, "..", "data-deletion-status.html"));
+});
+
+// Redirect root to index.html
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "..", "index.html"));
+});
 
 // Routes
 const authRoutes = require("./routes/auth");
