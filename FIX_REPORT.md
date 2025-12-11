@@ -41,12 +41,19 @@ I have created a new **`.htaccess`** file for you.
 ### 3. Verify File Locations (The cause of "MIME type" errors)
 The error `index.html:1 Refused to execute script... MIME type ('text/html')` means the browser tried to load a `.js` file but got an HTML page (usually a 404 Not Found page) instead.
 
-**Please check the following on Hostinger File Manager:**
-1.  Ensure all files (including `app.js`, `courses.js`, `login.js`) are in the **same public_html folder** as your `index.html`.
-2.  Ensure the `js` folder (containing `courses-carousel.js` and `counter.js`) is also uploaded to `public_html/js`.
-3.  If you uploaded the entire `twm3-repo` folder, make sure you moved the **contents** into `public_html` directly, not inside a subfolder, OR ensure `index.html` links point to the correct subfolder (but moving contents to root is standard).
+**This confirms that your `app.js`, `login.js`, etc. are NOT found in the folder your browser is looking in.**
 
-### 3. Deploy Updates
+**Please check the following on Hostinger File Manager:**
+1.  **Placement:** files must be in `public_html`, not `public_html/twm3-repo`.
+2.  **Case Sensitivity:** Hostinger (Linux) distinguishes between `Login.html` and `login.html`. Ensure names match exactly.
+
+### 4. Run the Diagnostic Tool
+I have created a **`diagnostic.html`** file.
+1.  Upload `diagnostic.html` to your `public_html` folder.
+2.  Visit `https://www.twm3.org/diagnostic.html`.
+3.  It will tell you exactly which files are missing.
+
+### 5. Deploy Updates
 1.  Save your local changes.
 2.  Upload `config.js`, `index.html`, `login.html`, `dashboard.html`, `login.js`, `courses.js`, and `js/courses-carousel.js` to Hostinger (replacing old ones).
 
