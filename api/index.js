@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
+const path = require('path');
 const dotenv = require('dotenv');
 
 require("dotenv").config();
@@ -66,6 +67,13 @@ app.use(cors({
 }));
 
 app.use(express.json());
+
+// Serve static files from parent directory (Vercel root)
+app.use(express.static(path.join(__dirname, '..')));
+app.use('/css', express.static(path.join(__dirname, '../css')));
+app.use('/js', express.static(path.join(__dirname, '../js')));
+app.use('/img', express.static(path.join(__dirname, '../img')));
+app.use('/assets', express.static(path.join(__dirname, '../assets')));
 
 // Import and use routes from twm3-backend
 try {
