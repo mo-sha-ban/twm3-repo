@@ -1,9 +1,9 @@
 {
   "name": "twm3-backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "api/server.js",
   "scripts": {
-    "start": "cd twm3-backend && node server.js",
+    "start": "node twm3-backend/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
