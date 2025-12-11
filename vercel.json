@@ -1,0 +1,28 @@
+{
+    "version": 2,
+    "buildCommand": "cd twm3-backend && npm install",
+    "env": {
+        "NODE_ENV": "production"
+    },
+    "functions": {
+        "twm3-backend/server.js": {
+            "memory": 1024,
+            "maxDuration": 60,
+            "runtime": "nodejs18.x"
+        }
+    },
+    "routes": [
+        {
+            "src": "^/(api|auth|uploads)/.*",
+            "dest": "/twm3-backend/server.js"
+        },
+        {
+            "src": "^/(?!api|auth|uploads|css|js|img|assets).*\\.html$",
+            "dest": "$1.html"
+        },
+        {
+            "src": "^/(?!api|auth|uploads|css|js|img|assets).*$",
+            "dest": "/index.html"
+        }
+    ]
+}
