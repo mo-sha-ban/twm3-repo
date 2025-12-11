@@ -1,21 +1,5 @@
 {
   "version": 2,
-  "functions": {
-    "twm3-backend/server.js": {
-      "includeFiles": [
-        "*.html",
-        "assets/**",
-        "css/**",
-        "js/**",
-        "img/**",
-        "uploads/**",
-        "courses.json",
-        "products.json",
-        "users.json",
-        "twm3-backend/public/**"
-      ]
-    }
-  },
   "builds": [
     {
       "src": "twm3-backend/server.js",
