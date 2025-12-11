@@ -42,9 +42,35 @@ app.get('/api/health', (req, res) => {
     res.json({ status: 'healthy', timestamp: new Date().toISOString() });
 });
 
+// Import API Routes from twm3-backend
+try {
+    const authRoutes = require('../twm3-backend/routes/auth');
+    const courseRoutes = require('../twm3-backend/routes/courseRoutes');
+    const productRoutes = require('../twm3-backend/routes/productRoutes');
+    const blogRoutes = require('../twm3-backend/routes/blogRoutes');
+    const courseRoutesModule = require('../twm3-backend/routes/courseRoutes');
+    const counterRoutes = require('../twm3-backend/routes/counterRoutes');
+    const progressRoutes = require('../twm3-backend/routes/progressRoutes');
+
+    // Register API Routes
+    app.use('/api/auth', authRoutes);
+    app.use('/api/courses', courseRoutes);
+    app.use('/api/products', productRoutes);
+    app.use('/api/blogs', blogRoutes);
+    app.use('/api', counterRoutes);
+    app.use('/api/progress', progressRoutes);
+
+    console.log('✅ API routes loaded successfully');
+} catch (err) {
+    console.error('⚠️ Error loading routes:', err.message);
+}
+
+// Serve uploads
+app.use('/uploads', express.static(path.join(__dirname, '../twm3-backend/public/uploads')));
+
 // 404 handler
 app.use((req, res) => {
-    res.status(404).json({ error: 'Not Found - Frontend is on Vercel' });
+    res.status(404).json({ error: 'Not Found', path: req.path });
 });
 
 // Error handler
