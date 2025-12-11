@@ -18,8 +18,8 @@
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="../../css/dashboard.css">
-    <link rel="stylesheet" href="css/comments.css">
-    <script src="config.js"></script>
+    <link rel="stylesheet" href="../../css/comments.css">
+
     <script>
       // التحقق من تسجيل الدخول والصلاحيات
       (function () {
@@ -29,14 +29,14 @@
         // تحقق من وجود المستخدم والتوكن
         if (!user || !token) {
           alert("يجب تسجيل الدخول أولاً!");
-          window.location.href="login.html";
+          window.location.href = "../../login.html";
           return;
         }
 
         // تحقق من صلاحيات المدير
         if (!user.isAdmin) {
           alert("غير مصرح لك بالدخول إلى لوحة التحكم!");
-          window.location.href="alert.html";
+          window.location.href = "../../alert.html";
           return;
         }
 
@@ -2356,7 +2356,7 @@ body.modal-open {
             try{
                 const token = localStorage.getItem('token');
                 const headers = token? { 'Authorization': 'Bearer ' + token } : {};
-                const res = await fetch(`${window.appConfig.API_BASE_URL}/api/counter-config`, { headers });
+                const res = await fetch('/api/counter-config', { headers });
                 if(!res.ok) throw new Error('failed');
                 const cfg = await res.json();
                 document.getElementById('baseCountPrivate').value = cfg.baseCount || 0;
@@ -2399,7 +2399,7 @@ body.modal-open {
                         const startDate = new Date(document.getElementById('startDatePrivate').value).getTime();
                         const token = localStorage.getItem('token');
                         const headers = token? { 'Content-Type':'application/json','Authorization':'Bearer '+token } : { 'Content-Type':'application/json' };
-                        const res = await fetch(`${window.appConfig.API_BASE_URL}/api/counter-config`, { method: 'PUT', headers, body: JSON.stringify({ baseCount,dailyIncrement,startDate }) });
+                        const res = await fetch('/api/counter-config', { method: 'PUT', headers, body: JSON.stringify({ baseCount,dailyIncrement,startDate }) });
                         if(!res.ok) throw new Error('save failed');
                         alert('تم حفظ الإعدادات');
                         hide();

@@ -101,7 +101,7 @@
         }
         
         try {
-            const response = await fetch(`${window.appConfig.API_BASE_URL}/api/login`, {
+            const response = await fetch('/api/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -220,7 +220,7 @@
         }
         
         try {
-            const response = await fetch(`${window.appConfig.API_BASE_URL}/api/signup`, {
+            const response = await fetch('/api/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
