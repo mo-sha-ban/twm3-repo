@@ -7,7 +7,7 @@
     
     if (!links || !videoSrc) return;
 
-    const API_BASE = 'http://localhost:5000/api';
+    const API_BASE = '/api';
     let currentUser = null;
     let currentCourseId = null;
     let currentLessonId = null;
