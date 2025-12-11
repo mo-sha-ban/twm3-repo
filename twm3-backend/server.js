@@ -475,12 +475,18 @@ app.get("/api/health", (req, res) => {
     });
 });
 
-// Root serves frontend (or redirects if FRONTEND_BASE_URL set)
+// Plain health endpoint for platforms expecting root check
+app.get("/health", (req, res) => {
+    res.json({
+        message: "ok",
+        status: "active",
+        timestamp: new Date(),
+        env: process.env.NODE_ENV
+    });
+});
+
+// Root serves the bundled frontend index.html (no redirect to avoid failing platform checks)
 app.get("/", (req, res) => {
-    const frontendUrl = process.env.FRONTEND_BASE_URL;
-    if (frontendUrl) {
-        return res.redirect(frontendUrl);
-    }
     return res.sendFile(path.join(__dirname, "..", "index.html"));
 });
 
