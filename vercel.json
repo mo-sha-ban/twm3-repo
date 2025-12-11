@@ -1,5 +1,7 @@
 {
     "version": 2,
+    "public": true,
+    "buildCommand": "npm install",
     "env": {
         "NODE_ENV": "production"
     },
@@ -15,8 +17,36 @@
             "dest": "/api/index.js"
         },
         {
-            "src": "/(.*)",
-            "dest": "/"
+            "src": "/uploads/(.*)",
+            "dest": "/twm3-backend/public/uploads/$1"
+        },
+        {
+            "src": "/css/(.*)",
+            "dest": "/css/$1"
+        },
+        {
+            "src": "/js/(.*)",
+            "dest": "/js/$1"
+        },
+        {
+            "src": "/img/(.*)",
+            "dest": "/img/$1"
+        },
+        {
+            "src": "/assets/(.*)",
+            "dest": "/assets/$1"
+        },
+        {
+            "src": "/(.*\\.html)$",
+            "dest": "/$1"
+        },
+        {
+            "src": "/(.+)",
+            "dest": "/$1"
+        },
+        {
+            "src": "/",
+            "dest": "/index.html"
         }
     ]
 }
