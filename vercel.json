@@ -8,8 +8,19 @@
     ],
     "routes": [
         {
-            "src": "/(.*)",
+            "src": "/api/(.*)",
             "dest": "twm3-backend/server.js"
+        },
+        {
+            "src": "/auth/(.*)",
+            "dest": "twm3-backend/server.js"
+        },
+        {
+            "handle": "filesystem"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/index.html"
         }
     ]
 }
