@@ -62,9 +62,11 @@ app.use(helmet({
 
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
-        ? ['https://twm3.org', 'https://www.twm3.org', 'https://api.twm3.org']
+        ? ['https://twm3.org', 'https://www.twm3.org', 'https://api.twm3.org', 'https://twm3-repo.vercel.app']
         : ['http://localhost:5000', 'http://localhost:3000', 'http://127.0.0.1:3000', 'http://127.0.0.1:5000'],
-    credentials: true
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json());
@@ -134,6 +136,32 @@ try {
 // Health check endpoint
 app.get('/health', (req, res) => {
     res.status(200).json({ status: 'OK' });
+});
+
+// Counter config endpoint
+app.get('/api/counter-config', (req, res) => {
+    res.json({
+        baseCount: 50000,
+        dailyIncrement: 20,
+        startDate: new Date('2024-01-01').getTime()
+    });
+});
+
+// Courses endpoint fallback (if routes not loaded)
+app.get('/api/courses', (req, res) => {
+    // Try to read courses.json
+    const coursesPath = path.join(__dirname, '../courses.json');
+    try {
+        if (fs.existsSync(coursesPath)) {
+            const courses = JSON.parse(fs.readFileSync(coursesPath, 'utf8'));
+            res.json(courses);
+        } else {
+            res.json([]);
+        }
+    } catch (error) {
+        console.error('Error reading courses:', error);
+        res.json([]);
+    }
 });
 
 // 404 - Error handler (must be before final catch-all)
