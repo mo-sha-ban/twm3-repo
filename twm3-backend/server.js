@@ -455,14 +455,23 @@ app.get("/data-deletion-status.html", (req, res) => {
     res.sendFile(path.join(__dirname, "..", "data-deletion-status.html"));
 });
 
-// Redirect root to status checks
-app.get("/", (req, res) => {
-    res.json({ 
-        message: "TWM3 Backend is running successfully", 
+// Health check endpoint for monitors
+app.get("/api/health", (req, res) => {
+    res.json({
+        message: "TWM3 Backend is running successfully",
         status: "active",
         timestamp: new Date(),
         env: process.env.NODE_ENV
     });
+});
+
+// Serve frontend on root (redirect to deployed frontend if specified)
+app.get("/", (req, res) => {
+    const frontendUrl = process.env.FRONTEND_BASE_URL;
+    if (frontendUrl) {
+        return res.redirect(frontendUrl);
+    }
+    return res.sendFile(path.join(__dirname, "..", "index.html"));
 });
 
 // Routes
