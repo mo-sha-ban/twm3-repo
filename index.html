@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/courses-carousel.css">
+    <!-- <link rel="stylesheet" href="css/all.min.css"> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Marhey:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="img/loogo.png">
+    <script src="js/socket.io.min.js"></script>
+    <title>TWM3</title>
+</head>
+<body >
+    <!-- this is nav bar  -->
+    
+        <!-- -------------------------------------------Start Header-------------------------------- -->
+        <div dir="rtl" class="header">
+          <div class="container">
+            <div class="logo">
+              <a href="index.html"><img src="img/logo.png" alt=""></a>
+          </div>
+              <div id="list" class="links">
+                  <ul>
+                      <li><a href="index.html">الرئيسيه</a></li>
+                      <li><a href="courses.html">الكورسات </a></li>
+                      <li><a href="portfolio.html">مشاريعنا </a></li>
+                      <li class="nav-dropdown"><a href="roadmap.html">مسارات التعلم <i class="fa-solid fa-angle-down"></i></a>
+                          <ul class="nav-dropdown-items">
+                              <li><a href="frontendroadmap.html">Front End </a></li>
+                              <li><a href="backendroadmap.html">Back End</a></li>
+                              <li><a href="cybersecurityroadmap.html">Cyber security</a></li>
+                          </ul>
+                      </li>
+                  </ul>
+              </div>
+              <div  class="bars">
+                  <i id="bars" class="fa-solid fa-bars "></i>
+              </div>
+              <div class="icon">
+              <div id="colorMode" class="theme">
+                  <i  class="fa-solid fa-moon moon"></i>
+                  <i  class="fa-solid fa-sun sun"></i>
+              </div>
+                                    <a href="store.html" aria-label="المتجر" title="المتجر"><i class="fa-solid fa-store store"></i></a>
+                    <a href="login.html" aria-label="تسجيل الدخول" title="تسجيل الدخول"><i class="fa-solid fa-user user"></i></a>
+              </div>
+          </div>
+      </div>
+        <!-- ---------------------------------------------End Header--------------------------------------- -->
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        <!-- -------------------------------------------Start Landing Page-------------------------------- -->
+        
+        <div class="landing">
+            
+            <!-- <div class="back">
+                <canvas id="canvas"></canvas>
+            </div> -->
+            <!-- <div class="container">
+                <div class="text">
+                    <h1> فريق عمل قوي مهتم بالبرمجة وتقديم محتوى البرمجة والمعلومات العامة</h1>
+                    <p> فريق عمل قوي مهتم بالبرمجة وتقديم محتوى البرمجة والمعلومات العامة</p>
+                </div>
+                <div class="social">
+                    <ul>
+                        <li><a href="https://www.youtube.com/@twm3"target="_blank"><img src="./img/Facebook-1.png" alt=""> </a> </li>
+                        <li><a href="https://www.youtube.com/@twm3"target="_blank"><img src="./img/Telegram-1.png" alt=""> </a> </li>
+                        <li><a href="https://www.youtube.com/@twm3"target="_blank"><img src="./img/Instagram-1.png" alt=""> </a> </li>
+                        <li><a href="https://www.youtube.com/@twm3"target="_blank"><img src="./img/Tiktok-1.png" alt=""> </a> </li>
+                        <li><a href="https://www.youtube.com/@twm3"target="_blank"><img src="./img/Youtube-1.png" alt=""> </a> </li>
+                    </ul>
+                </div>
+                <div class="btn">
+                    <a href="">Join Now</a>
+                </div>
+                <div class="shape">
+                    <img class="shape1" src="img/hero-shape-1.svg" alt="">
+                    <img class="shape2" src="img/hero-shape-2.svg" alt="">
+                </div>
+            </div> -->
+            
+<div class="slider" id="slider" style="--img-prev:url(../img/img1.png);"> 
+    <div class="slider__content" id="slider-content">
+        <div class="slider__images">
+        <div class="slider__images-item slider__images-item--active" data-id="1"><img src="img/img1.png"/></div>
+        <div class="slider__images-item" data-id="2"><img src="img/img2.jpg"/></div>
+        <div class="slider__images-item" data-id="3"><img src="img/img3.png"/></div>
+        <div class="slider__images-item" data-id="4"><img src="img/img4.jpg"/></div>
+        <div class="slider__images-item" data-id="5"><img src="img/img5.jpg"/></div>
+        </div>
+        <div class="slider__text">
+            <div class="slider__text-item slider__text-item--active" data-id="1">
+            <div class="slider__text-item-head">
+                <h3>TWM3</h3>
+            </div>
+            <div class="slider__text-item-info">
+                <p>نفتخر بأن نقدم لكم مجموعة من الكورسات المذهلة والقوية التي تمثل رؤيتنا الرائدة في مجال التعليم . نسعى جاهدين لتقديم تجارب تعليمية استثنائية تمنحكم المعرفة والمهارات اللازمه فى البرمجة وامن المعلومات لمواجهة تحديات الغد</p>
+            </div>
+            </div>
+            <div class="slider__text-item" data-id="2">
+            <div class="slider__text-item-head">
+                <h3>تميز</h3>
+            </div>
+            <div class="slider__text-item-info">
+                <p>“تمتاز كورساتنا بالتنوع والعمق، تغطي مجموعة واسعة من المواضيع التي تشمل مجالات التكنولوجيا،  والتطوير الشخصي. نحن ملتزمون بتقديم محتوى محدث ومبتكر يتيح لكم التعلم بوتيرة خاصة بكم وفقًا لاحدث اساليب التعلم”</p>
+            </div>
+            </div>
+            <div class="slider__text-item" data-id="3">
+            <div class="slider__text-item-head">
+                <h3>احترافية</h3>
+            </div>
+            <div class="slider__text-item-info">
+                <p>“فريقنا مكون من محترفين في مجالاتهم ، وهم ملهمون لتقديم أفضل تجربة تعليمية. سواء كنتم مبتدئين أو محترفين، ستجدون لدينا ما يناسب احتياجاتكم ويساعدكم في الوصول إلى آفاق جديدة من التفوق”</p>
+            </div>
+            </div>
+            <div class="slider__text-item" data-id="4">
+            <div class="slider__text-item-head">
+                <h3>ابتكار</h3>
+            </div>
+            <div class="slider__text-item-info">
+                <p>“ملتزمون بالتميز والابتكار، ونهدف إلى تزويدكم بمهارات تدعمكم في تحقيق أهدافكم الشخصية والمهنية. انضموا إلى عائلة TWM3 وابدأوا رحلتكم نحو التعلم والتطور اللا محدود”</p>
+            </div>
+            </div>
+            <div class="slider__text-item" data-id="5">
+            <div class="slider__text-item-head">
+                <h3>التزام</h3>
+            </div>
+            <div class="slider__text-item-info">
+                <p>.موجودين دايما لدعم رغبتكم في التعلم والنمو. ونتطلع إلى رؤيتكم تنمون وتطورون من خلال دوراتنا، ونأمل أن تكونوا جزءًا من رحلة تعليمية ملهمة ومثمرة</p>
+            </div>
+            </div>
+        </div>
+        </div>
+        <div class="slider__nav">
+        <div class="slider__nav-arrows">
+            <div class="slider__nav-arrow slider__nav-arrow--left" id="left">to left</div>
+            <div class="slider__nav-arrow slider__nav-arrow--right" id="right">to right</div>
+        </div>
+        <div class="slider__nav-dots" id="slider-dots">
+            <div class="slider__nav-dot slider__nav-dot--active" data-id="1"></div>
+            <div class="slider__nav-dot" data-id="2"></div>
+            <div class="slider__nav-dot" data-id="3"></div>
+            <div class="slider__nav-dot" data-id="4"></div>
+            <div class="slider__nav-dot" data-id="5"></div>
+        </div>
+        </div>
+    </div>
+        </div>
+        <!-- -------------------------------------------End Landing Page--------------------------------  -->
+    <!-- this is nav  -->
+
+
+
+    <!-- Start Students -->
+    
+    <div class="students">
+        <div class="container">
+            <div class="text">
+                <h1>انضم الي اكثر من <span>  50,000+  </span> متدرب علي جميع المنصات </h1>
+            </div>
+        </div>
+    </div>
+
+
+
+    
+    <!--End Students -->
+
+
+
+
+
+
+
+    <!-- Start features  -->
+    <div class="features">
+        <div class="main-title" title="المميزات">
+            <h1>المميزات</h1>
+        </div>
+        <div class="container">
+            <div class="box">
+                <div class="info">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <h2>الامان & الحماية </h2>
+                    <p>سواء كنتم متعلمين أو مطورين، فإن الأمان أحد أولوياتنا. نهتم بضمان بيئة تعليمية وتطويرية آمنة تمامًا، حيث نتبنى أحدث معايير الأمان والخصوصية لضمان حماية بياناتكم الشخصية ومعلوماتكم الحساسة في كل الأوقات</p>
+                </div>
+            </div>
+            <div class="box dif">
+                <div class="info">
+                    <i class="fa-solid fa-clock"></i>
+                    <h2>الوقت</h2>
+                    <p>نهدف دائمًا إلى تقديم مشاريعنا البرمجية المتميزة في وقت قياسي، مما يساعدكم على تحقيق أهدافكم بفعالية وسرعة.</p>
+                </div>
+            </div>
+            <div class="box">
+                <div class="info">
+                    <i class="fa-solid fa-signal"></i>
+                    <h2>الجودة</h2>
+                    <p> جودة استثنائيه فى تقديم المحتوى ستجدون أنفسكم في رحلة تعليمية ملهمة تمنحكم الفرصة لاكتشاف أعمق الجوانب في عالم البرمجة، وتطبيق ما تعلمتمه في مشاريع تطبيقية تعزز من فهمكم وثقتكم في مجالكم المفضل.</p>
+                </div>
+            </div>
+            <div class="box dif">
+                <div class="info">
+                    <i class="fa-solid fa-wallet"></i>
+                    <h2> التكلفة</h2>
+                    <p> نعمل دائمًا على تقديم أقصى قيمة ممكنة مقابل استثماركم، حيث نفخر بتقديم الكورسات والمشاريع بتكلفة مناسبة وميسرة، مما يمكنكم من الاستفادة القصوى من فرص التعلم والتطوير بدون إجهاد مالي</p>
+                </div>
+            </div>
+            <div class="box">
+                <div class="info">
+                    <i class="fa-solid fa-bolt-lightning"></i>
+                    <h2>السرعه</h2>
+                    <p>نتفوق في سرعة التسليم ونتميز بفارقنا عن الآخرين من خلال التزامنا القوي بتقديم خدمة سريعة وفعالة. نحن ندرك أهمية الوقت في عالم الأعمال والخدمات، وبالتالي نعمل جاهدين لضمان وصول منتجاتنا أو خدماتنا إلى عملائنا في أقصر وقت ممكن</p>
+                </div>
+            </div>
+            <div class="box dif">
+                <div class="info">
+                    <i class="fa-solid fa-palette"></i>
+                    <h2>التصميم</h2>
+                    <p>سيأخذكم جمال التصميم في مشاريعنا إلى عالم من الإبداع والتفرد، حيث نجمع بين الجمال البصري والوظائف العملية بأسلوب يثير الإعجاب ويضيف قيمة لتجربتكم</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End features  -->
+
+    <!-- Latest Courses -->
+    <div class="home-courses">
+        <div class="main-title" title="أحدث الكورسات">
+            <h1>أحدث الكورسات</h1>
+        </div>
+        <div class="container" id="latest-courses">
+            <p class="loading">جاري تحميل أحدث الكورسات...</p>
+        </div>
+    </div>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- Start Tesimonials -->
+    <div class="testimonials">
+        <div class="main-title" title="الأراء">
+            <h1>الأراء</h1>
+        </div>
+        <div class="container">
+            <section id="testim" class="testim">
+	            <div class="wrap">
+                    <span id="right-arrow" class="arrow right fa fa-chevron-right"></span>
+                    <span id="left-arrow" class="arrow left fa fa-chevron-left "></span>
+                    <ul id="testim-dots" class="dots">
+                        <li class="dot active"></li>
+                        <!--
+                                -->
+                        <li class="dot"></li>
+                        <!--
+                                -->
+                        <li class="dot"></li>
+                        <!--
+                                -->
+                        <li class="dot"></li>
+                        <!--
+                                -->
+                        <li class="dot"></li>
+                        <li class="dot"></li>
+                        <!--
+                                -->
+                        <li class="dot"></li>
+                        <!--
+                                -->
+                        <li class="dot"></li>
+                        <!--
+                                -->
+                        <li class="dot"></li>
+                        <li class="dot"></li>
+                        <!--
+                                -->
+                        <li class="dot"></li>
+                        <!--
+                                -->
+                        <li class="dot"></li>
+                    </ul>
+                    <div id="testim-content" class="cont">
+                        <div class="active">
+                            <div class="img">
+                                <img src="img/testi1.jpg" alt="">
+                            </div>
+                                <h2>محمود جمال</h2>
+                                <p>
+                                    شابووو لافضل محتوي ف الوطن العربي 🤞❤️محتواك فوق الوصف بصراحة وطريقة الشرح كويسة جدا 👍❤️
+                                    </p>
+                            </div>
+                        <div>
+                            <div class="img">
+                                <img src="img/testi2.jpg" alt="">
+                            </div>
+                                <h2>عبدالله الشرع</h2>
+                                <p>بعيدا عن المحتوى لكن تعاملكم وأخلاقكم ابهرتني  صراحة ، أتمنى لكم مزيدا من التفوّق والنجاح 🤍</p>
+                            </div>
+                        <div>
+                            <div class="img">
+                                <img src="img/testi3.jpg" alt="">
+                            </div>
+                                <h2>youssef lchouaa</h2>
+                                <p>تقريبا منذ دخولي لهذه المجموعة و أنا أجد حلول  المشاكل التي تواجهني بفضل الله ثم المشرفين و الأعضاء . شكرا لكم ❤️🔥🤩</p>
+                            </div>
+                        <div>
+                            <div class="img">
+                                <img src="img/testi4.jpg" alt="">
+                            </div>
+                                <h2>نعيم</h2>
+                                <p>نقول فقط ربنا يرزقكم على قد عملكم لان مشاءالله تعملون  وتعلمون مااتاكم ربنا لوجه الكريم بارك الله بكم</p>
+                            </div>
+                        <div>
+                            <div class="img">
+                                <img src="img/testi5.jpg" alt="">
+                            </div>
+                                <h2>shall alkhulaidi</h2>
+                                <p> الطرح للمحتوى ممتّاز جدا جدا ورائع . احييك من كل قلبي وشكرا وكل الدعم  جدا جدا جدا جدا جدا 🤍</p>
+                            </div>
+                        <div>
+                            <div class="img">
+                                <img src="img/testi6.jpg" alt="">
+                            </div>
+                                <h2>Amr farhat</h2>
+                                <p> الله محتواك ممتاز جدا جدا جدا بحييك من كل قلبي بجد بجد عاش ربنا معاك وكل الدعم 💯✨</p>
+                            </div>
+                        <div>
+                            <div class="img">
+                                <img src="img/testi7.jpg" alt="">
+                            </div>
+                                <h2>Mohammed M.A</h2>
+                                <p>محتوى جميل ومفيد جدا ورائع وبستناه كل يوم 
+                                    عاش جداً جدا جدا جدا وكل الدعم ليك يا فنا 🤍</p>
+                            </div>
+                        <div>
+                            <div class="img">
+                                <img src="img/testi8.jpg" alt="">
+                            </div>
+                            <h2>Mohamed Emad</h2>
+                            <p>  بصراحه انتو احسن ناس شوفتها بتشرح على اليوتيوب وحتى احسن من ناس بتدى كورسات وكل الدعم ليكم ❤️❤️ </p>
+                        </div>
+                        <div>
+                            <div class="img">
+                                <img src="img/testi9.jpg" alt="">
+                            </div>
+                                <h2>Profology</h2>
+                                <p>بسم الله ماشاء الله اللهم بارك،  فاهمين كويس وعندكم قدر هآئل من المعلومات 
+                                    استمروا ❤️</p>
+                            </div>
+                        <div>
+                            <div class="img">
+                                <img src="img/testi10.jpg" alt="">
+                            </div>
+                            <h2>محمود الفارسى </h2>
+                            <p>خرفيآ اقوى حد فى مصر شوفتوا بيشرح وعاااش جدا .. استمر واحنا معاك وفضهرك يا اسطوره 💙</p>
+                        </div>
+                        <div>
+                            <div class="img">
+                                <img src="img/testi11.jpg" alt="">
+                            </div>
+                                <h2>Alorik Gaming </h2>
+                                <p>شروحات جميله وسريعه شكرا ليكم 
+                                    اتمنى تستمروا وتعلمونه اكتر واكتر 
+                                    متشكر جدا جدا جد جدا ❤️  </p>
+                            </div>
+                        <div>
+                            <div class="img">
+                                <img src="img/testi12.jpg" alt="">
+                            <div>
+                                <h2>رأفت عنتر </h2>
+                                <p>ياريت تبدء معااناا بكورسات من الصفر ونتستمر فى ادوات الاختراق من التلفون والاشياء اللازمه  لفعلهاا ونتابع معاك حتى الاحتراف.. ❤️</p>
+                            </div>
+                    </div>
+	            </div>
+	<!--         </div> -->
+            </section>
+
+        </div>
+        <div class="shape">
+            <img class="shape2" src="img/hero-shape-2.svg" alt="">
+            <img class="shape1" src="img/timeline.svg" alt="">
+        </div>
+    </div>
+    <!-- End Tesimonials -->
+
+
+
+
+
+
+
+
+    <!-- Start contact us  -->
+    <div class="contact">
+        <div class="main-title" title="تواصل معنا ">
+            <h1>تواصل معنا </h1>
+        </div>
+        <div class="container">
+            <div class="text">
+                <h2>دعنا نتحدث عن مشكلتك</h2>
+                <div class="info1">
+                    <div class="text-info">
+                        <h3>موقعنا</h3>
+                        <p> مصر  </p> 
+                        <p> الفيوم  </p> 
+                    </div>
+                    <div class="text-info">
+                        <h3>ايملاتنا </h3>
+                        <p> <a href="mailto:tworkm3@gmail.com">ايميل 1</a> </p>
+                        <p> <a href="mailto:teamworkhack@gmail.com">ايميل 2</a></p>
+                    </div>
+                </div>
+                <div class="info2">
+
+                    <div class="text-info">
+                        <h3>كيف يمكننا المساعده ؟ </h3>
+                        <p>اخبرنا بمشكلتك </p>
+                        <p>وسوف نتوصل لاسرع حل ممكن </p>
+                    </div>
+                </div>
+            </div>
+            <div class="form">
+                <h3> تواصل معنا</h3>
+                <form action="">
+                    <label for="name"> Enter Your name:</label>
+                    <input type="text" placeholder="Enter your Name" id="name">
+                    <label for="email"> Enter Your email:</label>
+                    <input type="email" placeholder="Enter your email" id="email">
+                    <label for="message"> Enter Your message:</label>
+                    <textarea placeholder="Enter your message" id="message"></textarea>
+                    <input type="submit" value="send">
+                </form>
+                <div class="shape">
+                    <img class="shape1" src="img/hero-shape-1.svg" alt="">
+                </div>
+            </div>
+        </div>
+        <div class="shape">
+            <img class="shape2" src="img/hero-shape-2.svg" alt="">
+        </div>
+    </div>
+    <!-- End contact us  -->
+
+
+
+
+
+
+<!-- Start Footer  -->
+<footer id="footer">
+    <div class="container">
+        <div class="social">
+            <h4>Social</h4>
+            <div class="img">
+                <a href="index.html"><img src="img/logo.png" alt="" /></a>
+            </div>
+            <ul>
+                <a target="_blank" href="https://facebook.com/teamworkm3">  <img src="img/Facebook-1.png" alt="" />   </a>
+                <a target="_blank" href="https://youtube.com/@twm3"><img src="img/Youtube-1.png" alt="" />            </a>
+                <a target="_blank" href="https://instagram.com/mo_hussien_20"><img src="img/Instagram-1.png"alt=""/>  </a>
+                <a target="_blank" href="https://t.me/teamworkm3"><img src="img/Telegram-1.png" alt="" />             </a>
+            </ul>
+        </div>
+        <div class="pages">
+            <h4>pages</h4>
+            <ul>
+                <li><a href="index.html">الرئيسيه</a></li>
+                <li><a href="courses.html">الكورسات</a></li>
+                <li><a href="portfolio.html">مشاريعنا</a></li>
+                <li><a href="roadmap.html">مسارات التعلم</a></li>
+            </ul>
+        </div>
+        <div class="news">
+            <h4>Blog</h4>
+            <ul>
+                <li><a target="_blank" href="blog-details.html"> ازالة قفل الهاتف</a></li>
+                <li><a target="_blank" href="blog-details2.html">تغيير موقعك على الخريطه</a></li>
+                <li><a target="_blank" href="blog-details3.html">الربح من ثغرات الويب</a></li>
+                <li><a target="_blank" href="blog-details4.html"> ازاى تحمى نفسك من الاختراق</a></li>
+            </ul>
+        </div>
+    </div>
+    <p> all copy Rights Reserved © <span id="yearData"></span> , created by <span>❤</span> by twm3</p>
+        <div class="shape">
+        <img class="footer-shape1" src="img/footer-shape-1.svg" alt="" />
+        <img class="footer-shape2" src="img/footer-shape-2.svg" alt="" />
+    </div>
+</footer>
+<!-- End Footer  -->
+
+
+
+
+
+    <!-- Start up tp top  -->
+    <div class="up">
+        <i class="fa-solid fa-arrow-up"></i>
+    </div>
+    <!-- End up tp top  -->
+    
+
+    <script src="app.js"></script>
+    <script src="testimonials.js"></script>
+    <script src="imgSlider.js"></script>
+    <script src="js/courses-carousel.js"></script>
+    <script src="js/counter.js"></script>
+
+
+    </body>
+    </html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/normalize.css" />
+    <link rel="stylesheet" href="css/course-page-modern.css" />
+    <link rel="stylesheet" href="css/all.min.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Marhey:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="img/loogo.png" />
+    <title>JS course</title>
+  </head>
+  <body>
+    <!-- -------------------------------------------Start Header-------------------------------- -->
+    <div dir="rtl" class="header">
+            <div class="container">
+                <div class="logo">
+                    <a href="index.html"><img src="img/logo.png" alt=""></a>
+                </div>
+                <div id="list" class="links">
+                    <ul>
+                        <li><a href="index.html">الرئيسيه</a></li>
+                        <li><a href="courses.html">الكورسات </a></li>
+                        <li><a href="portfolio.html">مشاريعنا </a></li>
+                        <li class="nav-dropdown"><a href="roadmap.html">مسارات التعلم <i class="fa-solid fa-angle-down"></i></a>
+                            <ul class="nav-dropdown-items">
+                                <li><a href="frontendroadmap.html">Front End </a></li>
+                                <li><a href="backendroadmap.html">Back End</a></li>
+                                <li><a href="cybersecurityroadmap.html">Cyber security</a></li>
+                            </ul>
+                        </li>
+                        <li><a class="blog" href="blog.html">المدونة</a></li>
+                    </ul>
+                </div>
+                <div  class="bars">
+                    <i id="bars" class="fa-solid fa-bars "></i>
+                </div>
+                <div class="icon">
+                    <div id="colorMode" class="theme">
+                        <i  class="fa-solid fa-moon moon"></i>
+                        <i  class="fa-solid fa-sun sun"></i>
+                    </div>
+                    <a href="store.html"><i  class="fa-solid fa-store store"></i></a>
+                    <a href="login.html"><i  class="fa-solid fa-user user"></i></a>
+                    <a href=""><i id="userIcon" class="fa-solid fa-user "></i></a>
+                </div>
+            </div>
+        </div>
+    <!-- ---------------------------------------------End Header--------------------------------------- -->
+
+    <!-- ---------------------------------------------Start HTML Course page--------------------------------------- -->
+
+    <div class="course-page">
+      <div class="main-menu">
+        <div class="video-container">
+          <div class="main">
+            <iframe
+              id="iframe"
+              width="992"
+              height="558"
+              src="https://www.youtube.com/embed/3krI6UpQAXU"
+              title="تعلم برمجة الويب | 01 | مقدمة عن الدوره (@twm3 )"
+              frameborder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+            ></iframe>
+          </div>
+          <div class="content">
+            <h1> JAVA SECRIPT يعنى ايــــــة</h1>
+            <p>
+                
+JavaScript هي لغة برمجة تستخدم على نطاق واسع في تطوير مواقع الويب وتطبيقات الويب. إنها لغة برمجة نصية تسمح بإضافة التفاعلية والدينامية إلى صفحات الويب. JavaScript يتيح للمطورين تنفيذ العديد من الأمور مثل التحكم في العناصر على الصفحة، والتفاعل مع المستخدمين، وجمع وعرض البيانات بشكل دينامي.
+
+بفضل JavaScript، يمكن إنشاء تطبيقات ويب متقدمة تقدم تجارب مستخدم ممتازة. إنها لغة حيوية تُستخدم في تطوير الألعاب عبر الإنترنت، وتطبيقات الوقت الحقيقي، والمزيد. بالنظر إلى شعبيتها وقوتها، تُعتبر JavaScript أحد أهم أدوات تطوير الويب في العالم اليوم.
+            </p>
+          </div>
+        </div>
+        <!-- <div class="right-menu">
+          <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Laboriosam itaque eum nesciunt corrupti neque dolores dignissimos quod. Dignissimos sit repudiandae, tempore eos impedit deleniti aliquam rem at aut doloribus officia.</p>
+        </div> -->
+      </div>
+      <div class="left-menu">
+        <ul id="links">
+          <li class="dropdown active">
+            <span onclick="this.parentElement.classList.toggle('active')">
+              الوحدة الأولى <i class="fa-solid fa-chevron-down"></i>
+            </span>
+            <ul class="dropdown-items">
+              <li>
+                <a title="https://www.youtube.com/embed/3krI6UpQAXU" class="active">الدرس 1: مقدمة</a>
+              </li>
+              <li>
+                <a title="https://www.youtube.com/embed/mE3iWIFEDMA">الدرس 2</a>
+              </li>
+              <li>
+                <a title="https://www.youtube.com/embed/IBVeJEqn13A">lesson 3</a>
+              </li>
+              <li>
+                <a title="https://www.youtube.com/embed/btK_UP1zSw0">lesson 4</a>
+              </li>
+              <li>
+                <a title="https://www.youtube.com/embed/pYscdG4K0zg">lesson 5</a>
+              </li>
+            </ul>
+          </li>
+          
+          <li class="dropdown">
+            <span onclick="this.parentElement.classList.toggle('active')">
+              الوحدة الثانية <i class="fa-solid fa-chevron-down"></i>
+            </span>
+            <ul class="dropdown-items">
+              <li>
+                <a title="https://www.youtube.com/embed/vRfER3jmeAg">الدرس 6</a>
+              </li>
+              <li>
+                <a title="https://www.youtube.com/embed/VaDzddGLXZM">الدرس 7</a>
+              </li>
+              <li>
+                <a title="https://www.youtube.com/embed/raWH4G4mrso">الدرس 8</a>
+              </li>
+              <li>
+                <a title="https://www.youtube.com/embed/LgU2pdZoSfw">الدرس 9</a>
+              </li>
+              <li>
+                <a title="https://www.youtube.com/embed/I0-N8BuC4vM">الدرس 10</a>
+              </li>
+            </ul>
+          </li>
+          
+          <li class="dropdown">
+            <span onclick="this.parentElement.classList.toggle('active')">
+              الوحدة الثالثة <i class="fa-solid fa-chevron-down"></i>
+            </span>
+            <ul class="dropdown-items">
+              <li>
+                <a title="https://www.youtube.com/embed/LIMXKEO4xy4">الدرس 11</a>
+              </li>
+              <li>
+                <a title="https://www.youtube.com/embed/i9Ky_nboz5U">الدرس 12</a>
+              </li>
+              <li>
+                <a title="https://www.youtube.com/embed/5INBH-fE76Y">الدرس 13</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <!-- ---------------------------------------------Start HTML Course page--------------------------------------- -->
+
+    <!-- Start Footer  -->
+    <footer id="footer">
+      <div class="container">
+          <div class="social">
+              <h4>Social</h4>
+              <div class="img">
+                  <a href="index.html"><img src="img/logo.png" alt="" /></a>
+              </div>
+              <ul>
+                  <a target="_blank" href="https://facebook.com/teamworkm3">  <img src="img/Facebook-1.png" alt="" />   </a>
+                  <a target="_blank" href="https://youtube.com/@twm3"><img src="img/Youtube-1.png" alt="" />            </a>
+                  <a target="_blank" href="https://instagram.com/mo_hussien_20"><img src="img/Instagram-1.png"alt=""/>  </a>
+                  <a target="_blank" href="https://t.me/teamworkm3"><img src="img/Telegram-1.png" alt="" />             </a>
+              </ul>
+          </div>
+          <div class="pages">
+              <h4>pages</h4>
+              <ul>
+                  <li><a href="index.html">الرئيسيه</a></li>
+                  <li><a href="courses.html">الكورسات</a></li>
+                  <li><a href="portfolio.html">مشاريعنا</a></li>
+                  <li><a href="roadmap.html">مسارات التعلم</a></li>
+              </ul>
+          </div>
+          <div class="news">
+              <h4>Blog</h4>
+              <ul>
+                  <li><a target="_blank" href="blog-details.html"> ازالة قفل الهاتف</a></li>
+                  <li><a target="_blank" href="blog-details2.html">تغيير موقعك على الخريطه</a></li>
+                  <li><a target="_blank" href="blog-details3.html">الربح من ثغرات الويب</a></li>
+                  <li><a target="_blank" href="blog-details4.html"> ازاى تحمى نفسك من الاختراق</a></li>
+              </ul>
+          </div>
+      </div>
+      <p> all copy Rights Reserved © <span id="yearData"></span> , created by <span>❤</span> by twm3</p>
+      <div class="shape">
+          <img class="footer-shape1" src="img/footer-shape-1.svg" alt="" />
+          <img class="footer-shape2" src="img/footer-shape-2.svg" alt="" />
+      </div>
+  </footer>
+  <!-- End Footer  -->
+
+    <!-- Start up tp top  -->
+    <div class="up">
+      <i class="fa-solid fa-arrow-up"></i>
+    </div>
+    <!-- End up tp top  -->
+
+    <script src="app.js"></script>
+    <script src="course.js"></script>
+  </body>
+</html>

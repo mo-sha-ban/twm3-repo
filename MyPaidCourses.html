@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ar">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/normalize.css" />
+    <!-- <link rel="stylesheet" href="css/all.min.css"> -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Marhey:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="img/loogo.png" />
+    <title>My Paid Courses</title>
+    <script
+      type="text/javascript"
+      src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"
+    ></script>
+
+  </head>
+</html>
+<body>
+  <!-- this is nav bar  -->
+
+  <!-- -------------------------------------------Start Header-------------------------------- -->
+<div dir="rtl" class="header">
+            <div class="container">
+                <div class="logo">
+                    <a href="index.html"><img src="img/logo.png" alt=""></a>
+                </div>
+                <div id="list" class="links">
+                    <ul>
+                        <li><a href="index.html">الرئيسيه</a></li>
+                        <li><a href="courses.html">الكورسات </a></li>
+                        <li><a href="portfolio.html">مشاريعنا </a></li>
+                        <li class="nav-dropdown"><a href="roadmap.html">مسارات التعلم <i class="fa-solid fa-angle-down"></i></a>
+                            <ul class="nav-dropdown-items">
+                                <li><a href="frontendroadmap.html">Front End </a></li>
+                                <li><a href="backendroadmap.html">Back End</a></li>
+                                <li><a href="cybersecurityroadmap.html">Cyber security</a></li>
+                            </ul>
+                        </li>
+                        <li><a class="blog" href="blog.html">المدونة</a></li>
+                    </ul>
+                </div>
+                <div  class="bars">
+                    <i id="bars" class="fa-solid fa-bars "></i>
+                </div>
+                <div class="icon">
+                    <div id="colorMode" class="theme">
+                        <i  class="fa-solid fa-moon moon"></i>
+                        <i  class="fa-solid fa-sun sun"></i>
+                    </div>
+                    <a href="store.html"><i  class="fa-solid fa-store store"></i></a>
+                    <a href="login.html"><i  class="fa-solid fa-user user"></i></a>
+                    <a href="profile.html"><i id="userIcon" class="fa-solid fa-user "></i></a>
+                </div>
+            </div>
+        </div>
+  <form id="loginForm" method="post">
+  <label for="login-email">Email</label>
+  <input
+    id="login-email"
+    type="email"
+    name="email"
+    autocomplete="email"
+    required
+  />
+  <label for="login-password">Password</label>
+  <input
+    id="login-password"
+    type="password"
+    name="password"
+    autocomplete="current-password"
+    required
+  />
+  <button class="submit" type="submit">Log In</button>
+</form>
+<button id="logoutButton"> Sign out</button>
+  <!-- ---------------------------------------------End Header--------------------------------------- -->
+
+
+<!-- Start Paid Courses  -->
+ 
+
+    <!-- Start Courses -->
+    <div class="courses">
+      <div class="main-title" title="كورساتي">
+          <h1>كورساتي</h1>
+      </div>
+      <div class="container">
+
+      </div>
+      <div class="btn">
+          <a href="courses.html">جميع الكورسات</a>
+      </div>
+  </div>
+  <!-- End Courses -->
+
+<!-- End Paid Courses  -->
+
+
+
+
+<!-- Start Footer  -->
+<footer id="footer">
+  <div class="container">
+      <div class="social">
+          <h4>Social</h4>
+          <div class="img">
+              <a href="index.html"><img src="img/logo.png" alt="" /></a>
+          </div>
+          <ul>
+              <a target="_blank" href="https://facebook.com/teamworkm3">  <img src="img/Facebook-1.png" alt="" />   </a>
+              <a target="_blank" href="https://youtube.com/@twm3"><img src="img/Youtube-1.png" alt="" />            </a>
+              <a target="_blank" href="https://instagram.com/mo_hussien_20"><img src="img/Instagram-1.png"alt=""/>  </a>
+              <a target="_blank" href="https://t.me/teamworkm3"><img src="img/Telegram-1.png" alt="" />             </a>
+          </ul>
+      </div>
+      <div class="pages">
+          <h4>pages</h4>
+          <ul>
+              <li><a href="index.html">الرئيسيه</a></li>
+              <li><a href="courses.html">الكورسات</a></li>
+              <li><a href="portfolio.html">مشاريعنا</a></li>
+              <li><a href="roadmap.html">مسارات التعلم</a></li>
+          </ul>
+      </div>
+      <div class="news">
+          <h4>Blog</h4>
+          <ul>
+              <li><a target="_blank" href="blog-details.html"> ازالة قفل الهاتف</a></li>
+              <li><a target="_blank" href="blog-details2.html">تغيير موقعك على الخريطه</a></li>
+              <li><a target="_blank" href="blog-details3.html">الربح من ثغرات الويب</a></li>
+              <li><a target="_blank" href="blog-details4.html"> ازاى تحمى نفسك من الاختراق</a></li>
+          </ul>
+      </div>
+  </div>
+  <p> all copy Rights Reserved © <span id="yearData"></span> , created by <span>❤</span> by twm3</p>
+      <div class="shape">
+      <img class="footer-shape1" src="img/footer-shape-1.svg" alt="" />
+      <img class="footer-shape2" src="img/footer-shape-2.svg" alt="" />
+  </div>
+</footer>
+<!-- End Footer  -->
+
+
+
+
+
+  <!-- Start up tp top  -->
+  <div class="up">
+      <i class="fa-solid fa-arrow-up"></i>
+  </div>
+  <!-- End up tp top  -->
+  
+
+  <script src="app.js"></script>
+  <script type="text/javascript">
+      emailjs.init('X6myAWtkVyw9jBHz8')
+
+
+
+        document.getElementById("logoutButton").addEventListener("click", function () {
+  // حذف المعلومات من localStorage عند تسجيل الخروج
+  localStorage.removeItem("login-email");
+  localStorage.removeItem("login-password");
+  document.getElementById("logoutButton").style.display = "none"; // إخفاء زر تسجيل الخروج
+  window.location.href = "index.html";
+});
+
+  </script>
+  // <script src="paidCourses.js"></script>
+
+
+  </body>
+  </html>

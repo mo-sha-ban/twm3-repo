@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار رفع الفيديو</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            direction: rtl;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: bold;
+        }
+        
+        input[type="file"],
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        input[type="file"] {
+            cursor: pointer;
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            background: #2980b9;
+        }
+        
+        button:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+        
+        .log {
+            margin-top: 20px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        
+        .log-entry {
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .log-entry.success {
+            color: #27ae60;
+        }
+        
+        .log-entry.error {
+            color: #c0392b;
+        }
+        
+        .log-entry.info {
+            color: #3498db;
+        }
+        
+        .progress {
+            width: 100%;
+            height: 20px;
+            background: #ddd;
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+            display: none;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: #3498db;
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        
+        .result.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .result.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎥 اختبار رفع الفيديو</h1>
+        
+        <div class="form-group">
+            <label for="videoFile">اختر ملف فيديو:</label>
+            <input type="file" id="videoFile" accept="video/*" />
+        </div>
+        
+        <div class="form-group">
+            <label for="token">أدخل التوكن (اختياري):</label>
+            <input type="text" id="token" placeholder="سيتم الحصول عليه من localStorage تلقائياً" />
+        </div>
+        
+        <button id="uploadBtn" onclick="uploadVideo()">رفع الفيديو</button>
+        
+        <div class="progress">
+            <div class="progress-bar">0%</div>
+        </div>
+        
+        <div class="log" id="log"></div>
+        
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const logEl = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            const timestamp = new Date().toLocaleTimeString('ar-SA');
+            
+            let icon = 'ℹ️';
+            if (type === 'success') icon = '✅';
+            if (type === 'error') icon = '❌';
+            if (type === 'info') icon = 'ℹ️';
+            
+            entry.textContent = `[${timestamp}] ${icon} ${message}`;
+            logEl.appendChild(entry);
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+        
+        function showResult(message, type = 'success') {
+            const resultEl = document.getElementById('result');
+            resultEl.className = `result ${type}`;
+            resultEl.textContent = message;
+            resultEl.style.display = 'block';
+        }
+        
+        async function uploadVideo() {
+            const fileInput = document.getElementById('videoFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                log('يرجى اختيار ملف فيديو', 'error');
+                showResult('❌ يرجى اختيار ملف فيديو', 'error');
+                return;
+            }
+            
+            log(`اختيار الملف: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`);
+            
+            // Get token
+            let token = document.getElementById('token').value;
+            if (!token) {
+                token = localStorage.getItem('token');
+                if (!token) {
+                    log('لم يتم العثور على توكن! يرجى تسجيل الدخول أولاً', 'error');
+                    showResult('❌ لم يتم العثور على توكن', 'error');
+                    return;
+                }
+                log('تم الحصول على التوكن من localStorage');
+            }
+            
+            log(`التوكن: ${token.substring(0, 20)}...`);
+            
+            // Create FormData
+            const formData = new FormData();
+            formData.append('file', file);
+            
+            log('جاري رفع الملف...');
+            
+            try {
+                document.getElementById('uploadBtn').disabled = true;
+                
+                const response = await fetch('http://localhost:5000/api/uploads/lesson-asset', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                });
+                
+                log(`حالة الرد: ${response.status}`);
+                
+                const data = await response.json();
+                log('الرد JSON: ' + JSON.stringify(data));
+                
+                if (response.ok && data.success) {
+                    log('✅ تم رفع الفيديو بنجاح!', 'success');
+                    log(`الرابط: ${data.url}`, 'success');
+                    log(`النوع: ${data.type}`, 'success');
+                    showResult(`✅ تم رفع الفيديو بنجاح!\n\nالرابط: ${data.url}\nالنوع: ${data.type}`, 'success');
+                } else {
+                    const error = data.error || data.message || 'خطأ غير معروف';
+                    log(`❌ فشل الرفع: ${error}`, 'error');
+                    showResult(`❌ فشل الرفع: ${error}`, 'error');
+                }
+                
+            } catch (error) {
+                log(`❌ خطأ في الشبكة: ${error.message}`, 'error');
+                showResult(`❌ خطأ: ${error.message}`, 'error');
+            } finally {
+                document.getElementById('uploadBtn').disabled = false;
+            }
+        }
+        
+        // Initialize
+        log('جاري التحقق من البيانات...');
+        const token = localStorage.getItem('token');
+        if (token) {
+            log('✅ توكن موجود', 'success');
+        } else {
+            log('⚠️  لم يتم العثور على توكن', 'error');
+        }
+    </script>
+</body>
+</html>
