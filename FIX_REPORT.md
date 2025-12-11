@@ -23,14 +23,9 @@ I have updated your codebase to fix the connection between your Hostinger fronte
 
 ## Next Steps for You
 
-### 1. Update `config.js`
-Open `config.js` and set your backend URL:
-```javascript
-const config = {
-    // Replace with your Vercel URL
-    API_BASE_URL: 'https://your-actual-vercel-url.vercel.app' 
-};
-```
+### 1. Upload `config.js`
+I have already updated `config.js` with your Vercel URL: `https://twm3-repo-pgat-fq3lsav6l-twm2s-projects.vercel.app`.
+**Action:** Upload this `config.js` file to your Hostinger `public_html` directory (overwrite the old one).
 
 ### 2. Update .htaccess (CRITICAL)
 I have created a new **`.htaccess`** file for you.
