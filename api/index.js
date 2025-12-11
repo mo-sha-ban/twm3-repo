@@ -69,6 +69,37 @@ app.use(cors({
 
 app.use(express.json());
 
+// Middleware to serve static files with correct MIME types
+app.use((req, res, next) => {
+    const filePath = path.join(__dirname, '..', req.path);
+    
+    // Check if file exists
+    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+        // Set correct MIME types for common file types
+        if (req.path.endsWith('.js')) {
+            res.setHeader('Content-Type', 'application/javascript');
+        } else if (req.path.endsWith('.json')) {
+            res.setHeader('Content-Type', 'application/json');
+        } else if (req.path.endsWith('.css')) {
+            res.setHeader('Content-Type', 'text/css');
+        } else if (req.path.endsWith('.html')) {
+            res.setHeader('Content-Type', 'text/html');
+        } else if (req.path.endsWith('.png')) {
+            res.setHeader('Content-Type', 'image/png');
+        } else if (req.path.endsWith('.jpg') || req.path.endsWith('.jpeg')) {
+            res.setHeader('Content-Type', 'image/jpeg');
+        } else if (req.path.endsWith('.gif')) {
+            res.setHeader('Content-Type', 'image/gif');
+        } else if (req.path.endsWith('.svg')) {
+            res.setHeader('Content-Type', 'image/svg+xml');
+        }
+        
+        return res.sendFile(filePath);
+    }
+    
+    next();
+});
+
 // Serve static files from parent directory (Vercel root)
 app.use(express.static(path.join(__dirname, '..')));
 
