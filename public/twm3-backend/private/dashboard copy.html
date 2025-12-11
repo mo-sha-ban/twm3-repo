@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ar">
+  <head>
+    <script>
+      // منع الوصول إلى الكورسات المجانية إلا إذا كان المستخدم أدمن
+      (function () {
+        const user = JSON.parse(localStorage.getItem("user"));
+
+        // تحقق من وجود المستخدم وأنه أدمن
+        if (!user || !user.isAdmin) {
+          alert("غير مصرح لك بالدخول إلى لوحة التحكم!");
+          window.location.href = "alert.html";
+        }
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../../css/style.css" />
+    <link rel="stylesheet" href="../../css/normalize.css" />
+    <!-- <link rel="stylesheet" href="css/all.min.css"> -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Marhey:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="icon" href="img/loogo.png" />
+    <title>TWM3 | Dashboard</title>
+  </head>
+  <body>
+    <!-- -------------------------------------------Start Header-------------------------------- -->
+    <div class="dash-header">
+      <div class="container">
+        <div class="text">
+          <a href="dashboard.html"><h3>Dashboard</h3></a>
+        </div>
+        <div class="content">
+          <div class="icon">
+            <div id="colorMode" class="theme">
+              <i class="fa-solid fa-moon moon"></i>
+              <i class="fa-solid fa-sun sun"></i>
+            </div>
+          </div>
+          <div class="user">
+            <img src="img/dash-img.jpg" alt="" />
+            <p>twm3</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ---------------------------------------------End Header--------------------------------------- -->
+
+    <div class="dash-content">
+      <div class="container">
+        <div class="sidebar">
+          <a href="#">
+            <div class="icon">
+              <i class="fa-solid fa-house"></i>
+            </div>
+            <div class="text">
+              <p>home</p>
+            </div>
+          </a>
+
+          <ul class="dash-down">
+            <li>
+              <a href="#users" class="menu-item">
+                <div class="icon">
+                  <i class="fa-solid fa-users"></i>
+                </div>
+                <div class="text">
+                  <p>mermbers</p>
+                </div>
+              </a>
+              <ul class="dash-down-items">
+                <a href="#">
+                  <div class="icon">
+                    <i class="fa-solid fa-user-check"></i>
+                  </div>
+                  <div class="text">
+                    <p>active members</p>
+                  </div>
+                </a>
+                <a href="#">
+                  <div class="icon">
+                    <i class="fa-solid fa-user-xmark"></i>
+                  </div>
+                  <div class="text">
+                    <p>inctive members</p>
+                  </div>
+                </a>
+                <a href="#">
+                  <div class="icon">
+                    <i class="fa-solid fa-user-gear"></i>
+                  </div>
+                  <div class="text">
+                    <p>admins</p>
+                  </div>
+                </a>
+              </ul>
+            </li>
+          </ul>
+
+          <ul class="dash-down">
+            <li>
+              <a href="#courses" class="menu-item">
+                <div class="icon">
+                  <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div class="text">
+                  <p>Courses</p>
+                </div>
+              </a>
+              <ul class="dash-down-items">
+                <a href="#">
+                  <div class="icon">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                  </div>
+                  <div class="text">
+                    <p>make a course</p>
+                  </div>
+                </a>
+                <a href="#">
+                  <div class="icon">
+                    <i class="fa-solid fa-globe"></i>
+                  </div>
+                  <div class="text">
+                    <p>all courses</p>
+                  </div>
+                </a>
+                <a href="#">
+                  <div class="icon">
+                    <i class="fa-solid fa-music"></i>
+                  </div>
+                  <div class="text">
+                    <p>playlists</p>
+                  </div>
+                </a>
+              </ul>
+            </li>
+          </ul>
+
+          <ul class="dash-down">
+            <li>
+              <a href="#blog" class="menu-item">
+                <div class="icon">
+                  <i class="fa-brands fa-blogger-b"></i>
+                </div>
+                <div class="text">
+                  <p>blog</p>
+                </div>
+              </a>
+              <ul class="dash-down-items">
+                <a href="#">
+                  <div class="icon">
+                    <i class="fa-solid fa-pen"></i>
+                  </div>
+                  <div class="text">
+                    <p>make a blog</p>
+                  </div>
+                </a>
+                <a href="#">
+                  <div class="icon">
+                    <i class="fa-solid fa-blog"></i>
+                  </div>
+                  <div class="text">
+                    <p>all blogs</p>
+                  </div>
+                </a>
+                <a href="#">
+                  <div class="icon">
+                    <i class="fa-solid fa-list-check"></i>
+                  </div>
+                  <div class="text">
+                    <p>make a list</p>
+                  </div>
+                </a>
+                <a href="#">
+                  <div class="icon">
+                    <i class="fa-solid fa-list"></i>
+                  </div>
+                  <div class="text">
+                    <p>all lists</p>
+                  </div>
+                </a>
+              </ul>
+            </li>
+          </ul>
+
+          <a href="#settings" class="menu-item">
+            <div class="icon">
+              <i class="fa-solid fa-gear"></i>
+            </div>
+            <div class="text">
+              <p>settings</p>
+            </div>
+          </a>
+        </div>
+
+        <div class="dash-info">
+          <table>
+            <thead>
+              <tr>
+                <th>id</th>
+                <th>name</th>
+                <th>user name</th>
+                <th>email</th>
+                <th>phone</th>
+              </tr>
+            </thead>
+            <tbody>
+              <script>
+                // التحقق من الصلاحية عند تحميل الصفحة
+
+                // عند تحميل الصفحة
+                (async () => {
+                  const user = JSON.parse(localStorage.getItem("user"));
+
+                  // تحقق من وجود المستخدم وأنه أدمن
+                  if (!user || !user.isAdmin) {
+                    alert("غير مصرح لك بالدخول إلى لوحة التحكم!");
+                    window.location.href = "alert.html";
+                  }
+
+                  // هنا يمكنك إضافة كود جلب البيانات من الخادم وعرضها في الجدول
+                  const response = await fetch(
+                    "http://localhost:5000/api/admin/users"
+                  );
+                  const data = await response.json();
+
+                  const tbody = document.querySelector("tbody");
+                  data.forEach((user, index) => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                      <td>${index + 1}</td>
+                      <td>${user.name}</td>
+                      <td>${user.username}</td>
+                      <td><a href="mailto:">${user.email}</a></td>
+                      <td><a href="tel:+">${user.phone}</a></td>
+                    `;
+                    tbody.appendChild(row);
+                  });
+                })();
+              </script>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Start up tp top  -->
+    <div class="up">
+      <i class="fa-solid fa-arrow-up"></i>
+    </div>
+    <!-- End up tp top  -->
+
+    <script src="dash.js"></script>
+  </body>
+</html>
