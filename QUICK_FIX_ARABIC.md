@@ -9,10 +9,10 @@
 افتح ملف `js/config.js` وغير الرابط:
 
 ```javascript
-API_BASE_URL: 'https://twm3-repo.vercel.app/api'
+API_BASE_URL: 'https://your-project.railway.app/api'
 ```
 
-غير `twm3-repo` لاسم مشروعك على Vercel
+غير `your-project` لاسم مشروعك على Railway (أو Vercel)
 
 ### 2️⃣ ارفع الملفات على Hostinger
 
@@ -37,14 +37,23 @@ API_BASE_URL: 'https://twm3-repo.vercel.app/api'
    - ✅ mod_rewrite
    - ✅ mod_headers
 
-### 4️⃣ ارفع Backend على Vercel
+### 4️⃣ ارفع Backend على Railway/Vercel
 
+**للـ Railway:**
 ```bash
-# في مجلد المشروع
-vercel --prod
+# ارفع التغييرات على GitHub
+git add .
+git commit -m "Fix deployment issues"
+git push
+
+# أو استخدم Railway CLI
+railway up
 ```
 
-أو استخدم Vercel Dashboard لرفع المشروع
+**للـ Vercel:**
+```bash
+vercel --prod
+```
 
 ### 5️⃣ اختبر الموقع
 
@@ -78,8 +87,8 @@ GET https://www.twm3.org/api/courses 404
 افتح هذه الروابط في المتصفح:
 
 1. **Frontend:** https://www.twm3.org
-2. **API Health:** https://twm3-repo.vercel.app/health
-3. **API Courses:** https://twm3-repo.vercel.app/api/courses
+2. **API Health:** https://your-project.railway.app/health (أو vercel.app)
+3. **API Courses:** https://your-project.railway.app/api/courses
 
 يجب أن تعمل جميعها بدون أخطاء!
 
