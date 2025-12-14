@@ -2034,7 +2034,38 @@ io.on('connection', (socket) => {
 // Start server
 const startServer = async () => {
     try {
-        await mongoose.connect(process.env.MONGO_URI);
+        // Railway/Render/Heroku/Atlas env vars can differ. Accept common names.
+        // - Railway Mongo plugin often exposes MONGO_URL or MONGODB_URL
+        // - MongoDB Atlas tutorials frequently use MONGODB_URI
+        // - This project historically used MONGO_URI
+        const mongoUriCandidates = [
+            { key: 'MONGO_URI', value: process.env.MONGO_URI },
+            { key: 'MONGODB_URI', value: process.env.MONGODB_URI },
+            { key: 'MONGO_URL', value: process.env.MONGO_URL },
+            { key: 'MONGODB_URL', value: process.env.MONGODB_URL }
+        ];
+
+        const resolvedMongo = mongoUriCandidates.find((c) => typeof c.value === 'string' && c.value.trim().length > 0);
+        const mongoUri = resolvedMongo ? resolvedMongo.value.trim() : '';
+
+        // Local fallback only when NOT in production.
+        const finalMongoUri = mongoUri || (
+            process.env.NODE_ENV === 'production'
+                ? ''
+                : 'mongodb://localhost:27017/twm3'
+        );
+
+        if (!finalMongoUri) {
+            const availableKeys = mongoUriCandidates
+                .map((c) => `${c.key}=${c.value ? '[set]' : '[missing]'}`)
+                .join(', ');
+            throw new Error(
+                `Missing MongoDB connection string. Set one of: MONGO_URI, MONGODB_URI, MONGO_URL, MONGODB_URL. Seen: ${availableKeys}`
+            );
+        }
+
+        console.log(`MongoDB URI resolved from: ${(resolvedMongo && resolvedMongo.key) || (process.env.NODE_ENV === 'production' ? 'NONE' : 'local-default')}`);
+        await mongoose.connect(finalMongoUri);
         console.log("MongoDB connected");
 
         const port = Number(PORT);
