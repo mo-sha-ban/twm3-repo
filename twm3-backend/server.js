@@ -28,6 +28,8 @@ const app = express();
 // Frontend (static HTML/CSS/JS) lives in the repo-level `public/` folder.
 // When deploying to Railway we want `/` to serve `public/index.html`.
 const FRONTEND_DIR = path.join(__dirname, '..', 'public');
+console.log('__dirname:', __dirname);
+console.log('FRONTEND_DIR:', FRONTEND_DIR);
 // اقرأ متغير البيئة PORT المُقدم من Railway، وإذا لم يكن موجوداً، استخدم القيمة 5000.
 // Honor platform-provided port (Railway/Vercel/etc.) and fall back to 5000 locally
 const PORT = Number(process.env.PORT || process.env.RAILWAY_PORT || process.env.RAILWAY_TCP_PORT || 5000);
@@ -2092,34 +2094,13 @@ const startServer = async () => {
         console.log("MongoDB connected");
 
         const port = Number(PORT);
-        const maxRetries = 5;
-        let attempt = 0;
-
-        function tryListen(p) {
-            server.once('error', (err) => {
-                if (err && err.code === 'EADDRINUSE') {
-                    attempt++;
-                    if (attempt <= maxRetries) {
-                        const nextPort = p + 1;
-                        console.warn(`Port ${p} in use; trying port ${nextPort} (attempt ${attempt}/${maxRetries})`);
-                        tryListen(nextPort);
-                    } else {
-                        console.error(`Port ${p} still in use after ${maxRetries} attempts; exiting.`);
-                        process.exit(1);
-                    }
-                } else {
-                    console.error('Server listen error:', err);
-                    process.exit(1);
-                }
-            });
-
-            server.listen(p, '0.0.0.0', () => {
-                console.log(`Server is running on port ${p}`);
-            });
-        }
-        tryListen(port);
+        console.log('PORT env var:', process.env.PORT);
+        console.log('Using port:', port);
+        server.listen(port, '127.0.0.1', () => {
+            console.log(`Server is running on port ${port}`);
+        });
     } catch (err) {
-        console.error("MongoDB connection error:", err);
+        console.error("Server start error:", err);
         process.exit(1);
     }
 };
