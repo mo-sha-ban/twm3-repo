@@ -25,6 +25,9 @@ const helmet = require('helmet');
 require("dotenv").config();
 
 const app = express();
+// Frontend (static HTML/CSS/JS) lives in the repo-level `public/` folder.
+// When deploying to Railway we want `/` to serve `public/index.html`.
+const FRONTEND_DIR = path.join(__dirname, '..', 'public');
 // اقرأ متغير البيئة PORT المُقدم من Railway، وإذا لم يكن موجوداً، استخدم القيمة 5000.
 // Honor platform-provided port (Railway/Vercel/etc.) and fall back to 5000 locally
 const PORT = Number(process.env.PORT || process.env.RAILWAY_PORT || process.env.RAILWAY_TCP_PORT || 5000);
@@ -158,7 +161,7 @@ app.get('/uploads/:fileName', (req, res, next) => {
     }
 
     // If file not found, return a default placeholder image
-    const defaultImagePath = path.join(__dirname, '..', 'img', 'profile.png');
+    const defaultImagePath = path.join(FRONTEND_DIR, 'img', 'profile.png');
     if (fs.existsSync(defaultImagePath)) {
         console.warn(`Missing image: ${fileName}, serving default placeholder`);
         return res.sendFile(defaultImagePath);
@@ -436,8 +439,8 @@ function requireAuthToken(req, res, next) {
 
 // Serve static frontend files (but NOT /uploads - that's handled by custom route above)
 // IMPORTANT: This middleware must come AFTER the /uploads/:fileName route
-app.use(express.static(path.join(__dirname, ".."), {
-    extensions: ["html"],
+app.use(express.static(FRONTEND_DIR, {
+    index: 'index.html',
     setHeaders: (res, path) => {
         // Ensure JS files have correct content type
         if (path.endsWith('.js')) {
@@ -448,12 +451,12 @@ app.use(express.static(path.join(__dirname, ".."), {
 
 // Special route for data deletion status page
 app.get("/data-deletion-status", (req, res) => {
-    res.sendFile(path.join(__dirname, "..", "data-deletion-status.html"));
+    res.sendFile(path.join(FRONTEND_DIR, 'data-deletion-status.html'));
 });
 
 // Special route for data deletion status page with .html extension
 app.get("/data-deletion-status.html", (req, res) => {
-    res.sendFile(path.join(__dirname, "..", "data-deletion-status.html"));
+    res.sendFile(path.join(FRONTEND_DIR, 'data-deletion-status.html'));
 });
 
 // Health check endpoint for monitors
@@ -486,10 +489,7 @@ app.get("/health", (req, res) => {
     });
 });
 
-// Root serves the bundled frontend index.html (no redirect to avoid failing platform checks)
-app.get("/", (req, res) => {
-    return res.sendFile(path.join(__dirname, "..", "index.html"));
-});
+// Root is handled by static middleware above (serves index.html)
 
 // Routes
 const authRoutes = require("./routes/auth");
@@ -1914,7 +1914,7 @@ app.get('/api/products', async (req, res) => {
 
 // Protected routes (حماية عبر التوكن فقط)
 app.get('/course-page.html', authToken, requireAuthToken, (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'course-page.html'));
+    res.sendFile(path.join(FRONTEND_DIR, 'course-page.html'));
 });
 
 app.get('/twm3-backend/private/dashboard.html', (req, res, next) => {
@@ -1932,7 +1932,7 @@ app.get('/twm3-backend/private/dashboard.html', (req, res, next) => {
 });
 
 app.get('/dashboard.html', authToken, requireAuthToken, (req, res) => {
-    res.sendFile(path.join(__dirname, '..', 'dashboard.html'));
+    res.sendFile(path.join(FRONTEND_DIR, 'dashboard.html'));
 });
 
 
