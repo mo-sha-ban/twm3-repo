@@ -25,16 +25,8 @@ const helmet = require('helmet');
 require("dotenv").config();
 
 const app = express();
-// Frontend (static HTML/CSS/JS) lives in the repo-level `public/` folder.
-// When deploying to Railway we want `/` to serve `public/index.html`.
-const FRONTEND_DIR = path.join(__dirname, '..', 'public');
-console.log('__dirname:', __dirname);
-console.log('FRONTEND_DIR:', FRONTEND_DIR);
 // اقرأ متغير البيئة PORT المُقدم من Railway، وإذا لم يكن موجوداً، استخدم القيمة 5000.
-// Honor platform-provided port (Railway/Vercel/etc.) and fall back to 5000 locally
-const PORT = Number(process.env.PORT || process.env.RAILWAY_PORT || process.env.RAILWAY_TCP_PORT || 5000);
-console.log('PORT env var:', process.env.PORT);
-console.log('Using port:', PORT);
+const PORT = process.env.PORT || 5000;
 // Middleware
 app.use(helmet({
     crossOriginResourcePolicy: { policy: 'cross-origin' },
@@ -87,17 +79,21 @@ app.use(helmet({
 }));
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
-        ? ['https://twm3.org', 'https://www.twm3.org', 'https://api.twm3.org', 'https://twm3-repo-production.up.railway.app']
+        ? ['https://twm3.org', 'https://www.twm3.org', 'https://api.twm3.org']
         : ['http://localhost:5000', 'http://localhost:3000', 'http://127.0.0.1:3000', 'http://127.0.0.1:5000'],
     credentials: true
 }));
-// Logging middleware
-app.use((req, res, next) => {
-    console.log(`${req.method} ${req.url}`);
-    next();
-});
-
 app.use(express.json());
+
+// Redirect root to frontend domain so hitting the API root shows the main site
+app.get('/', (req, res) => {
+    const target = process.env.FRONTEND_BASE_URL || 'https://www.twm3.org';
+    // avoid redirect loops if misconfigured
+    if (!target.startsWith('http')) {
+        return res.status(200).send('Frontend URL is misconfigured on the server');
+    }
+    return res.redirect(302, target);
+});
 
 // Serve static files from public/uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads'), {
@@ -171,7 +167,7 @@ app.get('/uploads/:fileName', (req, res, next) => {
     }
 
     // If file not found, return a default placeholder image
-    const defaultImagePath = path.join(FRONTEND_DIR, 'img', 'profile.png');
+    const defaultImagePath = path.join(__dirname, '..', 'img', 'profile.png');
     if (fs.existsSync(defaultImagePath)) {
         console.warn(`Missing image: ${fileName}, serving default placeholder`);
         return res.sendFile(defaultImagePath);
@@ -449,10 +445,8 @@ function requireAuthToken(req, res, next) {
 
 // Serve static frontend files (but NOT /uploads - that's handled by custom route above)
 // IMPORTANT: This middleware must come AFTER the /uploads/:fileName route
-console.log('FRONTEND_DIR:', FRONTEND_DIR);
-console.log('Index file exists:', require('fs').existsSync(require('path').join(FRONTEND_DIR, 'index.html')));
-app.use(express.static(FRONTEND_DIR, {
-    index: 'index.html',
+app.use(express.static(path.join(__dirname, ".."), {
+    extensions: ["html"],
     setHeaders: (res, path) => {
         // Ensure JS files have correct content type
         if (path.endsWith('.js')) {
@@ -463,50 +457,18 @@ app.use(express.static(FRONTEND_DIR, {
 
 // Special route for data deletion status page
 app.get("/data-deletion-status", (req, res) => {
-    res.sendFile(path.join(FRONTEND_DIR, 'data-deletion-status.html'));
+    res.sendFile(path.join(__dirname, "..", "data-deletion-status.html"));
 });
 
 // Special route for data deletion status page with .html extension
 app.get("/data-deletion-status.html", (req, res) => {
-    res.sendFile(path.join(FRONTEND_DIR, 'data-deletion-status.html'));
+    res.sendFile(path.join(__dirname, "..", "data-deletion-status.html"));
 });
 
-// Health check endpoint for monitors
-app.get("/api/health", (req, res) => {
-    res.json({
-        message: "TWM3 Backend is running successfully",
-        status: "active",
-        timestamp: new Date(),
-        env: process.env.NODE_ENV
-    });
+// Redirect root to index.html
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, "..", "index.html"));
 });
-
-// Health check endpoint for monitors
-app.get("/api/health", (req, res) => {
-    res.json({
-        message: "TWM3 Backend is running successfully",
-        status: "active",
-        timestamp: new Date(),
-        env: process.env.NODE_ENV
-    });
-});
-
-// Plain health endpoint for platforms expecting root check
-app.get("/health", (req, res) => {
-    res.json({
-        message: "ok",
-        status: "active",
-        timestamp: new Date(),
-        env: process.env.NODE_ENV
-    });
-});
-
-// Debug endpoint
-app.get("/test", (req, res) => {
-    res.send("OK - Server is responding");
-});
-
-// Root is handled by static middleware above (serves index.html)
 
 // Routes
 const authRoutes = require("./routes/auth");
@@ -1931,7 +1893,7 @@ app.get('/api/products', async (req, res) => {
 
 // Protected routes (حماية عبر التوكن فقط)
 app.get('/course-page.html', authToken, requireAuthToken, (req, res) => {
-    res.sendFile(path.join(FRONTEND_DIR, 'course-page.html'));
+    res.sendFile(path.join(__dirname, '..', 'course-page.html'));
 });
 
 app.get('/twm3-backend/private/dashboard.html', (req, res, next) => {
@@ -1949,7 +1911,7 @@ app.get('/twm3-backend/private/dashboard.html', (req, res, next) => {
 });
 
 app.get('/dashboard.html', authToken, requireAuthToken, (req, res) => {
-    res.sendFile(path.join(FRONTEND_DIR, 'dashboard.html'));
+    res.sendFile(path.join(__dirname, '..', 'dashboard.html'));
 });
 
 
@@ -2048,79 +2010,44 @@ io.on('connection', (socket) => {
     });
 });
 
-// Start server
-const startServer = async () => {
-    try {
-        // Railway/Render/Heroku/Atlas env vars can differ. Accept common names.
-        // - Railway Mongo plugin often exposes MONGO_URL or MONGODB_URL
-        // - MongoDB Atlas tutorials frequently use MONGODB_URI
-        // - This project historically used MONGO_URI
-        const mongoUriCandidates = [
-            { key: 'MONGO_URI', value: process.env.MONGO_URI },
-            { key: 'MONGODB_URI', value: process.env.MONGODB_URI },
-            { key: 'MONGO_URL', value: process.env.MONGO_URL },
-            { key: 'MONGODB_URL', value: process.env.MONGODB_URL },
-            // Some platforms expose a single DATABASE_URL; only accept it if it looks like Mongo.
-            { key: 'DATABASE_URL', value: process.env.DATABASE_URL }
-        ];
+// Start server بعد التأكد من اتصال قاعدة البيانات
+mongoose.connect(process.env.MONGO_URI)
+    .then(async () => {
+        console.log("MongoDB connected");
+        
 
-        const isValidMongoUri = (val) => {
-            if (typeof val !== 'string') return false;
-            const v = val.trim();
-            return v.length > 0 && (v.startsWith('mongodb://') || v.startsWith('mongodb+srv://'));
-        };
+        
+        const port = parseInt(process.env.PORT || PORT || 5000, 10);
+        const maxRetries = 5;
+        let attempt = 0;
 
-        const resolvedMongo = mongoUriCandidates.find((c) => isValidMongoUri(c.value));
-        const mongoUri = resolvedMongo ? resolvedMongo.value.trim() : '';
+        function tryListen(p) {
+            // attach an error handler for this attempt only
+            server.once('error', (err) => {
+                if (err && err.code === 'EADDRINUSE') {
+                    attempt++;
+                    if (attempt <= maxRetries) {
+                        const nextPort = p + 1;
+                        console.warn(`Port ${p} in use; trying port ${nextPort} (attempt ${attempt}/${maxRetries})`);
+                        tryListen(nextPort);
+                    } else {
+                        console.error(`Port ${p} still in use after ${maxRetries} attempts; exiting.`);
+                        process.exit(1);
+                    }
+                } else {
+                    console.error('Server listen error:', err);
+                    process.exit(1);
+                }
+            });
 
-        // Local fallback only when NOT in production.
-        const finalMongoUri = mongoUri || (
-            process.env.NODE_ENV === 'production'
-                ? ''
-                : 'mongodb://localhost:27017/twm3'
-        );
-
-        if (!finalMongoUri) {
-            const availableKeys = mongoUriCandidates
-                .map((c) => `${c.key}=${c.value ? '[set]' : '[missing]'}`)
-                .join(', ');
-            throw new Error(
-                `Missing MongoDB connection string. Set one of: MONGO_URI, MONGODB_URI, MONGO_URL, MONGODB_URL (or DATABASE_URL if it starts with mongodb). Seen: ${availableKeys}`
-            );
+            server.listen(p, () => {
+                console.log(`Server is running on http://localhost:${p}`);
+            });
         }
 
-        console.log(`MongoDB URI resolved from: ${(resolvedMongo && resolvedMongo.key) || (process.env.NODE_ENV === 'production' ? 'NONE' : 'local-default')}`);
-        await mongoose.connect(finalMongoUri);
-        console.log("MongoDB connected");
-
-        const port = Number(PORT);
-        console.log('PORT env var:', process.env.PORT);
-        console.log('Using port:', port);
-        server.listen(port, '127.0.0.1', () => {
-            console.log(`Server is running on port ${port}`);
-        });
-    } catch (err) {
-        console.error("Server start error:", err);
+        tryListen(port);
+    })
+    .catch(err => {
+        console.error("MongoDB connection error:", err);
         process.exit(1);
-    }
-};
-
-// Start connection immediately
-startServer();
-
-// Error handlers for debugging
-process.on('uncaughtException', (err) => {
-    console.error('Uncaught Exception:', err);
-    process.exit(1);
-});
-
-process.on('unhandledRejection', (reason, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-});
-
-process.on('exit', (code) => {
-    console.log('Process exit with code:', code);
-});
-
-// Export for compatibility
-module.exports = app;
+    });
