@@ -31,6 +31,8 @@ const FRONTEND_DIR = path.join(__dirname, '..', 'public');
 // اقرأ متغير البيئة PORT المُقدم من Railway، وإذا لم يكن موجوداً، استخدم القيمة 5000.
 // Honor platform-provided port (Railway/Vercel/etc.) and fall back to 5000 locally
 const PORT = Number(process.env.PORT || process.env.RAILWAY_PORT || process.env.RAILWAY_TCP_PORT || 5000);
+console.log('PORT env var:', process.env.PORT);
+console.log('Using port:', PORT);
 // Middleware
 app.use(helmet({
     crossOriginResourcePolicy: { policy: 'cross-origin' },
@@ -87,6 +89,12 @@ app.use(cors({
         : ['http://localhost:5000', 'http://localhost:3000', 'http://127.0.0.1:3000', 'http://127.0.0.1:5000'],
     credentials: true
 }));
+// Logging middleware
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.url}`);
+    next();
+});
+
 app.use(express.json());
 
 // Serve static files from public/uploads directory
@@ -439,6 +447,8 @@ function requireAuthToken(req, res, next) {
 
 // Serve static frontend files (but NOT /uploads - that's handled by custom route above)
 // IMPORTANT: This middleware must come AFTER the /uploads/:fileName route
+console.log('FRONTEND_DIR:', FRONTEND_DIR);
+console.log('Index file exists:', require('fs').existsSync(require('path').join(FRONTEND_DIR, 'index.html')));
 app.use(express.static(FRONTEND_DIR, {
     index: 'index.html',
     setHeaders: (res, path) => {
@@ -487,6 +497,11 @@ app.get("/health", (req, res) => {
         timestamp: new Date(),
         env: process.env.NODE_ENV
     });
+});
+
+// Debug endpoint
+app.get("/test", (req, res) => {
+    res.send("OK - Server is responding");
 });
 
 // Root is handled by static middleware above (serves index.html)
@@ -2111,6 +2126,20 @@ const startServer = async () => {
 
 // Start connection immediately
 startServer();
+
+// Error handlers for debugging
+process.on('uncaughtException', (err) => {
+    console.error('Uncaught Exception:', err);
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('exit', (code) => {
+    console.log('Process exit with code:', code);
+});
 
 // Export for compatibility
 module.exports = app;
