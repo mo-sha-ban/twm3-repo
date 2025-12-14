@@ -2042,10 +2042,18 @@ const startServer = async () => {
             { key: 'MONGO_URI', value: process.env.MONGO_URI },
             { key: 'MONGODB_URI', value: process.env.MONGODB_URI },
             { key: 'MONGO_URL', value: process.env.MONGO_URL },
-            { key: 'MONGODB_URL', value: process.env.MONGODB_URL }
+            { key: 'MONGODB_URL', value: process.env.MONGODB_URL },
+            // Some platforms expose a single DATABASE_URL; only accept it if it looks like Mongo.
+            { key: 'DATABASE_URL', value: process.env.DATABASE_URL }
         ];
 
-        const resolvedMongo = mongoUriCandidates.find((c) => typeof c.value === 'string' && c.value.trim().length > 0);
+        const isValidMongoUri = (val) => {
+            if (typeof val !== 'string') return false;
+            const v = val.trim();
+            return v.length > 0 && (v.startsWith('mongodb://') || v.startsWith('mongodb+srv://'));
+        };
+
+        const resolvedMongo = mongoUriCandidates.find((c) => isValidMongoUri(c.value));
         const mongoUri = resolvedMongo ? resolvedMongo.value.trim() : '';
 
         // Local fallback only when NOT in production.
@@ -2060,7 +2068,7 @@ const startServer = async () => {
                 .map((c) => `${c.key}=${c.value ? '[set]' : '[missing]'}`)
                 .join(', ');
             throw new Error(
-                `Missing MongoDB connection string. Set one of: MONGO_URI, MONGODB_URI, MONGO_URL, MONGODB_URL. Seen: ${availableKeys}`
+                `Missing MongoDB connection string. Set one of: MONGO_URI, MONGODB_URI, MONGO_URL, MONGODB_URL (or DATABASE_URL if it starts with mongodb). Seen: ${availableKeys}`
             );
         }
 
