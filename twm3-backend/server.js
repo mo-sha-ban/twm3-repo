@@ -22,145 +22,218 @@ const dotenv = require('dotenv');
 const helmet = require('helmet');
 
 require("dotenv").config();
-
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-
-
-// ============ Logging للبدء ============
-
 console.log('==========================================');
-console.log('🚀 INITIALIZING TWM3 BACKEND');
+console.log('🚀 TWM3 BACKEND - PRODUCTION MODE');
 console.log('==========================================');
 console.log('Current directory:', __dirname);
-console.log('File path:', __filename);
 console.log('NODE_ENV:', process.env.NODE_ENV);
-console.log('PORT:', process.env.PORT);
-console.log('MONGO_URI exists:', !!process.env.MONGO_URI);
+console.log('PORT:', PORT);
 console.log('==========================================');
 
+// Request logging
+app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
+});
 
-console.log('🚀 Starting TWM3 Backend...');
-console.log('📅', new Date().toISOString());
-console.log('🔧 NODE_ENV:', process.env.NODE_ENV);
-console.log('🎯 PORT from env:', process.env.PORT);
-
-// ============ Middleware ============
-app.use(helmet({
-    crossOriginResourcePolicy: { policy: 'cross-origin' },
-    contentSecurityPolicy: {
-        useDefaults: true,
-        directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc: [
-                "'self'",
-                "'unsafe-inline'",
-                "blob:",
-                "data:",
-                "'unsafe-eval'",
-                "https://cdn.plyr.io",
-                "https://cdnjs.cloudflare.com",
-                "https://cdn.jsdelivr.net",
-                "https://pagead2.googlesyndication.com",
-                "https://www.googletagservices.com",
-                "https://www.googletagmanager.com",
-                "https://cdn.jsdelivr.net/npm/@emailjs/browser",
-                "https://use.fontawesome.com",
-                "https://www.youtube.com",
-                "https://cdn.quilljs.com"
-            ],
-            styleSrc: [
-                "'self'",
-                "'unsafe-inline'",
-                "https://fonts.googleapis.com",
-                "https://cdn.plyr.io",
-                "https://cdnjs.cloudflare.com",
-                "https://cdn.quilljs.com"
-            ],
-            imgSrc: ["'self'", "data:", "blob:", "https://*"],
-            connectSrc: [
-                "'self'",
-                "http://localhost:5000",
-                "https://twm3.org",
-                "https://cdn.plyr.io",
-                "https://noembed.com",
-                "https://www.youtube.com",
-                "https://www.youtube-nocookie.com",
-                "https://cdn.quilljs.com"
-            ],
-            frameSrc: ["'self'", "https://www.youtube.com", "https://www.youtube-nocookie.com"],
-            mediaSrc: ["'self'", "data:", "blob:", "https://cdn.plyr.io"],
-            fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com", "https://use.fontawesome.com", "data:"],
-            scriptSrcAttr: ["'unsafe-inline'"]
-        }
-    }
-}));
-
+// CORS - Production settings
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
-        ? ['https://twm3.org', 'https://www.twm3.org', 'https://api.twm3.org']
-        : ['http://localhost:5000', 'http://localhost:3000', 'http://127.0.0.1:3000', 'http://127.0.0.1:5000'],
+        ? ['https://twm3.org', 'https://www.twm3.org', 'https://*.railway.app']
+        : ['http://localhost:3000', 'http://localhost:5000'],
     credentials: true
 }));
+
 app.use(express.json());
 
-// Redirect root to frontend domain// في وسط ملف server.js، قبل أي routes أخرى
+// Serve static files - Multiple attempts
+const tryStaticPaths = [
+    '/app',
+    path.join(__dirname, '..'),
+    path.join(__dirname, '../..'),
+    '/app/public',
+    path.join(__dirname, '..', 'public')
+];
 
-// Test route - للتأكد من أن الـAPI شغال
-app.get('/test', (req, res) => {
+for (const staticPath of tryStaticPaths) {
+    try {
+        if (fs.existsSync(staticPath)) {
+            const stats = fs.statSync(staticPath);
+            if (stats.isDirectory()) {
+                const files = fs.readdirSync(staticPath);
+                console.log(`📁 Serving static from: ${staticPath}`);
+                console.log(`   Contains: ${files.slice(0, 5).join(', ')}...`);
+                
+                app.use(express.static(staticPath, {
+                    extensions: ['html', 'htm', 'css', 'js'],
+                    index: ['index.html', 'index.htm']
+                }));
+                break;
+            }
+        }
+    } catch (e) {
+        console.log(`   Skipping ${staticPath}: ${e.message}`);
+    }
+}
+
+// Simple test route
+app.get('/ping', (req, res) => {
     res.json({ 
-        success: true,
-        message: 'API is working correctly',
+        message: 'pong', 
         server: 'TWM3 Backend',
-        environment: process.env.NODE_ENV || 'development',
         timestamp: new Date().toISOString()
     });
 });
 
-// Health check route - مهم لـRailway
+// Health check
 app.get('/health', (req, res) => {
-    res.status(200).json({ 
+    res.status(200).json({
         status: 'UP',
-        uptime: process.uptime(),
         database: 'connected',
+        uptime: process.uptime(),
         timestamp: new Date().toISOString()
     });
 });
 
-// Main root route
+// Main route
 app.get('/', (req, res) => {
-    // بسيط ومضمون - بدون تعقيدات
     const html = `
     <!DOCTYPE html>
     <html>
     <head>
         <title>TWM3 - Backend Server</title>
         <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>
-            body { font-family: Arial, sans-serif; padding: 40px; text-align: center; }
-            .card { 
-                background: #f5f5f5; 
-                padding: 30px; 
-                border-radius: 10px; 
-                max-width: 600px; 
-                margin: 0 auto; 
-                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            * { margin: 0; padding: 0; box-sizing: border-box; }
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: white;
+                padding: 20px;
             }
-            .success { color: #4CAF50; font-weight: bold; }
+            .container {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(20px);
+                padding: 50px 40px;
+                border-radius: 24px;
+                text-align: center;
+                max-width: 800px;
+                width: 100%;
+                box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            h1 {
+                font-size: 3.5em;
+                margin-bottom: 20px;
+                background: linear-gradient(45deg, #fff, #f0f0f0);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                font-weight: 800;
+            }
+            .status-badge {
+                background: #10B981;
+                color: white;
+                padding: 12px 30px;
+                border-radius: 100px;
+                font-weight: 600;
+                letter-spacing: 1px;
+                display: inline-block;
+                margin: 25px 0;
+                font-size: 1.1em;
+                box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+            }
+            .subtitle {
+                font-size: 1.2em;
+                opacity: 0.9;
+                margin-bottom: 40px;
+                line-height: 1.6;
+            }
+            .grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
+                margin: 40px 0;
+            }
+            .card {
+                background: rgba(255, 255, 255, 0.15);
+                padding: 25px;
+                border-radius: 16px;
+                transition: all 0.3s ease;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .card:hover {
+                background: rgba(255, 255, 255, 0.25);
+                transform: translateY(-5px);
+            }
+            .card h3 {
+                margin-bottom: 15px;
+                font-size: 1.3em;
+            }
+            .card a {
+                color: white;
+                text-decoration: none;
+                font-weight: 600;
+                display: block;
+                padding: 10px;
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 10px;
+                margin-top: 10px;
+                transition: background 0.3s;
+            }
+            .card a:hover {
+                background: rgba(255, 255, 255, 0.3);
+            }
+            .info {
+                margin-top: 40px;
+                padding-top: 30px;
+                border-top: 1px solid rgba(255, 255, 255, 0.2);
+                font-size: 0.9em;
+                opacity: 0.7;
+            }
         </style>
     </head>
     <body>
-        <div class="card">
-            <h1>✅ TWM3 Backend Server</h1>
-            <p class="success">Server is running successfully on Railway!</p>
-            <p>All API endpoints are available.</p>
-            <hr>
-            <p><a href="/api/courses">/api/courses</a> - Browse courses</p>
-            <p><a href="/api/blogs">/api/blogs</a> - Read blogs</p>
-            <p><a href="/health">/health</a> - Health check</p>
-            <hr>
-            <p><small>${new Date().toISOString()}</small></p>
+        <div class="container">
+            <h1>🚀 TWM3 Backend</h1>
+            <div class="status-badge">✅ SERVER IS RUNNING</div>
+            <p class="subtitle">All systems operational • MongoDB Connected • API Ready</p>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>📚 Courses API</h3>
+                    <p>Browse available courses</p>
+                    <a href="/api/courses">View Courses →</a>
+                </div>
+                <div class="card">
+                    <h3>📝 Blog API</h3>
+                    <p>Read and manage blogs</p>
+                    <a href="/api/blogs">View Blogs →</a>
+                </div>
+                <div class="card">
+                    <h3>🛒 Products API</h3>
+                    <p>Browse products</p>
+                    <a href="/api/products">View Products →</a>
+                </div>
+                <div class="card">
+                    <h3>📊 System Info</h3>
+                    <p>Server status & health</p>
+                    <a href="/health">Health Check →</a>
+                </div>
+            </div>
+            
+            <div class="info">
+                <p>Port: ${PORT} • Environment: ${process.env.NODE_ENV}</p>
+                <p>Server Time: ${new Date().toISOString()}</p>
+                <p>Deployed on Railway • TWM3 Organization</p>
+            </div>
         </div>
     </body>
     </html>
