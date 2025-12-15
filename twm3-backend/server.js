@@ -1,13 +1,12 @@
+
 const express = require('express');
 const cors = require('cors');
 const mongoose = require("mongoose");
-const multer = require('multer'); // تم استيراد multer
+const multer = require('multer');
 const path = require("path");
-// const session = require("express-session"); // تم تعطيله نهائياً
-const fs = require('fs'); // أضفنا استيراد fs
+const fs = require('fs');
 const http = require('http');
 const { Server } = require('socket.io');
-const { exec } = require('child_process'); // للتحويل باستخدام FFmpeg
 const Course = require('./models/Course');
 const Blog = require('./models/Blog');
 const Product = require('./models/Product');
@@ -25,32 +24,38 @@ const helmet = require('helmet');
 require("dotenv").config();
 
 const app = express();
-// اقرأ متغير البيئة PORT المُقدم من Railway، وإذا لم يكن موجوداً، استخدم القيمة 5000.
 const PORT = process.env.PORT || 5000;
-// Middleware
+
+// ============ Logging للبدء ============
+console.log('🚀 Starting TWM3 Backend...');
+console.log('📅', new Date().toISOString());
+console.log('🔧 NODE_ENV:', process.env.NODE_ENV);
+console.log('🎯 PORT from env:', process.env.PORT);
+
+// ============ Middleware ============
 app.use(helmet({
     crossOriginResourcePolicy: { policy: 'cross-origin' },
-            contentSecurityPolicy: {
-                useDefaults: true,
-                directives: {
-                    defaultSrc: ["'self'"],
-                    scriptSrc: [
-                        "'self'",
-                        "'unsafe-inline'",
-                        "blob:",
-                        "data:",
-                        "'unsafe-eval'",
-                        "https://cdn.plyr.io",
-                        "https://cdnjs.cloudflare.com",
-                        "https://cdn.jsdelivr.net",
-                        "https://pagead2.googlesyndication.com",
-                        "https://www.googletagservices.com",
-                        "https://www.googletagmanager.com",
-                        "https://cdn.jsdelivr.net/npm/@emailjs/browser",
-                        "https://use.fontawesome.com",
-                        "https://www.youtube.com",
-                        "https://cdn.quilljs.com"
-                    ],
+    contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: [
+                "'self'",
+                "'unsafe-inline'",
+                "blob:",
+                "data:",
+                "'unsafe-eval'",
+                "https://cdn.plyr.io",
+                "https://cdnjs.cloudflare.com",
+                "https://cdn.jsdelivr.net",
+                "https://pagead2.googlesyndication.com",
+                "https://www.googletagservices.com",
+                "https://www.googletagmanager.com",
+                "https://cdn.jsdelivr.net/npm/@emailjs/browser",
+                "https://use.fontawesome.com",
+                "https://www.youtube.com",
+                "https://cdn.quilljs.com"
+            ],
             styleSrc: [
                 "'self'",
                 "'unsafe-inline'",
@@ -77,6 +82,7 @@ app.use(helmet({
         }
     }
 }));
+
 app.use(cors({
     origin: process.env.NODE_ENV === 'production' 
         ? ['https://twm3.org', 'https://www.twm3.org', 'https://api.twm3.org']
@@ -85,17 +91,16 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Redirect root to frontend domain so hitting the API root shows the main site
+// Redirect root to frontend domain
 app.get('/', (req, res) => {
     const target = process.env.FRONTEND_BASE_URL || 'https://www.twm3.org';
-    // avoid redirect loops if misconfigured
     if (!target.startsWith('http')) {
         return res.status(200).send('Frontend URL is misconfigured on the server');
     }
     return res.redirect(302, target);
 });
 
-// Serve static files from public/uploads directory
+// ============ Serve Static Files ============
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads'), {
     setHeaders: (res) => {
         res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
@@ -103,25 +108,27 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/uploads'), {
     }
 }));
 
-// Specific subdirectories with longer cache times
 app.use('/uploads/avatars', express.static(path.join(__dirname, 'public/uploads/avatars'), {
     setHeaders: (res) => {
         res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
         res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
     }
 }));
+
 app.use('/uploads/lesson-assets', express.static(path.join(__dirname, 'public/uploads/lesson-assets'), {
     setHeaders: (res) => {
         res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
         res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
     }
 }));
+
 app.use('/uploads/notifications', express.static(path.join(__dirname, 'public/uploads/notifications'), {
     setHeaders: (res) => {
         res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
         res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
     }
 }));
+
 app.use('/uploads/videos', express.static(path.join(__dirname, 'public/uploads/videos'), {
     setHeaders: (res) => {
         res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
@@ -129,7 +136,6 @@ app.use('/uploads/videos', express.static(path.join(__dirname, 'public/uploads/v
     }
 }));
 
-// Serve static assets from public/assets
 app.use('/assets', express.static(path.join(__dirname, 'public/assets'), {
     setHeaders: (res) => {
         res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
@@ -137,15 +143,7 @@ app.use('/assets', express.static(path.join(__dirname, 'public/assets'), {
     }
 }));
 
-// Serve static files from public/uploads directory
-app.use('/uploads', express.static(path.join(__dirname, 'public/uploads'), {
-    setHeaders: (res) => {
-        res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
-        res.setHeader('Cache-Control', 'public, max-age=3600');
-    }
-}));
-
-// Fallback route: try to resolve /uploads/:filename by checking common subfolders
+// Fallback route for uploads
 app.get('/uploads/:fileName', (req, res, next) => {
     const fileName = req.params.fileName;
     const publicDir = path.join(__dirname, 'public', 'uploads');
@@ -166,68 +164,67 @@ app.get('/uploads/:fileName', (req, res, next) => {
         } catch (e) { /* ignore */ }
     }
 
-    // If file not found, return a default placeholder image
     const defaultImagePath = path.join(__dirname, '..', 'img', 'profile.png');
     if (fs.existsSync(defaultImagePath)) {
         console.warn(`Missing image: ${fileName}, serving default placeholder`);
         return res.sendFile(defaultImagePath);
     }
 
-    // not found, pass to next handler (will result in 404)
     next();
 });
 
-
-
-
-// 🟢 إذا حابب ترجع PDF من API مخصص
+// ============ PDF Routes ============
 app.get('/pdf', (req, res) => {
     const filePath = path.join(__dirname, 'public/files/myfile.pdf');
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'inline; filename=myfile.pdf');
     res.sendFile(filePath);
-  });
-
-
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'public/uploads/');
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
 });
+
+app.get('/pdf/:filename', (req, res) => {
+    const filePath = path.join(__dirname, 'public/uploads', req.params.filename);
+
+    if (!fs.existsSync(filePath)) {
+        return res.status(404).send('❌ الملف غير موجود');
+    }
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `inline; filename="${req.params.filename}"`);
+    res.sendFile(filePath);
+});
+
+// ============ Multer Configurations ============
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'public/uploads/');
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
 const upload = multer({
     storage,
     fileFilter: (req, file, cb) => {
         console.log('Processing file:', file.originalname, 'MIME:', file.mimetype);
 
-        // For lessonFile accept both mp4 and mov (video/quicktime)
         if (file.fieldname === 'lessonFile' && file.originalname) {
             const ext = path.extname(file.originalname).toLowerCase();
             const mime = (file.mimetype || '').toLowerCase();
             const allowedVideoExts = ['.mp4', '.mov'];
             const allowedVideoMimes = ['video/mp4', 'video/quicktime'];
 
-            console.log('File upload attempt:', {
-                filename: file.originalname,
-                extension: ext,
-                mimetype: mime
-            });
-
             if (allowedVideoExts.includes(ext) || allowedVideoMimes.includes(mime)) {
                 req._fileFilterPassed = true;
                 return cb(null, true);
             }
 
-            // Reject with a clear error for debugging
             const error = new Error('صيغة الملف غير مسموح بها. الرجاء استخدام ملف فيديو بصيغة MP4 أو MOV.');
             error.code = 'INVALID_FILE_TYPE';
             return cb(error, false);
         }
 
-        // For other types (images, PDFs)
         const allowedMimes = [
             'image/png',
             'image/jpeg',
@@ -245,129 +242,57 @@ const upload = multer({
     }
 });
 
-// إعداد رفع صور البروفايل (صور فقط)
 const avatarStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const dest = path.join(__dirname, 'public/uploads/avatars');
-    try { fs.mkdirSync(dest, { recursive: true }); } catch(_) {}
-    cb(null, dest);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
+    destination: function (req, file, cb) {
+        const dest = path.join(__dirname, 'public/uploads/avatars');
+        try { fs.mkdirSync(dest, { recursive: true }); } catch(_) {}
+        cb(null, dest);
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
 });
+
 const avatarUpload = multer({
-  storage: avatarStorage,
-  limits: { fileSize: 2 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    const allowed = ['image/png', 'image/jpeg', 'image/webp'];
-    if (allowed.includes(file.mimetype)) return cb(null, true);
-    cb(new Error('صيغة الصورة غير مسموح بها!'), false);
-  }
+    storage: avatarStorage,
+    limits: { fileSize: 2 * 1024 * 1024 },
+    fileFilter: (req, file, cb) => {
+        const allowed = ['image/png', 'image/jpeg', 'image/webp'];
+        if (allowed.includes(file.mimetype)) return cb(null, true);
+        cb(new Error('صيغة الصورة غير مسموح بها!'), false);
+    }
 });
 
-// إعداد رفع ملفات وصف الدروس (صور + PDF)
 const lessonAssetStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const dest = path.join(__dirname, 'public/uploads/lesson-assets');
-    try { fs.mkdirSync(dest, { recursive: true }); } catch(_) {}
-    cb(null, dest);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
+    destination: function (req, file, cb) {
+        const dest = path.join(__dirname, 'public/uploads/lesson-assets');
+        try { fs.mkdirSync(dest, { recursive: true }); } catch(_) {}
+        cb(null, dest);
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
 });
+
 const lessonAssetUpload = multer({
-  storage: lessonAssetStorage,
-  limits: { fileSize: 500 * 1024 * 1024 }, // Increased to 500MB for videos
-  fileFilter: (req, file, cb) => {
-    // Accept images, videos, and PDFs
-    const allowed = [
-      // Images
-      'image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/avif',
-      // Videos
-      'video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo', 'video/x-ms-wmv', 'video/ogg',
-      'video/x-matroska', 'video/x-flv', 'video/mpeg', 'video/3gpp', 'video/mp2t',
-      'application/x-mpegURL', // HLS
-      // Documents
-      'application/pdf'
-    ];
-    if (allowed.includes(file.mimetype)) return cb(null, true);
-    // Also accept if it has a video/* type but MIME might not be registered
-    if (file.mimetype && file.mimetype.startsWith('video/')) return cb(null, true);
-    cb(new Error(`صيغة الملف غير مسموح بها (${file.mimetype}). يدعم الصور والفيديوهات و PDF فقط.`), false);
-  }
+    storage: lessonAssetStorage,
+    limits: { fileSize: 500 * 1024 * 1024 },
+    fileFilter: (req, file, cb) => {
+        const allowed = [
+            'image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/avif',
+            'video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo', 'video/x-ms-wmv', 'video/ogg',
+            'video/x-matroska', 'video/x-flv', 'video/mpeg', 'video/3gpp', 'video/mp2t',
+            'application/x-mpegURL',
+            'application/pdf'
+        ];
+        if (allowed.includes(file.mimetype)) return cb(null, true);
+        if (file.mimetype && file.mimetype.startsWith('video/')) return cb(null, true);
+        cb(new Error(`صيغة الملف غير مسموح بها (${file.mimetype}). يدعم الصور والفيديوهات و PDF فقط.`), false);
+    }
 });
 
-// 🟢 مسار عرض PDF مباشرة
-app.get('/pdf/:filename', (req, res) => {
-  const filePath = path.join(__dirname, 'public/uploads', req.params.filename);
-
-  if (!fs.existsSync(filePath)) {
-    return res.status(404).send('❌ الملف غير موجود');
-  }
-
-  // 🟢 هيدرز عرض Inline (بدل التحميل)
-  res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader(
-    'Content-Disposition',
-    'inline; filename="' + req.params.filename + '"'
-  );
-
-  res.sendFile(filePath);
-});
-
-// API: رفع ملف مرفق (صور + فيديو + PDF) عبر حقل form-data باسم 'file'
-app.post('/api/uploads/lesson-asset', authToken, requireAuthToken, (req, res) => {
-    lessonAssetUpload.single('file')(req, res, async (err) => {
-        if (err) return res.status(400).json({ error: err.message || 'فشل رفع الملف' });
-        if (!req.file) return res.status(400).json({ error: 'يرجى اختيار ملف' });
-        
-        let rel = '/uploads/lesson-assets/' + req.file.filename;
-        let type = 'file';
-        const mimetype = (req.file.mimetype || '').toLowerCase();
-        if (mimetype.startsWith('image/')) type = 'image';
-        else if (mimetype.startsWith('video/')) type = 'video';
-        else if (mimetype === 'application/pdf') type = 'pdf';
-        
-        // For MOV files, note that frontend should convert to MP4 URL
-        if (req.file.originalname.toLowerCase().endsWith('.mov')) {
-            console.log('🎬 MOV file uploaded:', req.file.filename);
-            console.log('📹 Client will attempt to use .mp4 version as fallback');
-        }
-        
-        return res.json({ 
-            success: true, 
-            url: rel, 
-            type, 
-            filename: req.file.originalname
-        });
-    });
-});
-
-// API: رفع فيديو للدرس
-app.post('/api/uploads/lesson-video', authToken, requireAuthToken, (req, res) => {
-    lessonUpload.single('video')(req, res, (err) => {
-        if (err) return res.status(400).json({ error: err.message || 'فشل رفع الفيديو' });
-        if (!req.file) return res.status(400).json({ error: 'يرجى اختيار ملف فيديو' });
-        const rel = '/uploads/' + req.file.filename;
-        return res.json({ url: rel, filename: req.file.filename });
-    });
-});
-
-// API: رفع PDF للدرس
-app.post('/api/uploads/lesson-pdf', authToken, requireAuthToken, (req, res) => {
-    lessonUpload.single('pdf')(req, res, (err) => {
-        if (err) return res.status(400).json({ error: err.message || 'فشل رفع PDF' });
-        if (!req.file) return res.status(400).json({ error: 'يرجى اختيار ملف PDF' });
-        const rel = '/uploads/' + req.file.filename;
-        return res.json({ url: rel, filename: req.file.filename });
-    });
-});
-
-// إعداد رفع ملفات الدروس
 const lessonStorage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, 'public/uploads/');
@@ -383,13 +308,10 @@ const lessonUpload = multer({
     fileFilter: (req, file, cb) => {
         console.log('Processing lesson file:', file.originalname, 'MIME:', file.mimetype);
 
-        // normalize
         const mime = (file.mimetype || '').toLowerCase();
         const ext = (path.extname(file.originalname || '') || '').toLowerCase();
 
-        // For lessonFile: allow mp4 and mov (video/quicktime) by mime or extension
         if (file.fieldname === 'lessonFile') {
-            // Allow video files (mp4, mov) and PDF files for lesson uploads
             const allowedVideoMimes = ['video/mp4', 'video/quicktime'];
             const allowedVideoExts = ['.mp4', '.mov'];
             const allowedPdfMimes = ['application/pdf'];
@@ -400,12 +322,10 @@ const lessonUpload = multer({
                 return cb(null, true);
             }
 
-            // mark as rejected but don't throw (so we can return JSON from the route)
             req._fileFilterPassed = false;
             return cb(null, false);
         }
 
-        // For other types (images, PDFs)
         const allowedMimes = [
             'image/png',
             'image/jpeg',
@@ -422,10 +342,10 @@ const lessonUpload = multer({
         return cb(null, false);
     }
 }).fields([
-    { name: 'lessonFile', maxCount: 1 } // فيديو أو PDF
+    { name: 'lessonFile', maxCount: 1 }
 ]);
 
-// ميدل وير جديد للتحقق من أن المستخدم أدمن بناءً على التوكن
+// ============ Middleware Functions ============
 function requireAdminToken(req, res, next) {
     if (req.user && req.user.isAdmin) {
         return next();
@@ -434,7 +354,6 @@ function requireAdminToken(req, res, next) {
     }
 }
 
-// ميدل وير جديد للتحقق من تسجيل الدخول بناءً على التوكن
 function requireAuthToken(req, res, next) {
     if (req.user) {
         return next();
@@ -443,31 +362,23 @@ function requireAuthToken(req, res, next) {
     }
 }
 
-// Serve static frontend files (but NOT /uploads - that's handled by custom route above)
-// IMPORTANT: This middleware must come AFTER the /uploads/:fileName route
+// Serve static frontend files
 app.use(express.static(path.join(__dirname, ".."), {
     extensions: ["html"],
     setHeaders: (res, path) => {
-        // Ensure JS files have correct content type
         if (path.endsWith('.js')) {
             res.setHeader('Content-Type', 'text/javascript');
         }
     }
 }));
 
-// Special route for data deletion status page
+// Special routes
 app.get("/data-deletion-status", (req, res) => {
     res.sendFile(path.join(__dirname, "..", "data-deletion-status.html"));
 });
 
-// Special route for data deletion status page with .html extension
 app.get("/data-deletion-status.html", (req, res) => {
     res.sendFile(path.join(__dirname, "..", "data-deletion-status.html"));
-});
-
-// Redirect root to index.html
-app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "..", "index.html"));
 });
 
 // Routes
@@ -483,192 +394,161 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/progress', progressRoutes);
 
-// --- Product Reviews & Comments Endpoints (BEFORE productRoutes to take priority) ---
+// Product Reviews & Comments
 app.get('/api/products/:id/reviews', async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id).select('reviews');
-    if (!product) return res.status(404).json({ error: 'Product not found' });
-    res.json(product.reviews || []);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch reviews' });
-  }
+    try {
+        const product = await Product.findById(req.params.id).select('reviews');
+        if (!product) return res.status(404).json({ error: 'Product not found' });
+        res.json(product.reviews || []);
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to fetch reviews' });
+    }
 });
 
 app.get('/api/products/:id/comments', async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id).select('comments');
-    if (!product) return res.status(404).json({ error: 'Product not found' });
-    res.json(product.comments || []);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch comments' });
-  }
+    try {
+        const product = await Product.findById(req.params.id).select('comments');
+        if (!product) return res.status(404).json({ error: 'Product not found' });
+        res.json(product.comments || []);
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to fetch comments' });
+    }
 });
 
-// POST review for a product
 app.post('/api/products/:id/reviews', async (req, res) => {
-  try {
-    const { user, rating, comment, text, title } = req.body;
-    const finalRating = rating || parseInt(req.body.rating);
-    const finalComment = comment || text || title;
-    
-    // Handle user as object or string
-    let finalUser = user;
-    if (typeof user === 'string') {
-      finalUser = user;
-    } else if (user && typeof user === 'object') {
-      finalUser = user; // Keep as object with name, email, avatarUrl
-    } else {
-      finalUser = (req.user && req.user.name) || 'Anonymous';
+    try {
+        const { user, rating, comment, text, title } = req.body;
+        const finalRating = rating || parseInt(req.body.rating);
+        const finalComment = comment || text || title;
+        
+        let finalUser = user;
+        if (typeof user === 'string') {
+            finalUser = user;
+        } else if (user && typeof user === 'object') {
+            finalUser = user;
+        } else {
+            finalUser = (req.user && req.user.name) || 'Anonymous';
+        }
+        
+        if (!finalRating || !finalComment) {
+            return res.status(400).json({ error: 'rating and comment/text are required', received: { rating: finalRating, comment: finalComment } });
+        }
+        
+        const product = await Product.findById(req.params.id);
+        if (!product) return res.status(404).json({ error: 'Product not found' });
+        
+        const newReview = { user: finalUser, rating: Number(finalRating), comment: finalComment, createdAt: new Date(), likes: [] };
+        if (!product.reviews) product.reviews = [];
+        product.reviews.push(newReview);
+        await product.save();
+        
+        res.status(201).json(newReview);
+    } catch (err) {
+        console.error('Error adding review:', err);
+        res.status(500).json({ error: 'Failed to add review', details: err.message });
     }
-    
-    console.log('POST /api/products/:id/reviews', { rating: finalRating, comment: finalComment, user: finalUser });
-    
-    if (!finalRating || !finalComment) {
-      return res.status(400).json({ error: 'rating and comment/text are required', received: { rating: finalRating, comment: finalComment } });
-    }
-    
-    const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ error: 'Product not found' });
-    
-    const newReview = { user: finalUser, rating: Number(finalRating), comment: finalComment, createdAt: new Date(), likes: [] };
-    if (!product.reviews) product.reviews = [];
-    product.reviews.push(newReview);
-    await product.save();
-    
-    res.status(201).json(newReview);
-  } catch (err) {
-    console.error('Error adding review:', err);
-    res.status(500).json({ error: 'Failed to add review', details: err.message });
-  }
 });
 
-// POST comment for a product
 app.post('/api/products/:id/comments', async (req, res) => {
-  try {
-    const { user, text, comment } = req.body;
-    const finalText = text || comment;
-    
-    // Handle user as object or string
-    let finalUser = user;
-    if (typeof user === 'string') {
-      finalUser = user;
-    } else if (user && typeof user === 'object') {
-      finalUser = user; // Keep as object with name, email, avatarUrl
-    } else {
-      finalUser = (req.user && req.user.name) || 'Anonymous';
+    try {
+        const { user, text, comment } = req.body;
+        const finalText = text || comment;
+        
+        let finalUser = user;
+        if (typeof user === 'string') {
+            finalUser = user;
+        } else if (user && typeof user === 'object') {
+            finalUser = user;
+        } else {
+            finalUser = (req.user && req.user.name) || 'Anonymous';
+        }
+        
+        if (!finalText) {
+            return res.status(400).json({ error: 'text is required', received: { text: finalText } });
+        }
+        
+        const product = await Product.findById(req.params.id);
+        if (!product) return res.status(404).json({ error: 'Product not found' });
+        
+        const newComment = { user: finalUser, text: finalText, createdAt: new Date(), likes: [] };
+        if (!product.comments) product.comments = [];
+        product.comments.push(newComment);
+        await product.save();
+        
+        res.status(201).json(newComment);
+    } catch (err) {
+        console.error('Error adding comment:', err);
+        res.status(500).json({ error: 'Failed to add comment', details: err.message });
     }
-    
-    console.log('POST /api/products/:id/comments', { text: finalText, user: finalUser });
-    
-    if (!finalText) {
-      return res.status(400).json({ error: 'text is required', received: { text: finalText } });
-    }
-    
-    const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ error: 'Product not found' });
-    
-    const newComment = { user: finalUser, text: finalText, createdAt: new Date(), likes: [] };
-    if (!product.comments) product.comments = [];
-    product.comments.push(newComment);
-    await product.save();
-    
-    res.status(201).json(newComment);
-  } catch (err) {
-    console.error('Error adding comment:', err);
-    res.status(500).json({ error: 'Failed to add comment', details: err.message });
-  }
 });
 
 app.use('/api/products', productRoutes);
 
-// Like/Unlike review (toggle)
 app.post('/api/products/:productId/reviews/:reviewId/like', authToken, async (req, res) => {
-  try {
-    const { productId, reviewId } = req.params;
-    const userId = req.user && req.user._id;
-    if (!userId) return res.status(401).json({ error: 'Not authenticated' });
+    try {
+        const { productId, reviewId } = req.params;
+        const userId = req.user && req.user._id;
+        if (!userId) return res.status(401).json({ error: 'Not authenticated' });
 
-    // Find product with this review
-    const product = await Product.findById(productId);
-    if (!product) return res.status(404).json({ error: 'Product not found' });
+        const product = await Product.findById(productId);
+        if (!product) return res.status(404).json({ error: 'Product not found' });
 
-    const review = product.reviews.id(reviewId);
-    if (!review) return res.status(404).json({ error: 'Review not found' });
+        const review = product.reviews.id(reviewId);
+        if (!review) return res.status(404).json({ error: 'Review not found' });
 
-    // Toggle like
-    if (!review.likes) review.likes = [];
-    const likeIndex = review.likes.findIndex(id => String(id) === String(userId));
-    
-    if (likeIndex >= 0) {
-      // Unlike
-      review.likes.splice(likeIndex, 1);
-    } else {
-      // Like
-      review.likes.push(userId);
+        if (!review.likes) review.likes = [];
+        const likeIndex = review.likes.findIndex(id => String(id) === String(userId));
+        
+        if (likeIndex >= 0) {
+            review.likes.splice(likeIndex, 1);
+        } else {
+            review.likes.push(userId);
+        }
+        
+        await product.save();
+        res.json({ liked: likeIndex < 0, likes: review.likes.length });
+    } catch (err) {
+        console.error('Error liking review:', err);
+        res.status(500).json({ error: 'Failed to like review' });
     }
-    
-    await product.save();
-    res.json({ liked: likeIndex < 0, likes: review.likes.length });
-  } catch (err) {
-    console.error('Error liking review:', err);
-    res.status(500).json({ error: 'Failed to like review' });
-  }
 });
 
-// Like/Unlike comment (toggle)
 app.post('/api/products/:productId/comments/:commentId/like', authToken, async (req, res) => {
-  try {
-    const { productId, commentId } = req.params;
-    const userId = req.user && req.user._id;
-    if (!userId) return res.status(401).json({ error: 'Not authenticated' });
+    try {
+        const { productId, commentId } = req.params;
+        const userId = req.user && req.user._id;
+        if (!userId) return res.status(401).json({ error: 'Not authenticated' });
 
-    // Find product with this comment
-    const product = await Product.findById(productId);
-    if (!product) return res.status(404).json({ error: 'Product not found' });
+        const product = await Product.findById(productId);
+        if (!product) return res.status(404).json({ error: 'Product not found' });
 
-    const comment = product.comments.id(commentId);
-    if (!comment) return res.status(404).json({ error: 'Comment not found' });
+        const comment = product.comments.id(commentId);
+        if (!comment) return res.status(404).json({ error: 'Comment not found' });
 
-    // Toggle like
-    if (!comment.likes) comment.likes = [];
-    const likeIndex = comment.likes.findIndex(id => String(id) === String(userId));
-    
-    if (likeIndex >= 0) {
-      // Unlike
-      comment.likes.splice(likeIndex, 1);
-    } else {
-      // Like
-      comment.likes.push(userId);
+        if (!comment.likes) comment.likes = [];
+        const likeIndex = comment.likes.findIndex(id => String(id) === String(userId));
+        
+        if (likeIndex >= 0) {
+            comment.likes.splice(likeIndex, 1);
+        } else {
+            comment.likes.push(userId);
+        }
+        
+        await product.save();
+        res.json({ liked: likeIndex < 0, likes: comment.likes.length });
+    } catch (err) {
+        console.error('Error liking comment:', err);
+        res.status(500).json({ error: 'Failed to like comment' });
     }
-    
-    await product.save();
-    res.json({ liked: likeIndex < 0, likes: comment.likes.length });
-  } catch (err) {
-    console.error('Error liking comment:', err);
-    res.status(500).json({ error: 'Failed to like comment' });
-  }
 });
 
 app.use('/api', dataDeletionRoutes);
 app.use('/api/upload', uploadRoutes);
 
-// NOTE: Do not mount authRoutes on '/api/admin' here — admin endpoints
-// are defined directly on `app` later in this file. Mounting a router
-// on '/api/admin' here would intercept requests and return 404 before
-// the real admin handlers run.
-
-// Error handler
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({
-        error: 'Internal Server Error',
-        message: err.message
-    });
-});
-
+// ============ User Routes ============
 const User = require("./models/User");
 
-// API: جلب بيانات المستخدم عبر التوكن أو بالبريد كبديل
+// API: جلب بيانات المستخدم
 app.get('/api/user', async (req, res) => {
     try {
         let userDoc = null;
@@ -677,18 +557,15 @@ app.get('/api/user', async (req, res) => {
             const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
             try {
                 const decoded = jwt.verify(token, process.env.JWT_SECRET || 'jwtsecret');
-                // support both _id and id in JWT payload
                 const userId = decoded && (decoded._id || decoded.id);
                 if (userId) {
                     userDoc = await User.findById(userId).lean();
                 }
-                // fallback: if user not found and token has email, try lookup by email
                 if (!userDoc && decoded && decoded.email) {
                     userDoc = await User.findOne({ email: decoded.email }).lean();
                 }
             } catch(_) { /* ignore */ }
         }
-        // fallback by email query param
         if (!userDoc && req.query && req.query.email) {
             userDoc = await User.findOne({ email: req.query.email }).lean();
         }
@@ -701,7 +578,7 @@ app.get('/api/user', async (req, res) => {
     }
 });
 
-// API: تحديث بيانات المستخدم الحالي (يمكن للمستخدم تعديل ملفه دون أن يكون أدمن)
+// API: تحديث بيانات المستخدم الحالي
 app.put('/api/user', authToken, requireAuthToken, async (req, res) => {
     try {
         const userId = req.user && (req.user._id || req.user.id);
@@ -712,7 +589,6 @@ app.put('/api/user', authToken, requireAuthToken, async (req, res) => {
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ error: 'المستخدم غير موجود' });
 
-        // Only allow updating safe fields for regular users
         if (name !== undefined) user.name = name;
         if (username !== undefined) user.username = username;
         if (phone !== undefined) user.phone = phone;
@@ -734,7 +610,7 @@ app.put('/api/user', authToken, requireAuthToken, async (req, res) => {
     }
 });
 
-// Block a user (current user blocks target) - this prevents messaging between them
+// Block/Unblock users
 app.post('/api/users/:id/block', authToken, async (req, res) => {
     try {
         const me = req.user && req.user._id;
@@ -755,7 +631,6 @@ app.post('/api/users/:id/block', authToken, async (req, res) => {
     }
 });
 
-// Unblock a user
 app.post('/api/users/:id/unblock', authToken, async (req, res) => {
     try {
         const me = req.user && req.user._id;
@@ -772,7 +647,6 @@ app.post('/api/users/:id/unblock', authToken, async (req, res) => {
     }
 });
 
-// Check block status between current user and target
 app.get('/api/users/:id/block-status', authToken, async (req, res) => {
     try {
         const me = req.user && req.user._id;
@@ -790,8 +664,6 @@ app.get('/api/users/:id/block-status', authToken, async (req, res) => {
     }
 });
 
-// Lookup user by username or email
-// NOTE: intentionally public so profile pages can resolve a username/email without a token
 app.get('/api/users/lookup', async (req, res) => {
     try {
         const { username, email } = req.query;
@@ -810,7 +682,6 @@ app.get('/api/users/lookup', async (req, res) => {
     }
 });
 
-// Public: list active users (for community member list)
 app.get('/api/users/active', async (req, res) => {
     try {
         const limit = Math.min(100, parseInt(req.query.limit || '20', 10));
@@ -826,7 +697,6 @@ app.get('/api/users/active', async (req, res) => {
     }
 });
 
-// API: رفع صورة البروفايل (حقل avatar)
 app.post('/api/users/me/avatar', async (req, res) => {
     try {
         const authHeader = req.headers['authorization'];
@@ -839,13 +709,8 @@ app.post('/api/users/me/avatar', async (req, res) => {
             if (err) return res.status(400).json({ error: err.message || 'فشل رفع الصورة' });
             if (!req.file) return res.status(400).json({ error: 'يجب رفع صورة' });
             const userId = decoded._id || decoded.id;
-            console.log('Looking for user with ID:', userId);
             const user = await User.findById(userId);
-            if (!user) {
-                console.log('User not found with ID:', userId);
-                return res.status(404).json({ error: 'المستخدم غير موجود' });
-            }
-            console.log('User found:', user.name, user.email);
+            if (!user) return res.status(404).json({ error: 'المستخدم غير موجود' });
             const relPath = '/uploads/avatars/' + req.file.filename;
             user.avatarUrl = relPath;
             await user.save();
@@ -857,7 +722,6 @@ app.post('/api/users/me/avatar', async (req, res) => {
     }
 });
 
-// User routes
 app.post('/api/signup', async (req, res) => {
     try {
         const { name, username, email, password, phone } = req.body;
@@ -865,13 +729,11 @@ app.post('/api/signup', async (req, res) => {
             return res.status(400).json({ message: 'اسم المستخدم والبريد وكلمة المرور مطلوبة' });
         }
 
-        // تحقق من عدم التكرار
         const existing = await User.findOne({ $or: [{ email }, { username }] });
         if (existing) {
             return res.status(400).json({ message: 'اسم المستخدم أو البريد الإلكتروني مستخدم بالفعل' });
         }
 
-        // تشفير كلمة المرور قبل الحفظ
         const bcrypt = require('bcryptjs');
         const hashedPassword = await bcrypt.hash(password, 10);
 
@@ -894,7 +756,6 @@ app.post('/api/signup', async (req, res) => {
     }
 });
 
-// تسجيل الدخول وإرجاع JWT
 app.post('/api/login', express.json(), async (req, res) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email });
@@ -914,9 +775,8 @@ app.post('/api/login', express.json(), async (req, res) => {
     res.json({ success: true, user: payload, token });
 });
 
-// ميدل وير مطور للتحقق من التوكن مع دعم Bearer أو إرسال التوكن مباشرة
+// ============ Auth Middleware ============
 function authToken(req, res, next) {
-    // لوج للتشخيص
     console.log('Authorization Header:', req.headers['authorization']);
     let token = null;
     const authHeader = req.headers['authorization'];
@@ -934,18 +794,15 @@ function authToken(req, res, next) {
         if (err) {
             return res.status(403).json({ error: 'توكن غير صالح أو منتهي الصلاحية' });
         }
-        // توحيد الحقل _id مع id إذا كان موجودًا فقط في التوكن
         if (user.id && !user._id) user._id = user.id;
         req.user = user;
         next();
     });
 }
 
-// Make authToken middleware accessible to route modules if they need to call it
 app.set('authToken', authToken);
 app.set('requireAuthToken', requireAuthToken);
 
-// إصلاح مسار الحماية لمسارات التعليقات: يجب أن يكون تعريف واحد فقط
 app.use('/api/comments', (req, res, next) => {
     console.log('--- [تعليقات] ---', req.method, req.originalUrl, '| Authorization:', req.headers['authorization'] || 'NONE');
     if (!req.headers['authorization']) {
@@ -954,76 +811,17 @@ app.use('/api/comments', (req, res, next) => {
     next();
 }, authToken, commentRoutes);
 
-// إزالة التكرار: لا داعي لتعريف app.use('/api/comments', authToken, commentRoutes) مرتين
-
-// adminRouter intentionally not mounted here — admin endpoints are
-// declared directly on the main `app` instance above (e.g. /api/admin/users).
-// Mounting the router here previously intercepted requests and returned
-// 404 before those handlers could run.
-
-// community routes (posts + replies)
 const communityRoutes = require('./routes/communityRoutes');
 app.use('/api/community', communityRoutes);
 
-// Error handler
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({
-        error: 'Internal Server Error',
-        message: err.message
-    });
-});
-
-
-
-// تحديث كورس
+// ============ Course Routes ============
 app.put('/api/courses/:id', authToken, requireAuthToken, async (req, res) => {
     try {
         const courseId = req.params.id;
         const { title, description, instructor, duration, price, category, tags, icon, categories, featured, isFree } = req.body;
 
-        // Defensive: if client incorrectly sends a POST while intending to update
-        // a course, allow update-by-id when an id is provided in the body to
-        // avoid creating duplicates. This helps legacy frontends that post
-        // instead of using PUT when editing.
-        const editId = req.body._id || req.body.id || req.body.courseId || req.body.editingCourseId;
-        if (editId) {
-            try {
-                const toUpdate = await Course.findById(editId);
-                if (toUpdate) {
-                    // ensure owner or admin (basic check)
-                    const userIdStr = req.user && (req.user._id || req.user.id) ? String(req.user._id || req.user.id) : null;
-                    const ownerIdStr = toUpdate.createdBy ? String(toUpdate.createdBy) : null;
-                    if (userIdStr && ownerIdStr && userIdStr !== ownerIdStr && !(req.user && req.user.isAdmin)) {
-                        // not owner and not admin -> forbidden
-                        return res.status(403).json({ error: 'غير مصرح بتعديل هذا الكورس' });
-                    }
-
-                    // apply provided fields
-                    toUpdate.title = title !== undefined ? title : toUpdate.title;
-                    toUpdate.description = description !== undefined ? description : toUpdate.description;
-                    toUpdate.instructor = instructor !== undefined ? instructor : toUpdate.instructor;
-                    toUpdate.duration = duration !== undefined ? duration : toUpdate.duration;
-                    toUpdate.price = price !== undefined ? price : toUpdate.price;
-                    toUpdate.category = category !== undefined ? category : toUpdate.category;
-                    toUpdate.tags = tags !== undefined ? tags : toUpdate.tags;
-                    toUpdate.icon = icon !== undefined ? icon : toUpdate.icon;
-                    if (categories !== undefined) toUpdate.categories = Array.isArray(categories) ? categories : toUpdate.categories;
-                    toUpdate.updatedAt = new Date();
-
-                    await toUpdate.save();
-                    return res.status(200).json(toUpdate);
-                }
-            } catch (e) {
-                console.warn('Edit-by-id path failed in POST /api/courses:', e && e.message);
-                // fall through to normal create/upsert flow
-            }
-        }
-
-        // Build update data - include all fields that are provided (even if empty)
         const updateData = {};
         
-        // Update fields only if they are explicitly provided in the request
         if (title !== undefined) updateData.title = title;
         if (description !== undefined) updateData.description = description;
         if (instructor !== undefined) updateData.instructor = instructor;
@@ -1032,12 +830,10 @@ app.put('/api/courses/:id', authToken, requireAuthToken, async (req, res) => {
         if (category !== undefined) updateData.category = category;
         if (tags !== undefined && Array.isArray(tags)) updateData.tags = tags;
         if (icon !== undefined) updateData.icon = icon;
-        // allow updating categories array (objects with mainCategory...)
         if (categories !== undefined && Array.isArray(categories)) updateData.categories = categories;
         if (featured !== undefined) updateData.featured = featured;
         if (isFree !== undefined) updateData.isFree = isFree;
         
-        // Always update the updatedAt timestamp
         updateData.updatedAt = new Date();
 
         const updatedCourse = await Course.findByIdAndUpdate(
@@ -1057,8 +853,6 @@ app.put('/api/courses/:id', authToken, requireAuthToken, async (req, res) => {
     }
 });
 
-
-// DELETE course
 app.delete('/api/courses/:id', authToken, requireAuthToken, async (req, res) => {
     try {
         const courseId = req.params.id;
@@ -1075,7 +869,6 @@ app.delete('/api/courses/:id', authToken, requireAuthToken, async (req, res) => 
     }
 });
 
-// Patch partial update (used by client to update categories quickly)
 app.patch('/api/courses/:id', authToken, requireAuthToken, async (req, res) => {
     try {
         const courseId = req.params.id;
@@ -1084,11 +877,9 @@ app.patch('/api/courses/:id', authToken, requireAuthToken, async (req, res) => {
         const course = await Course.findById(courseId);
         if (!course) return res.status(404).json({ error: 'الكورس غير موجود' });
 
-        // فقط السماح بتحديث الحقول المعروفة
         if (updates.categories && Array.isArray(updates.categories)) {
             course.categories = updates.categories;
         }
-        // يمكن توسيع هذا إلى حقول أخرى لاحقاً إن لزم
 
         await course.save();
         res.json(course);
@@ -1098,7 +889,6 @@ app.patch('/api/courses/:id', authToken, requireAuthToken, async (req, res) => {
     }
 });
 
-// جلب كورس واحد عبر ID
 app.get('/api/courses/:id', async (req, res) => {
     try {
         const courseId = req.params.id;
@@ -1113,13 +903,7 @@ app.get('/api/courses/:id', async (req, res) => {
     }
 });
 
-
-
-
-
-// Admin routes (حماية مسارات الإدارة بالتوكن)
-
-// جلب جميع المستخدمين - للمديرين فقط
+// ============ Admin Routes ============
 app.get('/api/admin/users', authToken, requireAdminToken, async (req, res) => {
     try {
         const users = await User.find().select('-password');
@@ -1129,27 +913,22 @@ app.get('/api/admin/users', authToken, requireAdminToken, async (req, res) => {
     }
 });
 
-// إضافة مستخدم جديد - للمديرين فقط
 app.post('/api/admin/users', authToken, requireAdminToken, async (req, res) => {
     try {
         const { name, username, email, password, phone, isAdmin } = req.body;
         
-        // التحقق من الحقول المطلوبة
         if (!name || !username || !email || !password) {
             return res.status(400).json({ error: 'جميع الحقول مطلوبة' });
         }
         
-        // التحقق من تكرار البريد الإلكتروني
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             return res.status(400).json({ error: 'البريد الإلكتروني مسجل مسبقاً' });
         }
         
-        // تشفير كلمة المرور
         const bcrypt = require('bcrypt');
         const hashedPassword = await bcrypt.hash(password, 10);
         
-        // إنشاء مستخدم جديد
         const newUser = new User({
             name,
             username,
@@ -1176,7 +955,6 @@ app.post('/api/admin/users', authToken, requireAdminToken, async (req, res) => {
     }
 });
 
-// تحديث مستخدم - للمديرين فقط
 app.put('/api/admin/users/:userId', authToken, requireAdminToken, async (req, res) => {
     try {
         const { userId } = req.params;
@@ -1187,13 +965,11 @@ app.put('/api/admin/users/:userId', authToken, requireAdminToken, async (req, re
             return res.status(404).json({ error: 'المستخدم غير موجود' });
         }
         
-        // تحديث البيانات
         user.name = name || user.name;
         user.username = username || user.username;
         user.email = email || user.email;
         user.phone = phone || user.phone;
         user.isAdmin = isAdmin !== undefined ? isAdmin : user.isAdmin;
-        // allow admins to set verification flag
         if (isVerified !== undefined) user.isVerified = !!isVerified;
         
         await user.save();
@@ -1213,7 +989,6 @@ app.put('/api/admin/users/:userId', authToken, requireAdminToken, async (req, re
     }
 });
 
-// حذف مستخدم - للمديرين فقط
 app.delete('/api/admin/users/:userId', authToken, requireAdminToken, async (req, res) => {
     try {
         const { userId } = req.params;
@@ -1231,7 +1006,6 @@ app.delete('/api/admin/users/:userId', authToken, requireAdminToken, async (req,
     }
 });
 
-// جلب جميع المدونات - للمديرين فقط
 app.get('/api/admin/blogs', authToken, requireAdminToken, async (req, res) => {
     try {
         const blogs = await Blog.find().populate('author', 'name username');
@@ -1241,7 +1015,6 @@ app.get('/api/admin/blogs', authToken, requireAdminToken, async (req, res) => {
     }
 });
 
-// إضافة مدونة جديدة - للمديرين فقط
 app.post('/api/admin/blogs', authToken, requireAdminToken, async (req, res) => {
     try {
         const { title, content, author, category, tags } = req.body;
@@ -1266,7 +1039,6 @@ app.post('/api/admin/blogs', authToken, requireAdminToken, async (req, res) => {
     }
 });
 
-// تحديث مدونة - للمديرين فقط
 app.put('/api/admin/blogs/:blogId', authToken, requireAdminToken, async (req, res) => {
     try {
         const { blogId } = req.params;
@@ -1290,7 +1062,6 @@ app.put('/api/admin/blogs/:blogId', authToken, requireAdminToken, async (req, re
     }
 });
 
-// حذف مدونة - للمديرين فقط
 app.delete('/api/admin/blogs/:blogId', authToken, requireAdminToken, async (req, res) => {
     try {
         const { blogId } = req.params;
@@ -1308,7 +1079,6 @@ app.delete('/api/admin/blogs/:blogId', authToken, requireAdminToken, async (req,
     }
 });
 
-// جلب جميع الكورسات - للمديرين فقط
 app.get('/api/admin/courses', authToken, requireAdminToken, async (req, res) => {
     try {
         const courses = await Course.find().populate('createdBy', 'username');
@@ -1318,7 +1088,6 @@ app.get('/api/admin/courses', authToken, requireAdminToken, async (req, res) => 
     }
 });
 
-// تحديث كورس - للمديرين فقط
 app.put('/api/admin/courses/:courseId', authToken, requireAdminToken, async (req, res) => {
     try {
         const { courseId } = req.params;
@@ -1345,7 +1114,6 @@ app.put('/api/admin/courses/:courseId', authToken, requireAdminToken, async (req
     }
 });
 
-// حذف كورس - للمديرين فقط
 app.delete('/api/admin/courses/:courseId', authToken, requireAdminToken, async (req, res) => {
     try {
         const { courseId } = req.params;
@@ -1363,42 +1131,29 @@ app.delete('/api/admin/courses/:courseId', authToken, requireAdminToken, async (
     }
 });
 
-// إضافة كورس جديد
 app.post('/api/courses', authToken, requireAuthToken, async (req, res) => {
-    // Lightweight request logging for debugging duplicate submissions
     try {
-        console.log('[/api/courses] Incoming POST — referer:', req.headers.referer || 'NONE', 'user:', (req.user && (req.user._id || req.user.id)) || 'anon');
-        try { console.log('[/api/courses] body preview:', JSON.stringify(req.body).slice(0,200)); } catch(_){}
-    } catch(_) {}
-    try {
+        console.log('[/api/courses] Incoming POST — user:', (req.user && (req.user._id || req.user.id)) || 'anon');
+        
         const { title, description, instructor, duration, price, category, tags, icon, categories, featured, isFree } = req.body;
 
-        // Basic duplicate prevention:
-        // 1) If the same creator already has a course with the same title (case-insensitive),
-        //    return the existing course.
-        // 2) Otherwise, if a course with the same title was created very recently
-        //    (within the last 60 seconds) by any creator, assume accidental duplicate
-        //    and return the existing course.
         const creatorId = req.user ? req.user._id : (req.body.createdBy || null);
         const normalizedTitleRaw = (title || '').trim();
         const forceCreate = req.body && (req.body.forceCreate === true || req.body.forceCreate === 'true') || (req.query && req.query.force === '1');
+        
         if (normalizedTitleRaw) {
             try {
-                // exact-match case-insensitive search
                 const titleRegex = { $regex: `^${normalizedTitleRaw.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&')}$`, $options: 'i' };
                 if (creatorId) {
                     const existingByCreator = await Course.findOne({ createdBy: creatorId, title: titleRegex });
                     if (existingByCreator) {
                         console.log('Duplicate course detected for same creator — title:', title);
                         if (!forceCreate) {
-                            // Inform client that a course with this title already exists for this user
                             return res.status(409).json({ error: 'CourseExists', message: 'You already have a course with this title', existing: existingByCreator });
                         }
-                        console.log('forceCreate requested — will create distinct course despite same title');
                     }
                 }
 
-                // recently-created duplicate check (last 60 seconds)
                 const oneMinuteAgo = new Date(Date.now() - 60 * 1000);
                 const recent = await Course.findOne({ title: titleRegex, created_at: { $gte: oneMinuteAgo } });
                 if (recent) {
@@ -1406,23 +1161,19 @@ app.post('/api/courses', authToken, requireAuthToken, async (req, res) => {
                     if (!forceCreate) {
                         return res.status(409).json({ error: 'RecentDuplicate', message: 'A course with this title was created recently', existing: recent });
                     }
-                    console.log('forceCreate requested — bypassing recent-duplicate prevention');
                 }
             } catch (dupErr) {
                 console.warn('Duplicate check failed:', dupErr && dupErr.message);
             }
         }
 
-        // Use atomic upsert with normalizedTitle to avoid race conditions that
-        // could create duplicate courses when two POSTs arrive concurrently.
         const creator = req.user ? String(req.user._id) : (req.body.createdBy ? String(req.body.createdBy) : null);
         let normalizedTitleLower = (title || '').trim().toLowerCase();
         if (forceCreate) {
-            // ensure normalizedTitle is unique by appending a timestamp
             normalizedTitleLower = `${normalizedTitleLower}-${Date.now()}`;
         }
 
-            const insertDoc = {
+        const insertDoc = {
             title,
             description,
             instructor,
@@ -1435,7 +1186,7 @@ app.post('/api/courses', authToken, requireAuthToken, async (req, res) => {
             featured: featured || false,
             isFree: isFree !== undefined ? isFree : true,
             createdBy: creator,
-             	normalizedTitle: normalizedTitleLower,
+            normalizedTitle: normalizedTitleLower,
             createdAt: new Date(),
             updatedAt: new Date()
         };
@@ -1448,17 +1199,10 @@ app.post('/api/courses', authToken, requireAuthToken, async (req, res) => {
                 { upsert: true, new: true, setDefaultsOnInsert: true }
             );
 
-            // If the document was newly inserted, Mongo returns it; if it existed
-            // findOneAndUpdate returns the existing doc too (new:true). In both
-            // cases return 201 only when inserted; otherwise 200.
-            // We can't directly know if it was an insert, but we can try to detect
-            // by checking updated.createdAt close to now — but simplest is to
-            // return 200 for existing and 201 if createdAt within last 5 seconds.
             const ageMs = Date.now() - new Date(updated.createdAt).getTime();
             const statusCode = ageMs < 5000 ? 201 : 200;
             return res.status(statusCode).json(updated);
         } catch (err) {
-            // if unique index violation occurs despite checks, return existing
             if (err && err.code === 11000) {
                 try {
                     const existing = await Course.findOne({ createdBy: creator, normalizedTitle: normalizedTitleLower });
@@ -1474,7 +1218,6 @@ app.post('/api/courses', authToken, requireAuthToken, async (req, res) => {
     }
 });
 
-// إضافة وحدة لكورس
 app.post('/api/courses/:courseId/units', authToken, requireAuthToken, async (req, res) => {
     try {
         const { title, description } = req.body;
@@ -1501,13 +1244,7 @@ app.post('/api/courses/:courseId/units', authToken, requireAuthToken, async (req
     }
 });
 
-
-
-
-app.post(
-'/api/courses/:courseId/units/:unitId/lessons',
-async (req, res) => {
-    // Handle multer file upload with proper error handling
+app.post('/api/courses/:courseId/units/:unitId/lessons', async (req, res) => {
     await new Promise((resolve, reject) => {
         lessonUpload(req, res, (err) => {
             if (err) {
@@ -1536,7 +1273,6 @@ async (req, res) => {
         console.log('📂 الملفات المرفوعة:', req.files);
         console.log('📝 البيانات:', req.body);
 
-    // If multer's fileFilter marked the file as not allowed, return a JSON error
     if (req._fileFilterPassed === false) {
         console.warn('ملف مرفوض بواسطة فلتر الصيغ. originalname=', req.files && req.files.lessonFile && req.files.lessonFile[0] && req.files.lessonFile[0].originalname);
         return res.status(400).json({ error: 'صيغة الملف غير مسموح بها أو الملف غير مدعوم. يرجى رفع ملف بصيغة mp4 أو mov أو pdf.' });
@@ -1553,7 +1289,7 @@ async (req, res) => {
     const files = req.files || {};
     const lessonFiles = Array.isArray(files.lessonFile) ? files.lessonFile : [];
     const videoFile = lessonFiles[0] || null;
-const pdfFile = videoFile; // لأنك تستخدم نفس الاسم في الـ form
+const pdfFile = videoFile;
 
 const newLesson = {
     title,
@@ -1588,7 +1324,6 @@ if (newLesson.type === 'video') {
     newLesson.content = content || '';
 }
 
-
     unit.lessons.push(newLesson);
     await course.save();
 
@@ -1600,11 +1335,8 @@ if (newLesson.type === 'video') {
     console.error('خطأ في إضافة الدرس:', err);
     res.status(500).json({ error: 'حدث خطأ أثناء إضافة الدرس' });
 }
-}
-);
+});
 
-
-// تحديث محتوى الكورس بالكامل
 app.put('/api/courses/:courseId/content', authToken, requireAuthToken, async (req, res) => {
     try {
         const { units } = req.body;
@@ -1624,7 +1356,6 @@ app.put('/api/courses/:courseId/content', authToken, requireAuthToken, async (re
     }
 });
 
-// جلب محتوى الكورس
 app.get('/api/courses/:courseId/content', async (req, res) => {
     try {
         const course = await Course.findById(req.params.courseId);
@@ -1646,7 +1377,6 @@ app.get('/api/courses/:courseId/content', async (req, res) => {
     }
 });
 
-// حذف وحدة
 app.delete('/api/courses/:courseId/units/:unitId', authToken, requireAuthToken, async (req, res) => {
     try {
         const course = await Course.findById(req.params.courseId);
@@ -1670,7 +1400,6 @@ app.delete('/api/courses/:courseId/units/:unitId', authToken, requireAuthToken, 
     }
 });
 
-// جلب درس واحد
 app.get('/api/courses/:courseId/units/:unitId/lessons/:lessonId', async (req, res) => {
     try {
         const course = await Course.findById(req.params.courseId);
@@ -1696,7 +1425,6 @@ app.get('/api/courses/:courseId/units/:unitId/lessons/:lessonId', async (req, re
     }
 });
 
-// تحديث درس
 app.put('/api/courses/:courseId/units/:unitId/lessons/:lessonId', authToken, requireAuthToken, async (req, res) => {
     try {
         const { title, videoUrl, description, duration, type, fileUrl, externalUrl, content, isFree } = req.body;
@@ -1717,17 +1445,14 @@ app.put('/api/courses/:courseId/units/:unitId/lessons/:lessonId', authToken, req
             return res.status(404).json({ error: 'الدرس غير موجود' });
         }
 
-        // تحديث بيانات الدرس
         lesson.title = title || lesson.title;
         lesson.description = description || lesson.description;
         lesson.duration = duration || lesson.duration;
         lesson.type = type || lesson.type;
         lesson.isFree = isFree !== undefined ? isFree : lesson.isFree;
         
-        // Update media fields if provided - do not rely solely on the 'type' value
         if (typeof videoUrl !== 'undefined') {
             lesson.videoUrl = videoUrl;
-            // clear other media to avoid conflicts
             lesson.fileUrl = undefined;
             lesson.externalUrl = undefined;
             lesson.content = undefined;
@@ -1761,7 +1486,6 @@ app.put('/api/courses/:courseId/units/:unitId/lessons/:lessonId', authToken, req
     }
 });
 
-// حذف درس
 app.delete('/api/courses/:courseId/units/:unitId/lessons/:lessonId', authToken, requireAuthToken, async (req, res) => {
     try {
         const course = await Course.findById(req.params.courseId);
@@ -1794,10 +1518,8 @@ app.get('/api/courses', async (req, res) => {
     try {
         const filter = {};
 
-        // دعم فلترة حسب التصنيفات: ?categories=programming&categories=web-development
         if (req.query && req.query.categories) {
             const cats = Array.isArray(req.query.categories) ? req.query.categories : [req.query.categories];
-            // ابحث عن أي كورس يحتوي على mainCategory داخل المصفوفة
             filter['categories.mainCategory'] = { $in: cats };
         }
 
@@ -1809,7 +1531,6 @@ app.get('/api/courses', async (req, res) => {
     }
 });
 
-// جلب المدونات العامة
 app.get('/api/blogs', async (req, res) => {
     try {
         const blogs = await Blog.find().populate('author', 'name username');
@@ -1819,7 +1540,6 @@ app.get('/api/blogs', async (req, res) => {
     }
 });
 
-// جلب الدروس المكتملة للمستخدم (اختياري، يستخدمه الواجهة لعرض التقدم)
 app.get('/api/user/lessons/completed', authToken, requireAuthToken, async (req, res) => {
     try {
         const userId = req.user && req.user._id;
@@ -1827,7 +1547,6 @@ app.get('/api/user/lessons/completed', authToken, requireAuthToken, async (req, 
         const user = await User.findById(userId).lean();
         if (!user) return res.status(404).json({ error: 'المستخدم غير موجود' });
 
-        // جمع الدروس المكتملة عبر كل الكورسات
         let completed = [];
         if (Array.isArray(user.courseProgress)) {
             user.courseProgress.forEach(cp => {
@@ -1844,20 +1563,17 @@ app.get('/api/user/lessons/completed', authToken, requireAuthToken, async (req, 
     }
 });
 
-
-// جلب جميع المنتجات مع تصفية بسيطة
 app.get('/api/products', async (req, res) => {
     try {
         const { search, category, minPrice, maxPrice, sort } = req.query;
 
-        // بناء فلتر البحث
         const filter = {};
         if (search) {
-            const regex = new RegExp(search, 'i'); // حساس لحالة الأحرف
+            const regex = new RegExp(search, 'i');
             filter.$or = [
                 { name: regex },
                 { description: regex },
-                { 'category.name': regex } // ابحث في اسم التصنيف الفرعي
+                { 'category.name': regex }
             ];
         }
         if (category) {
@@ -1869,13 +1585,11 @@ app.get('/api/products', async (req, res) => {
             if (maxPrice !== undefined) filter.price.$lte = Number(maxPrice);
         }
 
-        // جلب المنتجات مع التصنيف
         const products = await Product.find(filter)
-            .populate('category', 'name') // اجلب اسم التصنيف فقط
-            .sort({ createdAt: -1 }) // ترتيب حسب تاريخ الإضافة تنازلياً
+            .populate('category', 'name')
+            .sort({ createdAt: -1 })
             .lean();
 
-        // تطبيق الفرز على مستوى التطبيق إذا لزم الأمر
         let sortedProducts = products;
         if (sort === 'priceAsc') {
             sortedProducts = products.sort((a, b) => a.price - b.price);
@@ -1890,8 +1604,7 @@ app.get('/api/products', async (req, res) => {
     }
 });
 
-
-// Protected routes (حماية عبر التوكن فقط)
+// ============ Protected routes ============
 app.get('/course-page.html', authToken, requireAuthToken, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'course-page.html'));
 });
@@ -1904,7 +1617,7 @@ app.get('/twm3-backend/private/dashboard.html', (req, res, next) => {
     authToken(req, res, (err) => {
         if (err) return next(err);
         requireAdminToken(req, res, (err2) => {
-            if (err2) return; // سيقوم الميدل وير بإرجاع الرد في حالة الخطأ
+            if (err2) return;
             res.sendFile(path.join(__dirname, '..', 'twm3-backend/private/dashboard.html'));
         });
     });
@@ -1914,10 +1627,8 @@ app.get('/dashboard.html', authToken, requireAuthToken, (req, res) => {
     res.sendFile(path.join(__dirname, '..', 'dashboard.html'));
 });
 
-
 app.use("/twm3-backend/private", authToken, requireAdminToken, express.static(path.join(__dirname, "private")));
 
-// Admin helper: list products with missing image files (for troubleshooting)
 app.get('/api/admin/missing-product-images', authToken, requireAdminToken, async (req, res) => {
     try {
         const products = await Product.find({}).lean();
@@ -1941,19 +1652,17 @@ app.get('/api/admin/missing-product-images', authToken, requireAdminToken, async
     }
 });
 
-// Custom error handler for all errors
+// ============ Error Handlers ============
 app.use((err, req, res, next) => {
     console.error('Error:', err.message);
     console.error('Stack:', err.stack);
     
-    // Always return JSON, never HTML
     res.status(err.status || 500).json({
         error: err.message || 'Internal Server Error',
         status: err.status || 500
     });
 });
 
-// Catch-all handler for any unhandled routes to return JSON instead of HTML
 app.use((req, res) => {
     res.status(404).json({ 
         error: 'Route not found',
@@ -1961,27 +1670,36 @@ app.use((req, res) => {
     });
 });
 
-// Create HTTP server and attach Socket.IO (so routes can access io via req.app.get('io'))
+// ============ Socket.IO Server ============
 const server = http.createServer(app);
+
+// ✅ **التعديل المهم هنا: CORS لـSocket.IO يجب يتضمن Railway domains**
 const io = new Server(server, {
     cors: {
-        origin: ['http://localhost:5000', 'http://localhost:3000', 'http://127.0.0.1:3000', 'http://127.0.0.1:5000'],
-        methods: ['GET', 'POST']
+        origin: process.env.NODE_ENV === 'production' 
+            ? [
+                'https://twm3.org',
+                'https://www.twm3.org',
+                'https://*.up.railway.app', // كل Railway domains
+                'https://*.railway.app'     // للمجال العام
+              ]
+            : ['http://localhost:5000', 'http://localhost:3000', 'http://127.0.0.1:3000', 'http://127.0.0.1:5000'],
+        methods: ['GET', 'POST'],
+        credentials: true
     }
 });
+
 app.set('io', io);
 
-// Authenticate socket connections using the token provided in handshake.auth.token
 io.use((socket, next) => {
     try {
         const token = socket.handshake && socket.handshake.auth && socket.handshake.auth.token;
-        if (!token) return next(); // allow unauthenticated sockets too (optional)
+        if (!token) return next();
         jwt.verify(token, process.env.JWT_SECRET || 'jwtsecret', (err, decoded) => {
             if (err) {
                 console.warn('Socket auth failed:', err && err.message);
                 return next();
             }
-            // normalize id
             if (decoded && decoded.id && !decoded._id) decoded._id = decoded.id;
             socket.user = decoded;
             socket.userId = decoded && (decoded._id || decoded.id) ? String(decoded._id || decoded.id) : null;
@@ -1996,33 +1714,27 @@ io.use((socket, next) => {
 io.on('connection', (socket) => {
     try { console.log('Socket connected:', socket.id, 'userId=', socket.userId); } catch(e) { console.log('Socket connected:', socket.id); }
 
-    // Auto-join the user's room if authenticated
     try { if (socket.userId) socket.join(socket.userId); } catch (e) { console.error('Auto-join room failed', e); }
 
-    // Support legacy client 'join' call as well
     socket.on('join', (userId) => {
         try { if (userId) socket.join(userId); } catch (e) { console.error('join handler failed', e); }
     });
 
     socket.on('disconnect', (reason) => {
         // optional logging
-        // console.log('Socket disconnected', socket.id, reason);
     });
 });
 
-// Start server بعد التأكد من اتصال قاعدة البيانات
+// ============ Start Server ============
 mongoose.connect(process.env.MONGO_URI)
     .then(async () => {
-        console.log("MongoDB connected");
-        
-
+        console.log("✅ MongoDB connected");
         
         const port = parseInt(process.env.PORT || PORT || 5000, 10);
         const maxRetries = 5;
         let attempt = 0;
 
         function tryListen(p) {
-            // attach an error handler for this attempt only
             server.once('error', (err) => {
                 if (err && err.code === 'EADDRINUSE') {
                     attempt++;
@@ -2040,14 +1752,17 @@ mongoose.connect(process.env.MONGO_URI)
                 }
             });
 
-            server.listen(p, () => {
-                console.log(`Server is running on http://localhost:${p}`);
+            // ✅ **هذا هو التعديل المهم - أضف '0.0.0.0'**
+            server.listen(p, '0.0.0.0', () => {
+                console.log(`✅ Server is running on port ${p} (0.0.0.0:${p})`);
+                console.log(`🚀 Ready to accept connections from Railway`);
+                console.log(`🌐 App should be accessible at: https://${process.env.RAILWAY_STATIC_URL || 'your-project.up.railway.app'}`);
             });
         }
 
         tryListen(port);
     })
     .catch(err => {
-        console.error("MongoDB connection error:", err);
+        console.error("❌ MongoDB connection error:", err);
         process.exit(1);
     });
