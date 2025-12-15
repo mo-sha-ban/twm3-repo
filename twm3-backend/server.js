@@ -26,7 +26,21 @@ require("dotenv").config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+
+
 // ============ Logging للبدء ============
+
+console.log('==========================================');
+console.log('🚀 INITIALIZING TWM3 BACKEND');
+console.log('==========================================');
+console.log('Current directory:', __dirname);
+console.log('File path:', __filename);
+console.log('NODE_ENV:', process.env.NODE_ENV);
+console.log('PORT:', process.env.PORT);
+console.log('MONGO_URI exists:', !!process.env.MONGO_URI);
+console.log('==========================================');
+
+
 console.log('🚀 Starting TWM3 Backend...');
 console.log('📅', new Date().toISOString());
 console.log('🔧 NODE_ENV:', process.env.NODE_ENV);
@@ -1803,43 +1817,89 @@ process.on('unhandledRejection', (reason, promise) => {
 
 
 // ============ Start Server ============
-mongoose.connect(process.env.MONGO_URI)
-    .then(async () => {
-        console.log("✅ MongoDB connected");
-        
-        const port = parseInt(process.env.PORT || PORT || 5000, 10);
-        const maxRetries = 5;
-        let attempt = 0;
+// ============ START SERVER ============
+console.log('🚀 Attempting to start server...');
 
-        function tryListen(p) {
-            server.once('error', (err) => {
-                if (err && err.code === 'EADDRINUSE') {
-                    attempt++;
-                    if (attempt <= maxRetries) {
-                        const nextPort = p + 1;
-                        console.warn(`Port ${p} in use; trying port ${nextPort} (attempt ${attempt}/${maxRetries})`);
-                        tryListen(nextPort);
-                    } else {
-                        console.error(`Port ${p} still in use after ${maxRetries} attempts; exiting.`);
-                        process.exit(1);
-                    }
-                } else {
-                    console.error('Server listen error:', err);
-                    process.exit(1);
-                }
-            });
-
-            // ✅ **هذا هو التعديل المهم - أضف '0.0.0.0'**
-            server.listen(p, '0.0.0.0', () => {
-                console.log(`✅ Server is running on port ${p} (0.0.0.0:${p})`);
-                console.log(`🚀 Ready to accept connections from Railway`);
-                console.log(`🌐 App should be accessible at: https://${process.env.RAILWAY_STATIC_URL || 'your-project.up.railway.app'}`);
-            });
-        }
-
-        tryListen(port);
-    })
-    .catch(err => {
-        console.error("❌ MongoDB connection error:", err);
-        process.exit(1);
+// Simple routes that don't need MongoDB
+app.get('/status', (req, res) => {
+    res.json({
+        status: 'alive',
+        server: 'TWM3 Backend',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development'
     });
+});
+
+app.get('/', (req, res) => {
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>TWM3 Backend</title>
+            <style>
+                body { font-family: Arial; padding: 40px; text-align: center; }
+                .status { background: green; color: white; padding: 10px; border-radius: 5px; }
+            </style>
+        </head>
+        <body>
+            <h1>TWM3 Backend Server</h1>
+            <div class="status">✅ Server is running</div>
+            <p>Go to <a href="/status">/status</a> for API status</p>
+            <p>Go to <a href="/api/courses">/api/courses</a> for courses</p>
+            <p><small>${new Date().toISOString()}</small></p>
+        </body>
+        </html>
+    `);
+});
+
+const startServer = async () => {
+    try {
+        const port = parseInt(process.env.PORT || 5000, 10);
+        
+        // Try to connect to MongoDB first
+        if (process.env.MONGO_URI) {
+            console.log('🔗 Connecting to MongoDB...');
+            try {
+                await mongoose.connect(process.env.MONGO_URI, {
+                    serverSelectionTimeoutMS: 10000,
+                });
+                console.log('✅ MongoDB connected');
+            } catch (dbError) {
+                console.warn('⚠️ MongoDB connection failed:', dbError.message);
+                console.log('🔄 Starting server without database...');
+            }
+        } else {
+            console.log('⚠️ No MONGO_URI provided');
+        }
+        
+        // Start the server regardless of MongoDB
+        server.listen(port, '0.0.0.0', () => {
+            console.log(`==========================================`);
+            console.log(`✅ SERVER STARTED SUCCESSFULLY`);
+            console.log(`✅ Port: ${port} (0.0.0.0:${port})`);
+            console.log(`✅ Environment: ${process.env.NODE_ENV || 'development'}`);
+            console.log(`✅ Railway URL: ${process.env.RAILWAY_STATIC_URL || 'Not set'}`);
+            console.log(`==========================================`);
+        });
+        
+        // Error handling
+        server.on('error', (error) => {
+            console.error('❌ Server error:', error.message);
+        });
+        
+    } catch (error) {
+        console.error('❌ Critical error starting server:', error);
+    }
+};
+
+// Handle uncaught errors
+process.on('uncaughtException', (error) => {
+    console.error('⚠️ Uncaught Exception:', error.message);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('⚠️ Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+// Start the server
+startServer();
