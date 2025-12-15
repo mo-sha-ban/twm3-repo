@@ -91,28 +91,68 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Redirect root to frontend domain
+// Redirect root to frontend domain// في وسط ملف server.js، قبل أي routes أخرى
+
+// Test route - للتأكد من أن الـAPI شغال
+app.get('/test', (req, res) => {
+    res.json({ 
+        success: true,
+        message: 'API is working correctly',
+        server: 'TWM3 Backend',
+        environment: process.env.NODE_ENV || 'development',
+        timestamp: new Date().toISOString()
+    });
+});
+
+// Health check route - مهم لـRailway
+app.get('/health', (req, res) => {
+    res.status(200).json({ 
+        status: 'UP',
+        uptime: process.uptime(),
+        database: 'connected',
+        timestamp: new Date().toISOString()
+    });
+});
+
+// Main root route
 app.get('/', (req, res) => {
-    res.send(`
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <title>TWM3 Backend</title>
-            <style>
-                body { font-family: Arial; padding: 40px; text-align: center; }
-                h1 { color: #333; }
-                .status { background: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; }
-            </style>
-        </head>
-        <body>
-            <h1>🚀 TWM3 Backend is Running!</h1>
-            <div class="status">Status: ✅ Online</div>
-            <p>Backend API is ready to accept requests.</p>
-            <p>Go to <a href="/api/courses">/api/courses</a> to test API</p>
-            <p>Timestamp: ${new Date().toISOString()}</p>
-        </body>
-        </html>
-    `);
+    // بسيط ومضمون - بدون تعقيدات
+    const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>TWM3 - Backend Server</title>
+        <meta charset="utf-8">
+        <style>
+            body { font-family: Arial, sans-serif; padding: 40px; text-align: center; }
+            .card { 
+                background: #f5f5f5; 
+                padding: 30px; 
+                border-radius: 10px; 
+                max-width: 600px; 
+                margin: 0 auto; 
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            }
+            .success { color: #4CAF50; font-weight: bold; }
+        </style>
+    </head>
+    <body>
+        <div class="card">
+            <h1>✅ TWM3 Backend Server</h1>
+            <p class="success">Server is running successfully on Railway!</p>
+            <p>All API endpoints are available.</p>
+            <hr>
+            <p><a href="/api/courses">/api/courses</a> - Browse courses</p>
+            <p><a href="/api/blogs">/api/blogs</a> - Read blogs</p>
+            <p><a href="/health">/health</a> - Health check</p>
+            <hr>
+            <p><small>${new Date().toISOString()}</small></p>
+        </div>
+    </body>
+    </html>
+    `;
+    
+    res.send(html);
 });
 
 // ============ Serve Static Files ============
@@ -1739,6 +1779,28 @@ io.on('connection', (socket) => {
         // optional logging
     });
 });
+
+
+
+
+// أضف error handler للـserver
+server.on('error', (error) => {
+    console.error('❌ Server error:', error);
+});
+
+// Handle uncaught errors
+process.on('uncaughtException', (error) => {
+    console.error('⚠️ Uncaught Exception:', error);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('⚠️ Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+
+
+
+
 
 // ============ Start Server ============
 mongoose.connect(process.env.MONGO_URI)
