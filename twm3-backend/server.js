@@ -93,11 +93,26 @@ app.use(express.json());
 
 // Redirect root to frontend domain
 app.get('/', (req, res) => {
-    const target = process.env.FRONTEND_BASE_URL || 'https://www.twm3.org';
-    if (!target.startsWith('http')) {
-        return res.status(200).send('Frontend URL is misconfigured on the server');
-    }
-    return res.redirect(302, target);
+    res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>TWM3 Backend</title>
+            <style>
+                body { font-family: Arial; padding: 40px; text-align: center; }
+                h1 { color: #333; }
+                .status { background: #4CAF50; color: white; padding: 10px 20px; border-radius: 5px; }
+            </style>
+        </head>
+        <body>
+            <h1>🚀 TWM3 Backend is Running!</h1>
+            <div class="status">Status: ✅ Online</div>
+            <p>Backend API is ready to accept requests.</p>
+            <p>Go to <a href="/api/courses">/api/courses</a> to test API</p>
+            <p>Timestamp: ${new Date().toISOString()}</p>
+        </body>
+        </html>
+    `);
 });
 
 // ============ Serve Static Files ============
