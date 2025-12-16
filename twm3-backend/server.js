@@ -558,38 +558,6 @@ app.get("/", (req, res) => {
 
 
 
-// تحديد المسار الرئيسي (المجلد الذي يحتوي على twm3-backend والملفات الأخرى)
-const rootDir = path.resolve(__dirname, '..');
-
-// خدمة المجلدات الثابتة
-app.use('/css', express.static(path.join(rootDir, 'css')));
-app.use('/js', express.static(path.join(rootDir, 'js')));
-app.use('/img', express.static(path.join(rootDir, 'img')));
-
-// خدمة الصفحة الرئيسية
-app.get('/', (req, res) => {
-    const indexPath = path.join(rootDir, 'index.html');
-    if (fs.existsSync(indexPath)) {
-        res.sendFile(indexPath);
-    } else {
-        res.status(404).send("Index.html not found at: " + indexPath);
-    }
-});
-
-// نظام التنقل بين الصفحات
-app.get('/:page', (req, res) => {
-    const pageName = req.params.page;
-    const pagePath = path.join(rootDir, `${pageName}.html`);
-    
-    if (fs.existsSync(pagePath)) {
-        res.sendFile(pagePath);
-    } else {
-        res.status(404).send("Page not found");
-    }
-});
-
-
-
 
 
 
@@ -2138,6 +2106,48 @@ io.on('connection', (socket) => {
         // console.log('Socket disconnected', socket.id, reason);
     });
 });
+
+
+
+
+
+
+
+
+// تحديد المجلد الرئيسي مرة واحدة فقط في بداية الملف أو هنا
+const rootDirectory = path.resolve(__dirname, '..');
+
+// 1. مسار الصفحة الرئيسية
+app.get('/', (req, res) => {
+    const indexPath = path.join(rootDirectory, 'index.html');
+    if (fs.existsSync(indexPath)) {
+        return res.sendFile(indexPath);
+    }
+    res.redirect("https://twm3.org");
+});
+
+// 2. نظام تنقل ذكي لجميع الصفحات (بما فيها الكورسات)
+app.get('/:page', (req, res) => {
+    const pageName = req.params.page.replace('.html', ''); // تنظيف الاسم
+    
+    // قائمة بالأماكن المحتملة للملف
+    const paths = [
+        path.join(rootDirectory, `${pageName}.html`),
+        path.join(rootDirectory, 'Pages', `${pageName}.html`),
+        path.join(rootDirectory, 'Pages', 'courses', `${pageName}.html`)
+    ];
+
+    const foundPath = paths.find(p => fs.existsSync(p));
+
+    if (foundPath) {
+        res.sendFile(foundPath);
+    } else {
+        res.status(404).send("الصفحة غير موجودة - يرجى التأكد من مسار الملف في السيرفر");
+    }
+});
+
+
+
 
 // Start server بعد التأكد من اتصال قاعدة البيانات
 mongoose.connect(process.env.MONGO_URI)
