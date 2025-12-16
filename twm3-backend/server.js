@@ -499,54 +499,118 @@ app.get("/", (req, res) => {
     }
 });
 
-// Serve static files from root directory for hosting platforms
-app.use(express.static(path.join(__dirname, '..')));
 
-// Serve CSS files
-app.use('/css', express.static(path.join(__dirname, '..', 'css')));
 
-// Serve JS files
-app.use('/js', express.static(path.join(__dirname, '..', 'js')));
 
-// Serve img files
-app.use('/img', express.static(path.join(__dirname, '..', 'img')));
 
-// Serve assets files
-app.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
+// // Serve static files from root directory for hosting platforms
+// app.use(express.static(path.join(__dirname, '..')));
 
-// Fallback for any other static file requests
-app.get('/index.html', (req, res) => {
-    const indexPath = path.join(__dirname, '..', 'index.html');
+// // Serve CSS files
+// app.use('/css', express.static(path.join(__dirname, '..', 'css')));
+
+// // Serve JS files
+// app.use('/js', express.static(path.join(__dirname, '..', 'js')));
+
+// // Serve img files
+// app.use('/img', express.static(path.join(__dirname, '..', 'img')));
+
+// // Serve assets files
+// app.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
+
+// // Fallback for any other static file requests
+// app.get('/index.html', (req, res) => {
+//     const indexPath = path.join(__dirname, '..', 'index.html');
+//     if (fs.existsSync(indexPath)) {
+//         res.sendFile(indexPath);
+//     } else {
+//         res.status(404).json({ error: 'Not Found' });
+//     }
+// });
+
+// // Serve other HTML pages
+// app.get('/:page', (req, res) => {
+//     const pageName = req.params.page;
+//     const pagePath = path.join(__dirname, '..', `${pageName}.html`);
+
+//     if (fs.existsSync(pagePath)) {
+//         res.sendFile(pagePath);
+//     } else {
+//         // Check if it's a page in Pages directory
+//         const pagesPath = path.join(__dirname, '..', 'Pages', `${pageName}.html`);
+//         if (fs.existsSync(pagesPath)) {
+//             res.sendFile(pagesPath);
+//         } else {
+//             // Check if it's a course page
+//             const coursePath = path.join(__dirname, '..', 'Pages', 'courses', `${pageName}.html`);
+//             if (fs.existsSync(coursePath)) {
+//                 res.sendFile(coursePath);
+//             } else {
+//                 res.status(404).json({ error: 'Page not found' });
+//             }
+//         }
+//     }
+// });
+
+
+
+
+
+// 1. تعريف المسار الرئيسي للمشروع (المجلد الذي يحتوي على كل شيء)
+const rootDir = path.resolve(__dirname, '..');
+
+// 2. خدمة الملفات الثابتة من المجلد الرئيسي مباشرة
+app.use(express.static(rootDir));
+
+// 3. تعريف مسارات محددة للمجلدات الأساسية لضمان عملها
+app.use('/css', express.static(path.join(rootDir, 'css')));
+app.use('/js', express.static(path.join(rootDir, 'js')));
+app.use('/img', express.static(path.join(rootDir, 'img')));
+app.use('/assets', express.static(path.join(rootDir, 'assets')));
+
+// 4. مسار الصفحة الرئيسية
+app.get("/", (req, res) => {
+    const indexPath = path.join(rootDir, 'index.html');
     if (fs.existsSync(indexPath)) {
         res.sendFile(indexPath);
     } else {
-        res.status(404).json({ error: 'Not Found' });
+        // إذا لم يجد الملف، يوجه للدومين (للحماية)
+        res.redirect("https://twm3.org");
     }
 });
 
-// Serve other HTML pages
+// 5. نظام التنقل الذكي بين الصفحات (Smart Page Router)
 app.get('/:page', (req, res) => {
     const pageName = req.params.page;
-    const pagePath = path.join(__dirname, '..', `${pageName}.html`);
+    
+    // مصفوفة المسارات المحتملة للبحث عن الصفحة
+    const potentialPaths = [
+        path.join(rootDir, `${pageName}.html`),
+        path.join(rootDir, 'Pages', `${pageName}.html`),
+        path.join(rootDir, 'Pages', 'courses', `${pageName}.html`)
+    ];
 
-    if (fs.existsSync(pagePath)) {
-        res.sendFile(pagePath);
+    // البحث عن أول مسار موجود فعلياً
+    const existingPath = potentialPaths.find(p => fs.existsSync(p));
+
+    if (existingPath) {
+        res.sendFile(existingPath);
     } else {
-        // Check if it's a page in Pages directory
-        const pagesPath = path.join(__dirname, '..', 'Pages', `${pageName}.html`);
-        if (fs.existsSync(pagesPath)) {
-            res.sendFile(pagesPath);
-        } else {
-            // Check if it's a course page
-            const coursePath = path.join(__dirname, '..', 'Pages', 'courses', `${pageName}.html`);
-            if (fs.existsSync(coursePath)) {
-                res.sendFile(coursePath);
-            } else {
-                res.status(404).json({ error: 'Page not found' });
-            }
-        }
+        res.status(404).json({ error: 'Page not found at any location' });
     }
 });
+
+
+
+
+
+
+
+
+
+
+
+
 
 // Routes
 const authRoutes = require("./routes/auth");
@@ -560,6 +624,8 @@ app.use('/api/messages', messageRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/progress', progressRoutes);
+
+
 
 // --- Product Reviews & Comments Endpoints (BEFORE productRoutes to take priority) ---
 app.get('/api/products/:id/reviews', async (req, res) => {
