@@ -556,52 +556,38 @@ app.get("/", (req, res) => {
 
 
 
-// 1. تعريف المسار الرئيسي للمشروع (المجلد الذي يحتوي على كل شيء)
+/const path = require('path');
+const fs = require('fs');
+
+// تحديد المسار الرئيسي (المجلد الذي يحتوي على twm3-backend والملفات الأخرى)
 const rootDir = path.resolve(__dirname, '..');
 
-// 2. خدمة الملفات الثابتة من المجلد الرئيسي مباشرة
-app.use(express.static(rootDir));
-
-// 3. تعريف مسارات محددة للمجلدات الأساسية لضمان عملها
+// خدمة المجلدات الثابتة
 app.use('/css', express.static(path.join(rootDir, 'css')));
 app.use('/js', express.static(path.join(rootDir, 'js')));
 app.use('/img', express.static(path.join(rootDir, 'img')));
-app.use('/assets', express.static(path.join(rootDir, 'assets')));
 
-// 4. مسار الصفحة الرئيسية
-app.get("/", (req, res) => {
+// خدمة الصفحة الرئيسية
+app.get('/', (req, res) => {
     const indexPath = path.join(rootDir, 'index.html');
     if (fs.existsSync(indexPath)) {
         res.sendFile(indexPath);
     } else {
-        // إذا لم يجد الملف، يوجه للدومين (للحماية)
-        res.redirect("https://twm3.org");
+        res.status(404).send("Index.html not found at: " + indexPath);
     }
 });
 
-// 5. نظام التنقل الذكي بين الصفحات (Smart Page Router)
+// نظام التنقل بين الصفحات
 app.get('/:page', (req, res) => {
     const pageName = req.params.page;
+    const pagePath = path.join(rootDir, `${pageName}.html`);
     
-    // مصفوفة المسارات المحتملة للبحث عن الصفحة
-    const potentialPaths = [
-        path.join(rootDir, `${pageName}.html`),
-        path.join(rootDir, 'Pages', `${pageName}.html`),
-        path.join(rootDir, 'Pages', 'courses', `${pageName}.html`)
-    ];
-
-    // البحث عن أول مسار موجود فعلياً
-    const existingPath = potentialPaths.find(p => fs.existsSync(p));
-
-    if (existingPath) {
-        res.sendFile(existingPath);
+    if (fs.existsSync(pagePath)) {
+        res.sendFile(pagePath);
     } else {
-        res.status(404).json({ error: 'Page not found at any location' });
+        res.status(404).send("Page not found");
     }
 });
-
-
-
 
 
 
