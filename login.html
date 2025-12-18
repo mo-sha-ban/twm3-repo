@@ -64,21 +64,21 @@
 
                 <div class="oauth-section">
                     <div class="oauth-buttons">
-                        <a href="/api/auth/google" class="oauth-btn google-btn">
-                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
-                            <span>المتابعة باستخدام Google</span>
-                        </a>
+                         <a href="#" class="oauth-btn google-btn">
+                             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                             <span>المتابعة باستخدام Google</span>
+                         </a>
 
-                        <a href="/api/auth/github" class="oauth-btn github-btn">
-                            <i class="fab fa-github"></i>
-                            <span>المتابعة باستخدام GitHub</span>
-                        </a>
+                         <a href="#" class="oauth-btn github-btn">
+                             <i class="fab fa-github"></i>
+                             <span>المتابعة باستخدام GitHub</span>
+                         </a>
 
-                        <a href="/api/auth/microsoft" class="oauth-btn microsoft-btn">
-                            <i class="fab fa-microsoft"></i>
-                            <span>المتابعة باستخدام Microsoft</span>
-                        </a>
-                    </div>
+                         <a href="#" class="oauth-btn microsoft-btn">
+                             <i class="fab fa-microsoft"></i>
+                             <span>المتابعة باستخدام Microsoft</span>
+                         </a>
+                 </div>
 
                     <div class="oauth-info">
                         <p class="oauth-note">
@@ -171,9 +171,28 @@
         <i class="fa-solid fa-arrow-up"></i>
     </div>
 
+    <script src="config.js"></script>
     <script src="app.js"></script>
     <script src="js/ui-toast.js"></script>
     <script src="js/alert-to-toast.js"></script>
+    <script>
+        // Set OAuth URLs from config
+        document.addEventListener('DOMContentLoaded', function() {
+            const googleBtn = document.querySelector('.google-btn');
+            const githubBtn = document.querySelector('.github-btn');
+            const microsoftBtn = document.querySelector('.microsoft-btn');
+
+            if (googleBtn) {
+                googleBtn.href = CONFIG.API_BASE_URL + CONFIG.OAUTH_ENDPOINTS.google;
+            }
+            if (githubBtn) {
+                githubBtn.href = CONFIG.API_BASE_URL + CONFIG.OAUTH_ENDPOINTS.github;
+            }
+            if (microsoftBtn) {
+                microsoftBtn.href = CONFIG.API_BASE_URL + CONFIG.OAUTH_ENDPOINTS.microsoft;
+            }
+        });
+    </script>
     <script>
         // OAuth Token Capture
         (function(){
