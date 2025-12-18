@@ -7,23 +7,33 @@ const Blog = require('../models/Blog');
 const mongoose = require('mongoose');
 const fetch = require('node-fetch');
 const querystring = require('querystring');
+const passport = require('passport');
 
 const router = express.Router();
 
 // OAuth config
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/api/auth/google/callback';
+const GOOGLE_CALLBACK_URL = process.env.GOOGLE_CALLBACK_URL || 'http://localhost:5000/auth/google/callback';
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
-const GITHUB_CALLBACK_URL = process.env.GITHUB_CALLBACK_URL || 'http://localhost:5000/api/auth/github/callback';
+const GITHUB_CALLBACK_URL = process.env.GITHUB_CALLBACK_URL || 'http://localhost:5000/auth/github/callback';
 const FACEBOOK_CLIENT_ID = process.env.FACEBOOK_CLIENT_ID;
 const FACEBOOK_CLIENT_SECRET = process.env.FACEBOOK_CLIENT_SECRET;
-const FACEBOOK_CALLBACK_URL = process.env.FACEBOOK_CALLBACK_URL || 'http://localhost:5000/api/auth/facebook/callback';
+const FACEBOOK_CALLBACK_URL = process.env.FACEBOOK_CALLBACK_URL || 'http://localhost:5000/auth/facebook/callback';
 const FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL || 'http://localhost:5000';
 
 // Google OAuth endpoints
 const { OAuth2Client } = require('google-auth-library');
+// Config endpoint for frontend
+router.get('/config', (req, res) => {
+    res.json({
+        FRONTEND_BASE_URL: process.env.FRONTEND_BASE_URL || 'http://localhost:5000',
+        GOOGLE_ENABLED: !!process.env.GOOGLE_CLIENT_ID,
+        GITHUB_ENABLED: !!process.env.GITHUB_CLIENT_ID,
+        MICROSOFT_ENABLED: !!process.env.MICROSOFT_CLIENT_ID
+    });
+});
 
 // Facebook OAuth has been disabled by the administrator.
 // The routes remain as no-op endpoints returning 410 Gone so any old clients or links
@@ -293,6 +303,43 @@ router.get('/auth/github/callback', async (req, res) => {
     } catch (err) {
         console.error('Error in /auth/github/callback', err);
         return res.status(500).json({ error: 'Failed to complete GitHub OAuth' });
+    }
+});
+
+// Microsoft OAuth route
+router.get('/auth/microsoft', passport.authenticate('microsoft', { prompt: 'select_account' }));
+
+// Microsoft OAuth callback
+router.get('/auth/microsoft/callback', passport.authenticate('microsoft', { session: false, failureRedirect: '/login.html' }), (req, res) => {
+    try {
+        const user = req.user;
+        if (!user) {
+            return res.redirect(FRONTEND_BASE_URL + '/login.html?error=auth_failed');
+        }
+
+        // issue JWT
+        const jwtPayload = {
+            _id: user._id,
+            email: user.email,
+            isAdmin: user.isAdmin,
+            username: user.username,
+            name: user.name,
+            picture: user.avatarUrl,
+            provider: 'microsoft',
+            providerId: user.providerId
+        };
+        const token = jwt.sign(jwtPayload, process.env.JWT_SECRET || 'jwtsecret', { expiresIn: '7d' });
+
+        // redirect to frontend with token and picture URL
+        let redirectUrl = FRONTEND_BASE_URL + '/login.html?token=' + encodeURIComponent(token);
+        if (user.avatarUrl) {
+            redirectUrl += '&picture=' + encodeURIComponent(user.avatarUrl);
+        }
+        
+        return res.redirect(redirectUrl);
+    } catch (err) {
+        console.error('Error in /auth/microsoft/callback', err);
+        return res.redirect(FRONTEND_BASE_URL + '/login.html?error=server_error');
     }
 });
 

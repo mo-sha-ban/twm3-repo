@@ -171,26 +171,32 @@
         <i class="fa-solid fa-arrow-up"></i>
     </div>
 
-    <script src="config.js"></script>
     <script src="app.js"></script>
     <script src="js/ui-toast.js"></script>
     <script src="js/alert-to-toast.js"></script>
     <script>
-        // Set OAuth URLs from config
+        // Load config from backend endpoint /api/config
         document.addEventListener('DOMContentLoaded', function() {
-            const googleBtn = document.querySelector('.google-btn');
-            const githubBtn = document.querySelector('.github-btn');
-            const microsoftBtn = document.querySelector('.microsoft-btn');
-
-            if (googleBtn) {
-                googleBtn.href = CONFIG.API_BASE_URL + CONFIG.OAUTH_ENDPOINTS.google;
-            }
-            if (githubBtn) {
-                githubBtn.href = CONFIG.API_BASE_URL + CONFIG.OAUTH_ENDPOINTS.github;
-            }
-            if (microsoftBtn) {
-                microsoftBtn.href = CONFIG.API_BASE_URL + CONFIG.OAUTH_ENDPOINTS.microsoft;
-            }
+            fetch('/api/config')
+                .then(response => response.json())
+                .then(config => {
+                    const apiBaseUrl = config.FRONTEND_BASE_URL;
+                    if (apiBaseUrl) {
+                        const googleBtn = document.querySelector('.google-btn');
+                        const githubBtn = document.querySelector('.github-btn');
+                        const microsoftBtn = document.querySelector('.microsoft-btn');
+                        if (googleBtn) {
+                            googleBtn.href = apiBaseUrl + '/api/auth/google';
+                        }
+                        if (githubBtn) {
+                            githubBtn.href = apiBaseUrl + '/api/auth/github';
+                        }
+                        if (microsoftBtn) {
+                            microsoftBtn.href = apiBaseUrl + '/api/auth/microsoft';
+                        }
+                    }
+                })
+                .catch(error => console.error('Error loading config:', error));
         });
     </script>
     <script>
