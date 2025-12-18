@@ -776,6 +776,7 @@ const counterRoutes = require("./routes/counterRoutes");
 const uploadRoutes = require("./routes/upload");
 const progressRoutes = require("./routes/progressRoutes");
 app.use("/api", authRoutes);
+app.use("/", authRoutes); // Enable root-level auth routes for callbacks like /auth/github/callback
 app.use('/api/blogs', blogRoutes);
 app.use('/api', counterRoutes);
 app.use('/api/messages', messageRoutes);
