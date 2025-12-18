@@ -478,25 +478,19 @@ function displayUserData() {
 
     // Update profile info
     document.getElementById('profile-name').textContent = currentUser.name || currentUser.username || 'مستخدم';
-    
-    // Determine and display user status
-    let roleText = 'مستخدم';
-    let roleClass = 'status-normal';
-    
-    if (currentUser.isAdmin) {
-        roleText = 'مدير';
-        roleClass = 'status-admin';
-    } else if (currentUser.status === 'active' || currentUser.isActive) {
-        roleText = 'نشط';
-        roleClass = 'status-active';
-    } else if (currentUser.status === 'blocked' || !currentUser.isActive) {
-        roleText = 'محظور';
-        roleClass = 'status-blocked';
-    }
 
+    // Determine and display user status - only show for admins
     const roleElement = document.getElementById('profile-role');
-    roleElement.textContent = roleText;
-    roleElement.className = `profile-role ${roleClass}`;
+    if (currentUser.isAdmin) {
+        roleElement.textContent = 'مدير';
+        roleElement.className = 'profile-role status-admin';
+        roleElement.style.display = 'block'; // Ensure it's visible for admins
+    } else {
+        // For non-admins, completely hide the role element to prevent awareness of dashboard
+        roleElement.textContent = '';
+        roleElement.className = 'profile-role';
+        roleElement.style.display = 'none';
+    }
 
     // Update avatar if exists
     if (currentUser.avatarUrl) {
@@ -904,8 +898,14 @@ async function deleteComment(commentId) {
 }
 
 // Logout functionality
-document.getElementById('logout-btn').addEventListener('click', function() {
-    if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+document.getElementById('logout-btn').addEventListener('click', async function() {
+    const confirmed = await showConfirm({
+        title: 'تأكيد تسجيل الخروج',
+        message: 'هل أنت متأكد من تسجيل الخروج؟',
+        confirmText: 'نعم، سجل خروجي',
+        cancelText: 'إلغاء'
+    });
+    if (confirmed) {
         localStorage.removeItem('user');
         localStorage.removeItem('token');
         window.location.href = 'login.html';

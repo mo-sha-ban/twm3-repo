@@ -3,7 +3,7 @@ const cors = require('cors');
 const mongoose = require("mongoose");
 const multer = require('multer'); // تم استيراد multer
 const path = require("path");
-// const session = require("express-session"); // تم تعطيله نهائياً
+const session = require("express-session"); // إعادة تفعيل session لـ Passport
 const fs = require('fs'); // أضفنا استيراد fs
 const http = require('http');
 const { Server } = require('socket.io');
@@ -21,6 +21,13 @@ const dataDeletionRoutes = require('./routes/dataDeletion');
 const jwt = require('jsonwebtoken');
 const dotenv = require('dotenv');
 const helmet = require('helmet');
+const nodemailer = require('nodemailer');
+
+// OAuth setup
+const passport = require('passport');
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+const GitHubStrategy = require('passport-github2').Strategy;
+const MicrosoftStrategy = require('passport-microsoft').Strategy;
 
 require("dotenv").config();
 
@@ -41,6 +48,204 @@ if (!process.env.BASE_URL) {
 const app = express();
 // اقرأ متغير البيئة PORT المُقدم من Railway، وإذا لم يكن موجوداً، استخدم القيمة 5000.
 const PORT = process.env.PORT || 5000;
+
+// Session middleware for Passport
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'd7f8e3a1b6c94f2e8b5a7d0c9f3e2a1b6c94f2e8b5a7d0c9f3e2a1b6c94f2e',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+}));
+
+// Passport configuration
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Passport serialize/deserialize
+passport.serializeUser((user, done) => {
+    done(null, user._id);
+});
+
+passport.deserializeUser(async (id, done) => {
+    try {
+        const user = await User.findById(id);
+        done(null, user);
+    } catch (err) {
+        done(err, null);
+    }
+});
+
+// Google OAuth Strategy
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    callbackURL: process.env.GOOGLE_CALLBACK_URL
+}, async (accessToken, refreshToken, profile, done) => {
+    try {
+        let user = await User.findOne({ providerId: profile.id, provider: 'google' });
+
+        if (!user) {
+            // Check if user exists with same email
+            user = await User.findOne({ email: profile.emails[0].value });
+            if (user) {
+                // Link Google account to existing user
+                user.provider = 'google';
+                user.providerId = profile.id;
+                user.avatarUrl = profile.photos[0].value;
+                user.isVerified = true; // OAuth users are pre-verified
+                await user.save();
+            } else {
+                // Create new user
+                user = new User({
+                    name: profile.displayName,
+                    username: profile.emails[0].value.split('@')[0] + '_google',
+                    email: profile.emails[0].value,
+                    provider: 'google',
+                    providerId: profile.id,
+                    avatarUrl: profile.photos[0].value,
+                    isVerified: true, // OAuth users are pre-verified
+                    isAdmin: false
+                });
+                await user.save();
+            }
+        }
+
+        return done(null, user);
+    } catch (err) {
+        return done(err, null);
+    }
+}));
+
+// GitHub OAuth Strategy
+passport.use(new GitHubStrategy({
+    clientID: process.env.GITHUB_CLIENT_ID,
+    clientSecret: process.env.GITHUB_CLIENT_SECRET,
+    callbackURL: process.env.GITHUB_CALLBACK_URL
+}, async (accessToken, refreshToken, profile, done) => {
+    try {
+        let user = await User.findOne({ providerId: profile.id, provider: 'github' });
+
+        if (!user) {
+            // Check if user exists with same email
+            user = await User.findOne({ email: profile.emails[0].value });
+            if (user) {
+                // Link GitHub account to existing user
+                user.provider = 'github';
+                user.providerId = profile.id;
+                user.avatarUrl = profile.photos[0].value;
+                user.isVerified = true;
+                await user.save();
+            } else {
+                // Create new user
+                user = new User({
+                    name: profile.displayName || profile.username,
+                    username: profile.username + '_github',
+                    email: profile.emails[0].value,
+                    provider: 'github',
+                    providerId: profile.id,
+                    avatarUrl: profile.photos[0].value,
+                    isVerified: true,
+                    isAdmin: false
+                });
+                await user.save();
+            }
+        }
+
+        return done(null, user);
+    } catch (err) {
+        return done(err, null);
+    }
+}));
+
+// Microsoft OAuth Strategy
+passport.use(new MicrosoftStrategy({
+    clientID: process.env.MICROSOFT_CLIENT_ID,
+    clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
+    callbackURL: process.env.MICROSOFT_CALLBACK_URL,
+    scope: ['user.read']
+}, async (accessToken, refreshToken, profile, done) => {
+    try {
+        let user = await User.findOne({ providerId: profile.id, provider: 'microsoft' });
+
+        if (!user) {
+            // Check if user exists with same email
+            user = await User.findOne({ email: profile.emails[0].value });
+            if (user) {
+                // Link Microsoft account to existing user
+                user.provider = 'microsoft';
+                user.providerId = profile.id;
+                user.avatarUrl = profile.photos[0].value;
+                user.isVerified = true;
+                await user.save();
+            } else {
+                // Create new user
+                user = new User({
+                    name: profile.displayName,
+                    username: profile.username || profile.emails[0].value.split('@')[0] + '_microsoft',
+                    email: profile.emails[0].value,
+                    provider: 'microsoft',
+                    providerId: profile.id,
+                    avatarUrl: profile.photos[0].value,
+                    isVerified: true,
+                    isAdmin: false
+                });
+                await user.save();
+            }
+        }
+
+        return done(null, user);
+    } catch (err) {
+        return done(err, null);
+    }
+}));
+
+// Email transporter setup
+const emailTransporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: process.env.SMTP_PORT || 587,
+    secure: false,
+    auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+    }
+});
+
+// Function to send verification email
+async function sendVerificationEmail(email, token) {
+    const verificationUrl = `${process.env.BASE_URL}/verify-email?token=${token}`;
+
+    const mailOptions = {
+        from: process.env.SMTP_USER,
+        to: email,
+        subject: 'تأكيد حسابك في TWM3',
+        html: `
+            <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+                <h2 style="color: #2563eb; text-align: center;">مرحباً بك في TWM3</h2>
+                <p>شكراً لتسجيلك في منصة TWM3 للتعلم والأمن السيبراني.</p>
+                <p>لإكمال عملية التسجيل، يرجى تأكيد بريدك الإلكتروني بالنقر على الرابط التالي:</p>
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="${verificationUrl}" style="background-color: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; display: inline-block;">تأكيد البريد الإلكتروني</a>
+                </div>
+                <p>إذا لم تقم بطلب هذا التسجيل، يمكنك تجاهل هذا البريد الإلكتروني.</p>
+                <p>مع خالص التحية,<br>فريق TWM3</p>
+                <hr style="margin: 20px 0; border: none; border-top: 1px solid #eee;">
+                <p style="font-size: 12px; color: #666;">هذا البريد الإلكتروني تم إرساله تلقائياً، يرجى عدم الرد عليه.</p>
+            </div>
+        `
+    };
+
+    try {
+        await emailTransporter.sendMail(mailOptions);
+        console.log('Verification email sent to:', email);
+    } catch (error) {
+        console.error('Error sending verification email:', error);
+        throw error;
+    }
+}
+
 // Middleware
 app.use(helmet({
     crossOriginResourcePolicy: { policy: 'cross-origin' },
@@ -503,54 +708,54 @@ app.get("/", (req, res) => {
 
 
 
-// // Serve static files from root directory for hosting platforms
-// app.use(express.static(path.join(__dirname, '..')));
+// Serve static files from root directory for hosting platforms
+app.use(express.static(path.join(__dirname, '..')));
 
-// // Serve CSS files
-// app.use('/css', express.static(path.join(__dirname, '..', 'css')));
+// Serve CSS files
+app.use('/css', express.static(path.join(__dirname, '..', 'css')));
 
-// // Serve JS files
-// app.use('/js', express.static(path.join(__dirname, '..', 'js')));
+// Serve JS files
+app.use('/js', express.static(path.join(__dirname, '..', 'js')));
 
-// // Serve img files
-// app.use('/img', express.static(path.join(__dirname, '..', 'img')));
+// Serve img files
+app.use('/img', express.static(path.join(__dirname, '..', 'img')));
 
-// // Serve assets files
-// app.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
+// Serve assets files
+app.use('/assets', express.static(path.join(__dirname, '..', 'assets')));
 
-// // Fallback for any other static file requests
-// app.get('/index.html', (req, res) => {
-//     const indexPath = path.join(__dirname, '..', 'index.html');
-//     if (fs.existsSync(indexPath)) {
-//         res.sendFile(indexPath);
-//     } else {
-//         res.status(404).json({ error: 'Not Found' });
-//     }
-// });
+// Fallback for any other static file requests
+app.get('/index.html', (req, res) => {
+    const indexPath = path.join(__dirname, '..', 'index.html');
+    if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+    } else {
+        res.status(404).json({ error: 'Not Found' });
+    }
+});
 
-// // Serve other HTML pages
-// app.get('/:page', (req, res) => {
-//     const pageName = req.params.page;
-//     const pagePath = path.join(__dirname, '..', `${pageName}.html`);
+// Serve other HTML pages
+app.get('/:page', (req, res) => {
+    const pageName = req.params.page;
+    const pagePath = path.join(__dirname, '..', `${pageName}.html`);
 
-//     if (fs.existsSync(pagePath)) {
-//         res.sendFile(pagePath);
-//     } else {
-//         // Check if it's a page in Pages directory
-//         const pagesPath = path.join(__dirname, '..', 'Pages', `${pageName}.html`);
-//         if (fs.existsSync(pagesPath)) {
-//             res.sendFile(pagesPath);
-//         } else {
-//             // Check if it's a course page
-//             const coursePath = path.join(__dirname, '..', 'Pages', 'courses', `${pageName}.html`);
-//             if (fs.existsSync(coursePath)) {
-//                 res.sendFile(coursePath);
-//             } else {
-//                 res.status(404).json({ error: 'Page not found' });
-//             }
-//         }
-//     }
-// });
+    if (fs.existsSync(pagePath)) {
+        res.sendFile(pagePath);
+    } else {
+        // Check if it's a page in Pages directory
+        const pagesPath = path.join(__dirname, '..', 'Pages', `${pageName}.html`);
+        if (fs.existsSync(pagesPath)) {
+            res.sendFile(pagesPath);
+        } else {
+            // Check if it's a course page
+            const coursePath = path.join(__dirname, '..', 'Pages', 'courses', `${pageName}.html`);
+            if (fs.existsSync(coursePath)) {
+                res.sendFile(coursePath);
+            } else {
+                res.status(404).json({ error: 'Page not found' });
+            }
+        }
+    }
+});
 
 
 
@@ -962,6 +1167,12 @@ app.post('/api/signup', async (req, res) => {
             return res.status(400).json({ message: 'اسم المستخدم والبريد وكلمة المرور مطلوبة' });
         }
 
+        // التحقق من صحة البريد الإلكتروني
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ message: 'يرجى إدخال بريد إلكتروني صحيح' });
+        }
+
         // تحقق من عدم التكرار
         const existing = await User.findOne({ $or: [{ email }, { username }] });
         if (existing) {
@@ -972,16 +1183,35 @@ app.post('/api/signup', async (req, res) => {
         const bcrypt = require('bcryptjs');
         const hashedPassword = await bcrypt.hash(password, 10);
 
+        // إنشاء رمز التحقق
+        const verificationToken = require('crypto').randomBytes(32).toString('hex');
+        const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 ساعة
+
         const user = new User({
             name: name || username,
             username,
             email,
             password: hashedPassword,
-            phone: phone || ''
+            phone: phone || '',
+            verificationToken,
+            verificationExpires,
+            isVerified: false
         });
 
         await user.save();
-        res.json({ success: true });
+
+        // إرسال بريد التحقق
+        try {
+            await sendVerificationEmail(email, verificationToken);
+        } catch (emailError) {
+            console.error('Failed to send verification email:', emailError);
+            // لا نعيد خطأ هنا، المستخدم تم إنشاؤه بنجاح
+        }
+
+        res.json({
+            success: true,
+            message: 'تم إنشاء الحساب بنجاح. يرجى التحقق من بريدك الإلكتروني لتأكيد الحساب.'
+        });
     } catch (err) {
         if (err.code === 11000) {
             return res.status(400).json({ message: 'اسم المستخدم أو البريد الإلكتروني مستخدم بالفعل' });
@@ -991,11 +1221,172 @@ app.post('/api/signup', async (req, res) => {
     }
 });
 
+// OAuth Routes
+app.get('/api/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+app.get('/api/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: '/login.html' }),
+    (req, res) => {
+        const payload = {
+            _id: req.user._id,
+            email: req.user.email,
+            isAdmin: req.user.isAdmin,
+            username: req.user.username,
+            name: req.user.name
+        };
+        const token = jwt.sign(payload, process.env.JWT_SECRET || 'jwtsecret', { expiresIn: '7d' });
+
+        // Redirect to frontend with token
+        res.redirect(`${process.env.FRONTEND_BASE_URL}/login.html?token=${token}&user=${encodeURIComponent(JSON.stringify(payload))}`);
+    }
+);
+
+app.get('/api/auth/github', passport.authenticate('github', { scope: ['user:email'] }));
+
+app.get('/api/auth/github/callback',
+    passport.authenticate('github', { failureRedirect: '/login.html' }),
+    (req, res) => {
+        const payload = {
+            _id: req.user._id,
+            email: req.user.email,
+            isAdmin: req.user.isAdmin,
+            username: req.user.username,
+            name: req.user.name
+        };
+        const token = jwt.sign(payload, process.env.JWT_SECRET || 'jwtsecret', { expiresIn: '7d' });
+
+        res.redirect(`${process.env.FRONTEND_BASE_URL}/login.html?token=${token}&user=${encodeURIComponent(JSON.stringify(payload))}`);
+    }
+);
+
+app.get('/api/auth/microsoft', passport.authenticate('microsoft'));
+
+app.get('/api/auth/microsoft/callback',
+    passport.authenticate('microsoft', { failureRedirect: '/login.html' }),
+    (req, res) => {
+        const payload = {
+            _id: req.user._id,
+            email: req.user.email,
+            isAdmin: req.user.isAdmin,
+            username: req.user.username,
+            name: req.user.name
+        };
+        const token = jwt.sign(payload, process.env.JWT_SECRET || 'jwtsecret', { expiresIn: '7d' });
+
+        res.redirect(`${process.env.FRONTEND_BASE_URL}/login.html?token=${token}&user=${encodeURIComponent(JSON.stringify(payload))}`);
+    }
+);
+
+// مسار إعادة إرسال بريد التحقق
+app.post('/api/resend-verification', async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) {
+            return res.status(400).json({ message: 'البريد الإلكتروني مطلوب' });
+        }
+
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: 'المستخدم غير موجود' });
+        }
+
+        if (user.isVerified) {
+            return res.status(400).json({ message: 'الحساب مُؤكد بالفعل' });
+        }
+
+        // إنشاء رمز تحقق جديد
+        const verificationToken = require('crypto').randomBytes(32).toString('hex');
+        const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 ساعة
+
+        user.verificationToken = verificationToken;
+        user.verificationExpires = verificationExpires;
+        await user.save();
+
+        // إرسال بريد التحقق
+        await sendVerificationEmail(email, verificationToken);
+
+        res.json({ success: true, message: 'تم إرسال بريد التحقق مرة أخرى' });
+    } catch (err) {
+        console.error('Resend verification error:', err);
+        res.status(500).json({ message: 'فشل في إرسال بريد التحقق' });
+    }
+});
+
+// مسار تأكيد البريد الإلكتروني
+app.get('/verify-email', async (req, res) => {
+    try {
+        const { token } = req.query;
+        if (!token) {
+            return res.status(400).send(`
+                <div dir="rtl" style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+                    <h2>خطأ في التحقق</h2>
+                    <p>رمز التحقق غير صحيح أو مفقود.</p>
+                    <a href="/login.html">العودة لتسجيل الدخول</a>
+                </div>
+            `);
+        }
+
+        const user = await User.findOne({
+            verificationToken: token,
+            verificationExpires: { $gt: new Date() }
+        });
+
+        if (!user) {
+            return res.status(400).send(`
+                <div dir="rtl" style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+                    <h2>خطأ في التحقق</h2>
+                    <p>رمز التحقق غير صحيح أو منتهي الصلاحية.</p>
+                    <a href="/login.html">العودة لتسجيل الدخول</a>
+                </div>
+            `);
+        }
+
+        // تأكيد الحساب
+        user.isVerified = true;
+        user.verificationToken = undefined;
+        user.verificationExpires = undefined;
+        await user.save();
+
+        res.send(`
+            <div dir="rtl" style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+                <h2 style="color: #22c55e;">تم تأكيد الحساب بنجاح! ✅</h2>
+                <p>يمكنك الآن تسجيل الدخول إلى حسابك.</p>
+                <a href="/login.html" style="display: inline-block; margin-top: 20px; padding: 10px 20px; background: #2563eb; color: white; text-decoration: none; border-radius: 6px;">تسجيل الدخول</a>
+            </div>
+        `);
+    } catch (err) {
+        console.error('Email verification error:', err);
+        res.status(500).send(`
+            <div dir="rtl" style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">
+                <h2>خطأ في الخادم</h2>
+                <p>حدث خطأ أثناء التحقق من البريد الإلكتروني.</p>
+                <a href="/login.html">العودة لتسجيل الدخول</a>
+            </div>
+        `);
+    }
+});
+
 // تسجيل الدخول وإرجاع JWT
 app.post('/api/login', express.json(), async (req, res) => {
     const { email, password } = req.body;
+
+    // التحقق من صحة البريد الإلكتروني
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return res.status(400).json({ message: 'يرجى إدخال بريد إلكتروني صحيح' });
+    }
+
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: 'البريد الإلكتروني غير مسجل' });
+
+    // التحقق من تأكيد الحساب
+    if (!user.isVerified) {
+        return res.status(403).json({
+            message: 'يجب تأكيد حسابك أولاً. تحقق من بريدك الإلكتروني.',
+            requiresVerification: true
+        });
+    }
+
     const bcrypt = require('bcryptjs');
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ message: 'كلمة المرور غير صحيحة' });
@@ -1229,22 +1620,42 @@ app.get('/api/admin/users', authToken, requireAdminToken, async (req, res) => {
 // إضافة مستخدم جديد - للمديرين فقط
 app.post('/api/admin/users', authToken, requireAdminToken, async (req, res) => {
     try {
-        const { name, username, email, password, phone, isAdmin } = req.body;
+        console.log('========== POST /api/admin/users ==========');
+        console.log('Request body:', req.body);
+        
+        const { name, username, email, password, phone, isAdmin, role } = req.body;
+        
+        console.log('Extracted fields:', { name, username, email, phone, isAdmin, role });
         
         // التحقق من الحقول المطلوبة
         if (!name || !username || !email || !password) {
+            console.log('Missing required fields');
             return res.status(400).json({ error: 'جميع الحقول مطلوبة' });
         }
+        
+        console.log('All required fields present, checking for duplicates...');
         
         // التحقق من تكرار البريد الإلكتروني
         const existingUser = await User.findOne({ email });
         if (existingUser) {
+            console.log('Email already exists:', email);
             return res.status(400).json({ error: 'البريد الإلكتروني مسجل مسبقاً' });
         }
         
+        // التحقق من تكرار اسم المستخدم
+        const existingUsername = await User.findOne({ username });
+        if (existingUsername) {
+            console.log('Username already exists:', username);
+            return res.status(400).json({ error: 'اسم المستخدم مسجل مسبقاً' });
+        }
+        
+        console.log('No duplicates found, hashing password...');
+        
         // تشفير كلمة المرور
-        const bcrypt = require('bcrypt');
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const bcryptjs = require('bcryptjs');
+        const hashedPassword = await bcryptjs.hash(password, 10);
+        
+        console.log('Password hashed, creating user...');
         
         // إنشاء مستخدم جديد
         const newUser = new User({
@@ -1253,12 +1664,18 @@ app.post('/api/admin/users', authToken, requireAdminToken, async (req, res) => {
             email,
             password: hashedPassword,
             phone: phone || '',
-            isAdmin: isAdmin === true || isAdmin === 'true'
+            isAdmin: isAdmin === true || isAdmin === 'true' || role === 'admin'
         });
+        
+        console.log('User object created, saving to database...');
         
         await newUser.save();
         
+        console.log('User created successfully:', newUser._id);
+        
         res.status(201).json({
+            success: true,
+            message: 'تمت إضافة المستخدم بنجاح',
             _id: newUser._id,
             name: newUser.name,
             username: newUser.username,
@@ -1268,8 +1685,17 @@ app.post('/api/admin/users', authToken, requireAdminToken, async (req, res) => {
             created_at: newUser.created_at
         });
     } catch (err) {
-        console.error('خطأ في إضافة المستخدم:', err);
-        res.status(500).json({ error: 'فشل في إضافة المستخدم' });
+        console.error('========== ERROR in POST /api/admin/users ==========');
+        console.error('Error message:', err.message);
+        console.error('Error name:', err.name);
+        console.error('Stack:', err.stack);
+        console.error('Full error:', err);
+        
+        res.status(500).json({ 
+            error: 'فشل في إضافة المستخدم',
+            details: err.message,
+            errorName: err.name
+        });
     }
 });
 

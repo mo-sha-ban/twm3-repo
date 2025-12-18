@@ -66,34 +66,41 @@
       }
     },
 
-    renderCourses(courses) {
-      const tbody = document.getElementById('courses-table');
-      if (!tbody) return;
-      if (!Array.isArray(courses) || courses.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8">لا توجد كورسات</td></tr>';
-        return;
-      }
-      tbody.innerHTML = courses.map((course, idx) => {
-        return `
-          <tr>
-            <td>${idx + 1}</td>
-            <td>${escapeHtml(course.title || '')}</td>
-            <td>${escapeHtml((course.description || '').substring(0, 80))}</td>
-            <td>${escapeHtml(course.instructor || '')}</td>
-            <td>${course.duration || 0} ساعة</td>
-            <td>${course.isFree ? 'مجاني' : (course.price || 0) + ' جنيه'}</td>
-            <td>${course.categories && Array.isArray(course.categories) && course.categories.length ? 
-              course.categories.map(cat => escapeHtml(getCategoryName(cat.mainCategory))).join('، ') 
-              : '---'}</td>
-            <td>
-              <button class="btn btn-primary manage-content-btn" data-id="${course._id}" data-title="${escapeHtml(course.title || '')}">المحتوى</button>
-              <button class="btn btn-secondary edit-course-btn" data-id="${course._id}">تعديل</button>
-              <button class="btn btn-danger delete-course-btn" data-id="${course._id}">حذف</button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    },
+        // عرض الكورسات في الجدول
+        renderCourses: function(courses) {
+            try {
+                const tbody = document.getElementById('courses-table');
+                if (!tbody) {
+                    console.error('courses-table element not found');
+                    return;
+                }
+                if (!Array.isArray(courses) || courses.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="9">لا توجد كورسات</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = courses.map((c, idx) => `
+                    <tr data-id="${c._id}">
+                        <td>${idx + 1}</td>
+                        <td>${(c.icon || '') ? `<i class="${c.icon}"></i>` : ''} ${c.title || ''}</td>
+                        <td>${(c.instructor || '')}</td>
+                        <td>${(c.categories || []).map(cat => cat.mainCategory).join(', ')}</td>
+                        <td>${c.duration || ''}</td>
+                        <td>${c.price || ''}</td>
+                        <td>${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : ''}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-primary" onclick="editCourse('${c._id}')" title="تعديل"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-secondary" onclick="manageCourseContent('${c._id}','${(c.title||'').replace(/'/g, "\\'")}', )" title="محتوى"><i class="fas fa-folder-open"></i></button>
+                                <button class="btn btn-danger" onclick="deleteCourse('${c._id}')" title="حذف"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                console.error('Error rendering courses:', err);
+            }
+        },
 
     // إنشاء أو ربط واجهة الفلاتر أعلى جدول الكورسات
     initializeFilters() {
@@ -466,15 +473,21 @@
 
     async deleteCourse(courseId) {
       if (!courseId) return;
-      if (!confirm('هل أنت متأكد من حذف هذا الكورس؟')) return;
+      const confirmed = await showConfirm({
+        title: 'تأكيد حذف الكورس',
+        message: 'هل أنت متأكد من حذف هذا الكورس؟',
+        confirmText: 'نعم، احذف الكورس',
+        cancelText: 'إلغاء'
+      });
+      if (!confirmed) return;
       try {
         const res = await fetch(`/api/courses/${courseId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
         if (!res.ok) throw new Error('فشل الحذف');
-        alert('تم الحذف');
+        showToast('تم الحذف', 'تم حذف الكورس بنجاح', 'success');
         Courses.fetchCourses();
       } catch (err) {
         console.error('delete course', err);
-        alert('فشل في حذف الكورس');
+        showToast('خطأ', 'فشل في حذف الكورس', 'error');
       }
     },
 

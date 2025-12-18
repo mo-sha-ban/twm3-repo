@@ -511,11 +511,11 @@ if (!window.Courses) {
                         <td>${c.price || ''}</td>
                         <td>${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : ''}</td>
                         <td>
-                            <button class="btn btn-primary" onclick="editCourse('${c._id}')"><i class="fas fa-edit"></i> تعديل</button>
-                            <button class="btn btn-secondary" onclick="manageCourseContent('${c._id}','${(c.title||'').replace(/'/g, "\\'")}', )"><i class="fas fa-folder-open"></i> محتوى</button>
-                        </td>
-                        <td>
-                            <button class="btn btn-danger" onclick="deleteCourse('${c._id}')"><i class="fas fa-trash"></i> حذف</button>
+                            <div class="action-buttons">
+                                <button class="btn btn-primary" onclick="editCourse('${c._id}')" title="تعديل"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-secondary" onclick="manageCourseContent('${c._id}','${(c.title||'').replace(/'/g, "\\'")}', )" title="محتوى"><i class="fas fa-folder-open"></i></button>
+                                <button class="btn btn-danger" onclick="deleteCourse('${c._id}')" title="حذف"><i class="fas fa-trash"></i></button>
+                            </div>
                         </td>
                     </tr>
                 `).join('');
@@ -584,8 +584,6 @@ function closeModal() {
     if (form) {
         try { form.removeEventListener('submit', handleUpdateUserSubmit); } catch(e) {}
         try { form.removeEventListener('submit', addUser); } catch(e) {}
-        // reattach default handler
-        form.addEventListener('submit', addUser);
     }
 }
 
@@ -677,17 +675,19 @@ function renderUsers(users) {
                 <td>${user.email || ''}</td>
                 <td>${user.phone || "غير مسجل"}</td>
                 <td>
-                    <span class="status ${user.isAdmin ? "admin" : (user.isActive ? "active" : "inactive")}">
-                        ${user.isAdmin ? "مدير" : (user.isActive ? "نشط" : "غير نشط")}
+                    <span class="status ${user.isAdmin ? "admin" : "user"}">
+                        ${user.isAdmin ? "مدير" : "مستخدم عادي"}
                     </span>
                 </td>
                 <td>
-                    <button class="btn btn-primary btn-edit-user" data-userid="${user._id}">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn btn-danger btn-delete-user" data-userid="${user._id}">
-                        <i class="fas fa-trash"></i> حذف
-                    </button>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary btn-edit-user" data-userid="${user._id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-danger btn-delete-user" data-userid="${user._id}">
+                            <i class="fas fa-trash"></i> 
+                        </button>
+                    </div>
                 </td>
             </tr>
         `;
@@ -697,8 +697,14 @@ function renderUsers(users) {
 
 
 // دالة تسجيل الخروج
-function logout() {
-    if (confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+async function logout() {
+    const confirmed = await showConfirm({
+        title: 'تأكيد تسجيل الخروج',
+        message: 'هل أنت متأكد من تسجيل الخروج من لوحة التحكم؟',
+        confirmText: 'نعم، سجل خروجي',
+        cancelText: 'إلغاء'
+    });
+    if (confirmed) {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         window.location.href = "../../login.html";
@@ -970,6 +976,13 @@ window.closeCourseContentModal = function() {
 // دالة إضافة مستخدم معدلة
 async function addUser(e) {
     e.preventDefault();
+    
+    // منع الإرسال المتكرر
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'جاري الإضافة...';
+    }
 
     try {
         // التحقق من وجود العناصر
@@ -985,13 +998,13 @@ async function addUser(e) {
             email: getElement('email').value.trim(),
             phone: getElement('phone').value.trim(),
             isAdmin: getElement('isAdmin').checked,
-            role: document.getElementById('isAdmin').checked ? 'admin' : 'user',
+            role: getElement('isAdmin').checked ? 'admin' : 'user',
             password: getElement('password').value,
         };
 
-        // التحقق من البيانات
-        if (!formData.username || !formData.email || !formData.password || !formData.phone || !formData.name) {
-            throw new Error('جميع الحقول المطلوبة يجب أن تُملأ');
+        // التحقق من البيانات المطلوبة
+        if (!formData.username || !formData.email || !formData.password || !formData.name) {
+            throw new Error('الاسم والمستخدم والبريد وكلمة المرور مطلوبة');
         }
 
         // إرسال البيانات
@@ -1012,17 +1025,30 @@ async function addUser(e) {
 
         alert('تمت الإضافة بنجاح!');
         document.getElementById('addUserForm').reset();
+        closeAddModal();
         fetchUsers();
 
     } catch (error) {
         console.error('Full Error:', error);
         alert(`فشلت العملية: ${error.message}`);
+    } finally {
+        // إعادة تفعيل الزر
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'إضافة';
+        }
     }
 }
 
-// delete user 
+// delete user
 async function deleteUser(userId) {
-    if (!confirm('هل أنت متأكد من الحذف؟')) return;
+    const confirmed = await showConfirm({
+        title: 'تأكيد الحذف',
+        message: 'هل أنت متأكد من حذف هذا المستخدم؟ لا يمكن التراجع عن هذا الإجراء.',
+        confirmText: 'نعم، احذف المستخدم',
+        cancelText: 'إلغاء'
+    });
+    if (!confirmed) return;
 
     try {
         const response = await fetch(`/api/admin/users/${userId}`, {
@@ -1068,7 +1094,13 @@ async function deleteUser(userId) {
 async function editUser(userId) {
     // In your editUser function, make sure the ID is correct
     console.log('Editing user ID:', userId); // Add this to verify
-    if (!confirm('هل أنت متأكد من تعديل بيانات المستخدم؟')) return; // Confirm the action
+    const confirmed = await showConfirm({
+        title: 'تأكيد التعديل',
+        message: 'هل أنت متأكد من تعديل بيانات هذا المستخدم؟',
+        confirmText: 'نعم، عدل البيانات',
+        cancelText: 'إلغاء'
+    });
+    if (!confirmed) return; // Confirm the action
 
     // Check if users array is populated
     if (users.length === 0) {
@@ -1276,7 +1308,13 @@ function getCategoryName(category) {
 
 
 async function deleteCourse(courseId) {
-    if (!confirm('هل أنت متأكد من حذف هذا الكورس؟')) return;
+    const confirmed = await showConfirm({
+        title: 'تأكيد حذف الكورس',
+        message: 'هل أنت متأكد من حذف هذا الكورس؟ سيتم حذف جميع الوحدات والدروس المرتبطة به.',
+        confirmText: 'نعم، احذف الكورس',
+        cancelText: 'إلغاء'
+    });
+    if (!confirmed) return;
 
     try {
         // Validate courseId
@@ -1550,7 +1588,13 @@ async function updateCommentStatus(commentId, status) {
 }
 
 async function deleteComment(commentId) {
-    if (!confirm('هل أنت متأكد من حذف هذا التعليق؟')) return;
+    const confirmed = await showConfirm({
+        title: 'تأكيد حذف التعليق',
+        message: 'هل أنت متأكد من حذف هذا التعليق؟',
+        confirmText: 'نعم، احذف التعليق',
+        cancelText: 'إلغاء'
+    });
+    if (!confirmed) return;
 
     try {
         const response = await fetch(`/api/comments/${commentId}`, {
@@ -1931,7 +1975,8 @@ function switchSection(sectionId) {
         'users-section',
         'courses-section', 
         'comments-section',
-        'settings-section'
+        'settings-section',
+        'products-section'
     ];
     
     // 1. إخفاء جميع الأقسام
@@ -1945,7 +1990,7 @@ function switchSection(sectionId) {
             console.warn('Section not found:', sectionName);
         }
     });
-    
+
     // 2. إظهار القسم المطلوب
     const targetSection = document.getElementById(`${sectionId}-section`);
     if (targetSection) {
@@ -2005,7 +2050,7 @@ function switchSection(sectionId) {
                 initProducts();
             } else {
                 console.error('loadProducts function not found');
-            }
+            } 
             break;
         default:
             console.warn('Unknown section:', sectionId);
@@ -2530,9 +2575,15 @@ function addModule() {
     toggleAddModuleForm();
 }
 
-function deleteModule(moduleId) {
-    if (!confirm('هل أنت متأكد من حذف هذه الوحدة؟')) return;
-    
+async function deleteModule(moduleId) {
+    const confirmed = await showConfirm({
+        title: 'تأكيد حذف الوحدة',
+        message: 'هل أنت متأكد من حذف هذه الوحدة؟',
+        confirmText: 'نعم، احذف الوحدة',
+        cancelText: 'إلغاء'
+    });
+    if (!confirmed) return;
+
     modules = modules.filter(module => module.id !== moduleId);
     renderModules();
 }
@@ -2809,8 +2860,14 @@ window.manageCourseContent = function(courseId, courseTitle) {
     console.warn('manageCourseContent delegated: Courses module not available');
 };
 
-function deleteLesson(courseId, unitId, lessonId) {
-    if (!confirm('هل أنت متأكد من حذف هذا الدرس؟')) {
+async function deleteLesson(courseId, unitId, lessonId) {
+    const confirmed = await showConfirm({
+        title: 'تأكيد حذف الدرس',
+        message: 'هل أنت متأكد من حذف هذا الدرس؟',
+        confirmText: 'نعم، احذف الدرس',
+        cancelText: 'إلغاء'
+    });
+    if (!confirmed) {
         return;
     }
 
@@ -4177,8 +4234,14 @@ async function handleAddLessonSubmit(e) {
 
 // دالة لحذف وحدة (API)
 async function deleteUnit(courseId, unitId) {
-    if (!confirm('هل أنت متأكد من حذف هذه الوحدة؟')) return;
-    
+    const confirmed = await showConfirm({
+        title: 'تأكيد حذف الوحدة',
+        message: 'هل أنت متأكد من حذف هذه الوحدة؟ سيتم حذف جميع الدروس المرتبطة بها.',
+        confirmText: 'نعم، احذف الوحدة',
+        cancelText: 'إلغاء'
+    });
+    if (!confirmed) return;
+
     try {
         const response = await fetch(`/api/courses/${courseId}/units/${unitId}`, {
             method: 'DELETE',
@@ -4224,8 +4287,14 @@ async function editLesson(courseId, unitId, lessonId) {
 
 // دالة لحذف درس (API)
 async function deleteLesson(courseId, unitId, lessonId) {
-    if (!confirm('هل أنت متأكد من حذف هذا الدرس؟')) return;
-    
+    const confirmed = await showConfirm({
+        title: 'تأكيد حذف الدرس',
+        message: 'هل أنت متأكد من حذف هذا الدرس؟',
+        confirmText: 'نعم، احذف الدرس',
+        cancelText: 'إلغاء'
+    });
+    if (!confirmed) return;
+
     try {
         const response = await fetch(`/api/courses/${courseId}/units/${unitId}/lessons/${lessonId}`, {
             method: 'DELETE',
@@ -4782,10 +4851,12 @@ function openAddUserModal() {
     const form = document.getElementById('addUserForm');
     if (form) {
         form.reset();
-        form.onsubmit = function(e) {
-            e.preventDefault();
-            addUser(e);
-        };
+        // Remove all previous event listeners
+        const newForm = form.cloneNode(true);
+        form.parentNode.replaceChild(newForm, form);
+        
+        // Add new event listener
+        document.getElementById('addUserForm').addEventListener('submit', addUser);
     }
 
     ModalSystem.openModal('addUserModal');
@@ -4796,9 +4867,20 @@ function closeAddUserModal() {
     ModalSystem.closeModal('addUserModal');
 }
 
+// جسر الدوال - للتوافق مع HTML
+function closeAddModal() {
+    closeAddUserModal();
+}
+
+function openAddModal() {
+    openAddUserModal();
+}
+
 // جعل الدوال متاحة بشكل عام
 window.openAddUserModal = openAddUserModal;
 window.closeAddUserModal = closeAddUserModal;
+window.closeAddModal = closeAddModal;
+window.openAddModal = openAddModal;
 
 
 

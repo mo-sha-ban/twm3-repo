@@ -1,5 +1,5 @@
 (function(){
-    // Professional Liquid Glass Toast System
+    // Professional Liquid Glass Toast System with Confirm Modal
     // Exposes window.showToast(message, {type:'info'|'success'|'error'|'warning', timeout, title, icon})
     // and window.showConfirm({title, message, confirmText, cancelText}) -> Promise<boolean>
 
@@ -7,9 +7,9 @@
     /* Liquid Glass Toast Container */
     .twm3-toast-container {
         position: fixed;
-        bottom: 28px;
+        bottom: 120px;
         left: 28px;
-        z-index: 99999;
+        z-index: 100001;
         display: flex;
         flex-direction: column;
         gap: 14px;
@@ -22,7 +22,7 @@
         max-width: 480px;
         padding: 18px 22px;
         border-radius: 16px;
-        box-shadow: 
+        box-shadow:
             0 8px 32px rgba(0, 0, 0, 0.12),
             0 2px 8px rgba(0, 0, 0, 0.08),
             inset 0 1px 1px rgba(255, 255, 255, 0.1);
@@ -109,7 +109,7 @@
     /* Dark mode support */
     body.dark .twm3-toast,
     :root.dark-theme .twm3-toast {
-        box-shadow: 
+        box-shadow:
             0 12px 40px rgba(0, 0, 0, 0.4),
             0 4px 12px rgba(0, 0, 0, 0.3),
             inset 0 1px 1px rgba(255, 255, 255, 0.05);
@@ -182,7 +182,7 @@
         transform: scale(1.05);
     }
 
-    /* Confirm Modal with Liquid Glass */
+    /* Confirm Modal with Liquid Glass - Warning Style */
     .twm3-confirm-backdrop {
         position: fixed;
         inset: 0;
@@ -204,20 +204,43 @@
         width: min(92vw, 440px);
         background: linear-gradient(
             135deg,
-            rgba(255, 255, 255, 0.95) 0%,
-            rgba(255, 255, 255, 0.90) 100%
+            rgba(251, 146, 60, 0.95) 0%,
+            rgba(249, 115, 22, 0.90) 100%
         );
-        color: #1f2937;
+        color: #fff;
         border-radius: 20px;
         padding: 28px;
-        box-shadow: 
+        box-shadow:
             0 20px 60px rgba(0, 0, 0, 0.3),
             0 8px 20px rgba(0, 0, 0, 0.2),
-            inset 0 1px 1px rgba(255, 255, 255, 0.5);
+            inset 0 1px 1px rgba(255, 255, 255, 0.1);
         backdrop-filter: blur(20px) saturate(180%);
         -webkit-backdrop-filter: blur(20px) saturate(180%);
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border: 1px solid rgba(253, 186, 116, 0.3);
         animation: slideUp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .twm3-confirm::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255, 255, 255, 0.1),
+            transparent
+        );
+        animation: shimmer 2s infinite;
+    }
+
+    @keyframes shimmer {
+        0% { left: -100%; }
+        100% { left: 100%; }
     }
 
     @keyframes slideUp {
@@ -235,12 +258,11 @@
     :root.dark-theme .twm3-confirm {
         background: linear-gradient(
             135deg,
-            rgba(15, 23, 42, 0.95) 0%,
-            rgba(15, 23, 42, 0.90) 100%
+            rgba(251, 146, 60, 0.95) 0%,
+            rgba(249, 115, 22, 0.90) 100%
         );
-        color: #e5e7eb;
-        border-color: rgba(255, 255, 255, 0.1);
-        box-shadow: 
+        border-color: rgba(253, 186, 116, 0.2);
+        box-shadow:
             0 20px 60px rgba(0, 0, 0, 0.6),
             0 8px 20px rgba(0, 0, 0, 0.4);
     }
@@ -250,13 +272,14 @@
         font-size: 1.25rem;
         font-weight: 800;
         color: inherit;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
 
     .twm3-confirm p {
         margin: 0 0 24px 0;
         font-size: 0.95rem;
         line-height: 1.6;
-        opacity: 0.9;
+        opacity: 0.95;
     }
 
     .twm3-confirm .actions {
@@ -274,28 +297,45 @@
         font-size: 14px;
         transition: all 0.2s ease;
         backdrop-filter: blur(10px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     .twm3-confirm .btn.cancel {
-        background: rgba(148, 163, 184, 0.2);
+        background: rgba(255, 255, 255, 0.2);
         color: inherit;
-        border: 1px solid rgba(148, 163, 184, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.3);
     }
 
     .twm3-confirm .btn.cancel:hover {
-        background: rgba(148, 163, 184, 0.3);
+        background: rgba(255, 255, 255, 0.3);
         transform: translateY(-1px);
     }
 
     .twm3-confirm .btn.confirm {
-        background: linear-gradient(135deg, #3b82f6, #2563eb);
-        color: white;
-        box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        background: linear-gradient(135deg, #fff, rgba(255, 255, 255, 0.9));
+        color: #f97316;
+        box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
     }
 
     .twm3-confirm .btn.confirm:hover {
         transform: translateY(-1px);
-        box-shadow: 0 6px 16px rgba(37, 99, 235, 0.5);
+        box-shadow: 0 6px 16px rgba(255, 255, 255, 0.4);
+    }
+
+    /* Confirm Icon */
+    .twm3-confirm-icon {
+        width: 56px;
+        height: 56px;
+        margin: 0 auto 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 16px;
+        font-size: 28px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     /* Responsive */
@@ -303,12 +343,17 @@
         .twm3-toast-container {
             left: 16px;
             right: 16px;
-            bottom: 16px;
+            bottom: 140px;
         }
-        
+
         .twm3-toast {
             min-width: auto;
             max-width: 100%;
+        }
+
+        .twm3-confirm {
+            width: min(95vw, 400px);
+            padding: 24px;
         }
     }
     `;
@@ -399,9 +444,9 @@
 
     window.showConfirm = function(opts = {}) {
         const {
-            title = 'تأكيد',
-            message = 'هل أنت متأكد؟',
-            confirmText = 'نعم',
+            title = 'تأكيد الحذف',
+            message = 'هل أنت متأكد من هذا الإجراء؟',
+            confirmText = 'نعم، احذف',
             cancelText = 'إلغاء'
         } = opts;
 
@@ -411,7 +456,13 @@
 
             const box = document.createElement('div');
             box.className = 'twm3-confirm';
-            box.innerHTML = `<h3>${title}</h3><p>${message}</p>`;
+            box.innerHTML = `
+                <div class="twm3-confirm-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3>${title}</h3>
+                <p>${message}</p>
+            `;
 
             const actions = document.createElement('div');
             actions.className = 'actions';

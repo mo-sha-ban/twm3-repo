@@ -1267,31 +1267,30 @@ body.modal-open {
       </div>
             <form id="addUserForm">
       <div class="form-group">
-                    <label for="userName">الاسم الكامل</label>
-                    <input type="text" id="userName" name="name" required />
+                    <label for="name">الاسم الكامل</label>
+                    <input type="text" id="name" name="name" required />
       </div>
       <div class="form-group">
-                    <label for="userUsername">اسم المستخدم</label>
-                    <input type="text" id="userUsername" name="username" required />
+                    <label for="username">اسم المستخدم</label>
+                    <input type="text" id="username" name="username" required />
       </div>
       <div class="form-group">
-                    <label for="userEmail">البريد الإلكتروني</label>
-                    <input type="email" id="userEmail" name="email" required />
+                    <label for="email">البريد الإلكتروني</label>
+                    <input type="email" id="email" name="email" required />
       </div>
       <div class="form-group">
-                    <label for="userPassword">كلمة المرور</label>
-                    <input type="password" id="userPassword" name="password" required />
+                    <label for="password">كلمة المرور</label>
+                    <input type="password" id="password" name="password" required />
       </div>
       <div class="form-group">
-                    <label for="userPhone">رقم الهاتف</label>
-                    <input type="tel" id="userPhone" name="phone" />
+                    <label for="phone">رقم الهاتف</label>
+                    <input type="tel" id="phone" name="phone" />
       </div>
       <div class="form-group">
-                    <label for="userRole">الدور</label>
-                    <select id="userRole" name="role">
-                        <option value="user">مستخدم</option>
-                        <option value="admin">مدير</option>
-        </select>
+                    <label for="isAdmin">
+                        <input type="checkbox" id="isAdmin" name="isAdmin" />
+                        جعل المستخدم مدير
+                    </label>
       </div>
                 <div class="form-actions">
                     <button type="button" class="btn btn-secondary" onclick="closeAddModal()">إلغاء</button>
@@ -2002,7 +2001,6 @@ body.modal-open {
   <script src="../../js/dashboard.js"></script>
   <script src="dash.js"></script>
   <script src="dash-boot.js"></script>
-  <script src="../../js/ui-toast.js"></script>
   <script src="admin-messaging.js"></script>
   <script src="../../js/messages-ui.js"></script>
   <script src="../../js/notifications.js"></script>

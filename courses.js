@@ -86,9 +86,11 @@
               course.categories.map(cat => escapeHtml(getCategoryName(cat.mainCategory))).join('، ') 
               : '---'}</td>
             <td>
-              <button class="btn btn-primary manage-content-btn" data-id="${course._id}" data-title="${escapeHtml(course.title || '')}">المحتوى</button>
-              <button class="btn btn-secondary edit-course-btn" data-id="${course._id}">تعديل</button>
-              <button class="btn btn-danger delete-course-btn" data-id="${course._id}">حذف</button>
+              <div class="action-buttons">
+                  <button class="btn btn-primary" onclick="editCourse('${c._id}')" title="تعديل"><i class="fas fa-edit"></i></button>
+                  <button class="btn btn-secondary" onclick="manageCourseContent('${c._id}','${(c.title||'').replace(/'/g, "\\'")}', )" title="محتوى"><i class="fas fa-folder-open"></i></button>
+                  <button class="btn btn-danger" onclick="deleteCourse('${c._id}')" title="حذف"><i class="fas fa-trash"></i></button>
+              </div>
             </td>
           </tr>
         `;

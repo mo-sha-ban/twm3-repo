@@ -52,182 +52,48 @@
     <!-- Main Login Section -->
     <div class="auth-page">
         <div class="auth-container">
-            <!-- Login Form -->
-            <div class="auth-form-wrapper login-form active" id="loginForm">
+            <!-- OAuth Login Form -->
+            <div class="auth-form-wrapper oauth-form active" id="oauthForm">
                 <div class="auth-header">
                     <div class="auth-icon">
-                        <i class="fas fa-user-circle"></i>
+                        <i class="fas fa-sign-in-alt"></i>
                     </div>
-                    <h2>مرحباً بعودتك</h2>
-                    <p>سجل دخولك للوصول إلى حسابك</p>
+                    <h2>مرحباً بك في TWM3</h2>
+                    <p>سجل دخولك أو أنشئ حساباً جديداً عبر إحدى المنصات التالية</p>
                 </div>
 
-                <form action="/signup" method="post" class="auth-form">
-                    <div class="form-group">
-                        <label for="login-email">
-                            <i class="fas fa-envelope"></i>
-                            البريد الإلكتروني
-                        </label>
-                        <input
-                            id="login-email"
-                            type="email"
-                            name="email"
-                            autocomplete="email"
-                            placeholder="example@domain.com"
-                            required
-                        >
+                <div class="oauth-section">
+                    <div class="oauth-buttons">
+                        <a href="/api/auth/google" class="oauth-btn google-btn">
+                            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+                            <span>المتابعة باستخدام Google</span>
+                        </a>
+
+                        <a href="/api/auth/github" class="oauth-btn github-btn">
+                            <i class="fab fa-github"></i>
+                            <span>المتابعة باستخدام GitHub</span>
+                        </a>
+
+                        <a href="/api/auth/microsoft" class="oauth-btn microsoft-btn">
+                            <i class="fab fa-microsoft"></i>
+                            <span>المتابعة باستخدام Microsoft</span>
+                        </a>
                     </div>
 
-                    <div class="form-group">
-                        <label for="login-password">
-                            <i class="fas fa-lock"></i>
-                            كلمة المرور
-                        </label>
-                        <input
-                            id="login-password"
-                            type="password"
-                            name="password"
-                            autocomplete="current-password"
-                            placeholder="••••••••"
-                            required
-                        >
+                    <div class="oauth-info">
+                        <p class="oauth-note">
+                            <i class="fas fa-info-circle"></i>
+                            سيتم إنشاء حساب تلقائياً إذا لم يكن لديك حساب مسبق
+                        </p>
+                        <p class="oauth-privacy">
+                            <i class="fas fa-shield-alt"></i>
+                            نحن نحترم خصوصيتك ونستخدم بياناتك بأمان تام
+                        </p>
                     </div>
-
-                    <div class="form-options">
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="remember">
-                            <span>تذكرني</span>
-                        </label>
-                        <a href="#" class="forgot-link">نسيت كلمة المرور؟</a>
-                    </div>
-
-                    <button type="button" class="auth-submit-btn" id="login-submit-btn">
-                        <span>تسجيل الدخول</span>
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-                </form>
-
-                <div class="divider">
-                    <span>أو سجل دخولك عبر</span>
                 </div>
 
-                <div class="social-login">
-                    <a href="/api/auth/google" class="social-btn google-btn">
-                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
-                        <span>Google</span>
-                    </a>
-                    <a href="/api/auth/github" class="social-btn github-btn">
-                        <i class="fab fa-github"></i>
-                        <span>GitHub</span>
-                    </a>
-                </div>
-
-                <div class="auth-switch">
-                    <p>ليس لديك حساب؟ <a href="#" id="showSignup">إنشاء حساب جديد</a></p>
-                </div>
-            </div>
-
-            <!-- Signup Form -->
-            <div class="auth-form-wrapper signup-form" id="signupForm">
-                <div class="auth-header">
-                    <div class="auth-icon">
-                        <i class="fas fa-user-plus"></i>
-                    </div>
-                    <h2>إنشاء حساب جديد</h2>
-                    <p>انضم إلينا وابدأ رحلتك التعليمية</p>
-                </div>
-
-                <form action="/signup" method="post" class="auth-form">
-                    <div class="form-group">
-                        <label for="username">
-                            <i class="fas fa-user"></i>
-                            اسم المستخدم
-                        </label>
-                        <input
-                            id="username"
-                            type="text"
-                            name="username"
-                            autocomplete="username"
-                            placeholder="اسمك الكامل"
-                            required
-                        >
-                    </div>
-
-                    <div class="form-group">
-                        <label for="signup-email">
-                            <i class="fas fa-envelope"></i>
-                            البريد الإلكتروني
-                        </label>
-                        <input
-                            id="signup-email"
-                            type="email"
-                            name="email"
-                            autocomplete="email"
-                            placeholder="example@gmail.com"
-                            required
-                        >
-                    </div>
-
-                    <div class="form-group">
-                        <label for="signup-password">
-                            <i class="fas fa-lock"></i>
-                            كلمة المرور
-                        </label>
-                        <input
-                            id="signup-password"
-                            type="password"
-                            name="password"
-                            autocomplete="new-password"
-                            placeholder="••••••••"
-                            required
-                        >
-                    </div>
-
-                    <div class="form-group">
-                        <label for="repassword">
-                            <i class="fas fa-lock"></i>
-                            تأكيد كلمة المرور
-                        </label>
-                        <input
-                            id="repassword"
-                            type="password"
-                            name="password_confirm"
-                            autocomplete="new-password"
-                            placeholder="••••••••"
-                            required
-                        >
-                    </div>
-
-                    <div class="form-options">
-                        <label class="checkbox-label">
-                            <input type="checkbox" name="terms" required>
-                            <span>أوافق على <a href="terms.html">الشروط والأحكام</a></span>
-                        </label>
-                    </div>
-
-                    <button type="button" class="auth-submit-btn" id="signup-submit-btn">
-                        <span>إنشاء حساب</span>
-                        <i class="fas fa-arrow-left"></i>
-                    </button>
-                </form>
-
-                <div class="divider">
-                    <span>أو سجل عبر</span>
-                </div>
-
-                <div class="social-login">
-                    <a href="/api/auth/google?state=signup" class="social-btn google-btn">
-                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
-                        <span>Google</span>
-                    </a>
-                    <a href="/api/auth/github?state=signup" class="social-btn github-btn">
-                        <i class="fab fa-github"></i>
-                        <span>GitHub</span>
-                    </a>
-                </div>
-
-                <div class="auth-switch">
-                    <p>لديك حساب بالفعل؟ <a href="#" id="showLogin">تسجيل الدخول</a></p>
+                <div class="auth-footer">
+                    <p>من خلال المتابعة، أنت توافق على <a href="terms.html">الشروط والأحكام</a></p>
                 </div>
             </div>
 
@@ -242,42 +108,61 @@
 
     <!-- Footer -->
     <footer id="footer">
-        <div class="container">
-            <div class="social">
-                <h4>Social</h4>
-                <div class="img">
-                    <a href="index.html"><img src="img/logo.png" alt="TWM3" /></a>
+        <div class="footer-container">
+            <div class="footer-main">
+                <div class="footer-brand">
+                    <div class="brand-logo">
+                        <img src="img/logo.png" alt="TWM3 Logo" />
+                        <div class="logo-glow"></div>
+                    </div>
+                    <h3>TWM3</h3>
+                    <p>فريق عمل متخصص في البرمجة والأمن السيبراني</p>
                 </div>
-                <ul>
-                    <a target="_blank" href="https://facebook.com/teamworkm3"><img src="img/Facebook-1.png" alt="Facebook" /></a>
-                    <a target="_blank" href="https://youtube.com/@twm3"><img src="img/Youtube-1.png" alt="YouTube" /></a>
-                    <a target="_blank" href="https://instagram.com/mo_hussien_20"><img src="img/Instagram-1.png" alt="Instagram" /></a>
-                    <a target="_blank" href="https://t.me/teamworkm3"><img src="img/Telegram-1.png" alt="Telegram" /></a>
-                </ul>
+
+                <div class="footer-links">
+                    <h4>روابط سريعة</h4>
+                    <ul>
+                        <li><a href="index.html">الرئيسية</a></li>
+                        <li><a href="courses.html">الكورسات</a></li>
+                        <li><a href="portfolio.html">مشاريعنا</a></li>
+                        <li><a href="roadmap.html">مسارات التعلم</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-social">
+                    <h4>تابعنا</h4>
+                    <div class="social-links">
+                        <a href="https://facebook.com/teamworkm3" target="_blank" class="social-link" title="Facebook">
+                            <img src="img/Facebook-1.png" alt="Facebook" />
+                        </a>
+                        <a href="https://youtube.com/@twm3" target="_blank" class="social-link" title="YouTube">
+                            <img src="img/Youtube-1.png" alt="YouTube" />
+                        </a>
+                        <a href="https://instagram.com/mo_hussien_20" target="_blank" class="social-link" title="Instagram">
+                            <img src="img/Instagram-1.png" alt="Instagram" />
+                        </a>
+                        <a href="https://t.me/teamworkm3" target="_blank" class="social-link" title="Telegram">
+                            <img src="img/Telegram-1.png" alt="Telegram" />
+                        </a>
+                    </div>
+                </div>
             </div>
-            <div class="pages">
-                <h4>pages</h4>
-                <ul>
-                    <li><a href="index.html">الرئيسيه</a></li>
-                    <li><a href="courses.html">الكورسات</a></li>
-                    <li><a href="portfolio.html">مشاريعنا</a></li>
-                    <li><a href="roadmap.html">مسارات التعلم</a></li>
-                </ul>
+
+            <div class="footer-copyright">
+                <p>&copy; <span id="yearData"></span> جميع الحقوق محفوظة لفريق <span class="brand-highlight">TWM3</span> <i class="fas fa-heart heart"></i></p>
             </div>
-            <div class="news">
-                <h4>Blog</h4>
-                <ul>
-                    <li><a target="_blank" href="blog-details.html">ازالة قفل الهاتف</a></li>
-                    <li><a target="_blank" href="blog-details2.html">تغيير موقعك على الخريطه</a></li>
-                    <li><a target="_blank" href="blog-details3.html">الربح من ثغرات الويب</a></li>
-                    <li><a target="_blank" href="blog-details4.html">ازاى تحمى نفسك من الاختراق</a></li>
-                </ul>
+
+            <div class="footer-bg-effects">
+                <div class="floating-particles">
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                </div>
+                <div class="wave-effect"></div>
             </div>
-        </div>
-        <p>all copy Rights Reserved © <span id="yearData"></span>, created by <span>❤</span> by twm3</p>
-        <div class="shape">
-            <img class="footer-shape1" src="img/footer-shape-1.svg" alt="" />
-            <img class="footer-shape2" src="img/footer-shape-2.svg" alt="" />
         </div>
     </footer>
 
@@ -287,25 +172,9 @@
     </div>
 
     <script src="app.js"></script>
+    <script src="js/ui-toast.js"></script>
+    <script src="js/alert-to-toast.js"></script>
     <script>
-        // Form Toggle
-        const showSignupBtn = document.getElementById('showSignup');
-        const showLoginBtn = document.getElementById('showLogin');
-        const loginForm = document.getElementById('loginForm');
-        const signupForm = document.getElementById('signupForm');
-
-        showSignupBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            loginForm.classList.remove('active');
-            signupForm.classList.add('active');
-        });
-
-        showLoginBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            signupForm.classList.remove('active');
-            loginForm.classList.add('active');
-        });
-
         // OAuth Token Capture
         (function(){
             function decodeJwtPayload(t){
@@ -328,10 +197,10 @@
                         if (!avatarUrl && payload.providerId && payload.provider === 'google') {
                             avatarUrl = `https://lh3.googleusercontent.com/a/${payload.providerId}`;
                         }
-                        const minUser = { 
-                            _id: payload._id || payload.id || '', 
-                            email: payload.email || '', 
-                            username: payload.username || '', 
+                        const minUser = {
+                            _id: payload._id || payload.id || '',
+                            email: payload.email || '',
+                            username: payload.username || '',
                             name: payload.name || '',
                             avatarUrl: avatarUrl,
                             provider: payload.provider || 'google',
@@ -365,7 +234,7 @@
                         })
                         .catch(()=>{})
                         .finally(() => {
-                            window.location.replace('/profile.html');
+                            window.location.replace('index.html');
                         });
                 }
             } catch(e) { console.error('OAuth token capture failed', e); }

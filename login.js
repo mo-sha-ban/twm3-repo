@@ -79,7 +79,7 @@
         
         const email = emailInput.value.trim();
         const password = passwordInput.value;
-        
+
         if (!email || !password) {
             if (window.showToast) {
                 window.showToast('يرجى إدخال البريد الإلكتروني وكلمة المرور', {
@@ -90,6 +90,22 @@
                 });
             } else {
                 alert('يرجى إدخال البريد الإلكتروني وكلمة المرور');
+            }
+            return;
+        }
+
+        // التحقق من صحة البريد الإلكتروني
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            if (window.showToast) {
+                window.showToast('يرجى إدخال بريد إلكتروني صحيح', {
+                    type: 'error',
+                    timeout: 4000,
+                    title: 'بريد إلكتروني غير صحيح',
+                    icon: 'fas fa-times-circle'
+                });
+            } else {
+                alert('يرجى إدخال بريد إلكتروني صحيح');
             }
             return;
         }
@@ -115,19 +131,33 @@
                 // Save token and user data
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
-                
+
                 // Success state
                 if (submitBtn) {
                     submitBtn.classList.remove('loading');
                     submitBtn.classList.add('success');
                 }
-                
+
                 // Redirect after short delay
                 setTimeout(() => {
                     window.location.href = '/profile.html';
                 }, 500);
             } else {
-                throw new Error((data && (data.message || data.error)) || 'فشل في تسجيل الدخول');
+                // Handle verification required
+                if (data.requiresVerification) {
+                    if (window.showToast) {
+                        window.showToast(data.message, {
+                            type: 'warning',
+                            timeout: 6000,
+                            title: 'تأكيد مطلوب',
+                            icon: 'fas fa-envelope'
+                        });
+                    } else {
+                        alert(data.message);
+                    }
+                } else {
+                    throw new Error((data && (data.message || data.error)) || 'فشل في تسجيل الدخول');
+                }
             }
         } catch (error) {
             console.error('خطأ في تسجيل الدخول:', error);
@@ -181,6 +211,22 @@
                 });
             } else {
                 alert('يرجى ملء جميع الحقول');
+            }
+            return;
+        }
+
+        // التحقق من صحة البريد الإلكتروني
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            if (window.showToast) {
+                window.showToast('يرجى إدخال بريد إلكتروني صحيح', {
+                    type: 'error',
+                    timeout: 4000,
+                    title: 'بريد إلكتروني غير صحيح',
+                    icon: 'fas fa-times-circle'
+                });
+            } else {
+                alert('يرجى إدخال بريد إلكتروني صحيح');
             }
             return;
         }
@@ -242,40 +288,40 @@
                     submitBtn.classList.remove('loading');
                     submitBtn.classList.add('success');
                 }
-                
+
                 if (window.showToast) {
-                    window.showToast('يمكنك الآن تسجيل الدخول', {
+                    window.showToast(data.message || 'تم إنشاء الحساب بنجاح! تحقق من بريدك الإلكتروني للتأكيد.', {
                         type: 'success',
-                        timeout: 5000,
+                        timeout: 8000,
                         title: 'تم إنشاء الحساب بنجاح! 🎉',
                         icon: 'fas fa-check-circle'
                     });
                 } else {
-                    alert('تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول');
+                    alert(data.message || 'تم إنشاء الحساب بنجاح! تحقق من بريدك الإلكتروني للتأكيد.');
                 }
-                
+
                 // Switch to login form after delay
                 setTimeout(() => {
                     switchToLogin();
-                    
+
                     // Pre-fill email in login form
                     const loginEmailInput = document.getElementById('login-email');
                     if (loginEmailInput) {
                         loginEmailInput.value = email;
                     }
-                    
+
                     // Reset signup form and button
                     if (submitBtn) {
                         submitBtn.classList.remove('success');
                         submitBtn.disabled = false;
                     }
-                    
+
                     // Clear signup form
                     usernameInput.value = '';
                     emailInput.value = '';
                     passwordInput.value = '';
                     repasswordInput.value = '';
-                }, 1500);
+                }, 2000);
             } else {
                 throw new Error((data && (data.message || data.error)) || 'فشل في إنشاء الحساب');
             }
@@ -300,17 +346,85 @@
         }
     }
 
+    // Resend verification email handler
+    async function handleResendVerification(event) {
+        if (event) event.preventDefault();
+
+        const email = prompt('أدخل بريدك الإلكتروني لإعادة إرسال بريد التحقق:');
+        if (!email) return;
+
+        // التحقق من صحة البريد الإلكتروني
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email.trim())) {
+            if (window.showToast) {
+                window.showToast('يرجى إدخال بريد إلكتروني صحيح', {
+                    type: 'error',
+                    timeout: 4000,
+                    title: 'بريد إلكتروني غير صحيح',
+                    icon: 'fas fa-times-circle'
+                });
+            } else {
+                alert('يرجى إدخال بريد إلكتروني صحيح');
+            }
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/resend-verification', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: email.trim() })
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                if (window.showToast) {
+                    window.showToast(data.message, {
+                        type: 'success',
+                        timeout: 5000,
+                        title: 'تم إرسال البريد',
+                        icon: 'fas fa-envelope'
+                    });
+                } else {
+                    alert(data.message);
+                }
+            } else {
+                throw new Error((data && data.message) || 'فشل في إرسال بريد التحقق');
+            }
+        } catch (error) {
+            console.error('خطأ في إعادة إرسال التحقق:', error);
+            if (window.showToast) {
+                window.showToast(error.message || 'حدث خطأ في إرسال بريد التحقق', {
+                    type: 'error',
+                    timeout: 5000,
+                    title: 'فشل الإرسال',
+                    icon: 'fas fa-times-circle'
+                });
+            } else {
+                alert(error.message || 'حدث خطأ في إرسال بريد التحقق');
+            }
+        }
+    }
+
     // Setup event listeners
     function setupEventListeners() {
         const loginBtn = document.getElementById('login-submit-btn');
         const signupBtn = document.getElementById('signup-submit-btn');
-        
+        const resendBtn = document.getElementById('resendVerification');
+
         if (loginBtn) {
             loginBtn.addEventListener('click', handleLogin);
         }
-        
+
         if (signupBtn) {
             signupBtn.addEventListener('click', handleSignup);
+        }
+
+        if (resendBtn) {
+            resendBtn.addEventListener('click', handleResendVerification);
         }
         
         // Allow Enter key to submit
@@ -361,5 +475,6 @@
     // Export functions for inline use if needed
     window.handleLogin = handleLogin;
     window.handleSignup = handleSignup;
+    window.handleResendVerification = handleResendVerification;
 
 })();

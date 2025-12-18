@@ -415,8 +415,8 @@ function displayUsers(users) {
             <td>${user.email || '---'}</td>
             <td>${user.phone || '---'}</td>
             <td>
-                <span class="status-badge status-${user.isAdmin ? 'admin' : 'active'}">
-                    ${user.isAdmin ? 'مدير' : 'نشط'}
+                <span class="status-badge status-${user.isAdmin ? 'admin' : 'inactive'}">
+                    ${user.isAdmin ? 'مدير' : 'مستخدم عادي'}
                 </span>
             </td>
             <td>

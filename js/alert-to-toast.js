@@ -1,10 +1,12 @@
-// Alert to Toast Converter
+// Alert to Toast Converter with Confirm Support
 // This script replaces all alert() calls with beautiful toast notifications
+// and confirm() calls with modern confirm modals
 
 (function() {
-    // Store the original alert function
+    // Store the original alert and confirm functions
     const originalAlert = window.alert;
-    
+    const originalConfirm = window.confirm;
+
     // Override the alert function
     window.alert = function(message) {
         // If toast system is available, use it
@@ -13,12 +15,12 @@
             let type = 'info';
             let title = 'تنبيه';
             let icon = 'fas fa-info-circle';
-            
+
             const messageStr = String(message);
-            
+
             // Success indicators
-            if (messageStr.includes('نجاح') || 
-                messageStr.includes('تم') || 
+            if (messageStr.includes('نجاح') ||
+                messageStr.includes('تم') ||
                 messageStr.includes('✅') ||
                 messageStr.includes('بنجاح')) {
                 type = 'success';
@@ -26,28 +28,28 @@
                 icon = 'fas fa-check-circle';
             }
             // Error indicators
-            else if (messageStr.includes('خطأ') || 
-                     messageStr.includes('فشل') || 
-                     messageStr.includes('❌') ||
-                     messageStr.includes('Error') ||
-                     messageStr.includes('تعذر')) {
+            else if (messageStr.includes('خطأ') ||
+                      messageStr.includes('فشل') ||
+                      messageStr.includes('❌') ||
+                      messageStr.includes('Error') ||
+                      messageStr.includes('تعذر')) {
                 type = 'error';
                 title = 'خطأ';
                 icon = 'fas fa-times-circle';
             }
             // Warning indicators
-            else if (messageStr.includes('تحذير') || 
-                     messageStr.includes('⚠️') ||
-                     messageStr.includes('يجب') ||
-                     messageStr.includes('يرجى')) {
+            else if (messageStr.includes('تحذير') ||
+                      messageStr.includes('⚠️') ||
+                      messageStr.includes('يجب') ||
+                      messageStr.includes('يرجى')) {
                 type = 'warning';
                 title = 'تحذير';
                 icon = 'fas fa-exclamation-triangle';
             }
-            
+
             window.showToast(messageStr, {
                 type: type,
-                timeout: 5000,
+                timeout: 4000,
                 title: title,
                 icon: icon
             });
@@ -56,7 +58,24 @@
             originalAlert.call(window, message);
         }
     };
-    
-    // Also provide a way to access original alert if needed
+
+    // Override the confirm function
+    window.confirm = function(message) {
+        // If confirm system is available, use it
+        if (window.showConfirm) {
+            return window.showConfirm({
+                title: 'تأكيد الحذف',
+                message: String(message),
+                confirmText: 'نعم، احذف',
+                cancelText: 'إلغاء'
+            });
+        } else {
+            // Fallback to original confirm if not available
+            return originalConfirm.call(window, message);
+        }
+    };
+
+    // Also provide a way to access original functions if needed
     window.originalAlert = originalAlert;
+    window.originalConfirm = originalConfirm;
 })();

@@ -218,7 +218,7 @@ body {
 }
 
 .profile-role {
-    display: inline-block;
+    display: none; /* Hidden by default, shown only for admins via JS */
     padding: 0.25rem 0.75rem;
     border-radius: var(--radius-sm);
     font-size: 0.9rem;
@@ -628,7 +628,7 @@ body.dark .progress-fill,
 
     .sidebar {
         width: 280px;
-        right: -280px;
+        right: -300px;
     }
 
     .card {
@@ -639,12 +639,37 @@ body.dark .progress-fill,
 
 @media (max-width: 480px) {
     .header-title {
-        font-size: 1.2rem;
+        font-size: 1rem;
     }
-
+    .action-btn {
+        padding: 0.5rem;
+    }
+    .theme-toggle {
+        padding: 0.5rem;
+    }
     .card {
         padding: 1rem;
         max-height: 400px; /* Even smaller on mobile */
+    }
+
+    .comment-actions {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+}
+@media (max-width: 400px) {
+    .header-title {
+        display: none;
+    }
+    .action-btn {
+        padding: 0.5rem;
+    }
+    .theme-toggle {
+        padding: 0.5rem;
+    }
+    .card {
+        padding: 1rem;
+        max-height: 350px; /* Even smaller on mobile */
     }
 
     .comment-actions {

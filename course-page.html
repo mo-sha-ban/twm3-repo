@@ -782,6 +782,79 @@
           flex-direction: column;
         }
       }
+
+      /* Simple Toast Styles */
+      .course-toast-container {
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        z-index: 10000;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .course-toast {
+        background: linear-gradient(135deg, rgba(34, 197, 94, 0.95), rgba(22, 163, 74, 0.95));
+        color: white;
+        padding: 16px 20px;
+        border-radius: 12px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        font-weight: 600;
+        font-size: 14px;
+        max-width: 400px;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .course-toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .course-toast.error {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.95), rgba(220, 38, 38, 0.95));
+      }
+
+      .course-toast-title {
+        font-weight: 800;
+        font-size: 16px;
+        margin-bottom: 4px;
+      }
+
+      .course-toast-close {
+        position: absolute;
+        top: 8px;
+        left: 8px;
+        background: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .course-toast-content {
+        padding-left: 32px;
+      }
+
+      @media (max-width: 640px) {
+        .course-toast-container {
+          left: 10px;
+          right: 10px;
+          bottom: 10px;
+        }
+        .course-toast {
+          max-width: none;
+        }
+      }
     </style>
   </head>
   <body>
@@ -878,45 +951,64 @@
 
     <!-- Start Footer  -->
     <footer id="footer">
-      <div class="container">
-          <div class="social">
-              <h4>Social</h4>
-              <div class="img">
-                  <a href="index.html" aria-label="الصفحة الرئيسية"><img src="img/logo.png" alt="شعار الموقع" /></a>
-              </div>
-              <ul class="social-links">
-                  <li><a target="_blank" rel="noopener" href="https://facebook.com/teamworkm3" aria-label="Facebook"><img src="img/Facebook-1.png" alt="Facebook" /></a></li>
-                  <li><a target="_blank" rel="noopener" href="https://youtube.com/@twm3" aria-label="YouTube"><img src="img/Youtube-1.png" alt="YouTube" /></a></li>
-                  <li><a target="_blank" rel="noopener" href="https://instagram.com/mo_hussien_20" aria-label="Instagram"><img src="img/Instagram-1.png" alt="Instagram"/></a></li>
-                  <li><a target="_blank" rel="noopener" href="https://t.me/teamworkm3" aria-label="Telegram"><img src="img/Telegram-1.png" alt="Telegram" /></a></li>
-              </ul>
-          </div>
-          <div class="pages">
-              <h4>pages</h4>
-              <ul>
-                  <li><a href="index.html">الرئيسيه</a></li>
-                  <li><a href="courses.html">الكورسات</a></li>
-                  <li><a href="portfolio.html">مشاريعنا</a></li>
-                  <li><a href="roadmap.html">مسارات التعلم</a></li>
-              </ul>
-          </div>
-          <div class="news">
-              <h4>Blog</h4>
-              <ul>
-                  <li><a target="_blank" href="blog-details.html"> ازالة قفل الهاتف</a></li>
-                  <li><a target="_blank" href="blog-details2.html">تغيير موقعك على الخريطه</a></li>
-                  <li><a target="_blank" href="blog-details3.html">الربح من ثغرات الويب</a></li>
-                  <li><a target="_blank" href="blog-details4.html"> ازاى تحمى نفسك من الاختراق</a></li>
-              </ul>
-          </div>
-      </div>
-      <p> all copy Rights Reserved © <span id="yearData"></span> , created by <span>❤</span> by twm3</p>
-      <div class="shape">
-          <img class="footer-shape1" src="img/footer-shape-1.svg" alt="" />
-          <img class="footer-shape2" src="img/footer-shape-2.svg" alt="" />
-      </div>
-  </footer>
-  <!-- End Footer  -->
+        <div class="footer-container">
+            <div class="footer-main">
+                <div class="footer-brand">
+                    <div class="brand-logo">
+                        <img src="img/logo.png" alt="TWM3 Logo" />
+                        <div class="logo-glow"></div>
+                    </div>
+                    <h3>TWM3</h3>
+                    <p>فريق عمل متخصص في البرمجة والأمن السيبراني</p>
+                </div>
+
+                <div class="footer-links">
+                    <h4>روابط سريعة</h4>
+                    <ul>
+                        <li><a href="index.html">الرئيسية</a></li>
+                        <li><a href="courses.html">الكورسات</a></li>
+                        <li><a href="portfolio.html">مشاريعنا</a></li>
+                        <li><a href="roadmap.html">مسارات التعلم</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-social">
+                    <h4>تابعنا</h4>
+                    <div class="social-links">
+                        <a href="https://facebook.com/teamworkm3" target="_blank" class="social-link" title="Facebook">
+                            <img src="img/Facebook-1.png" alt="Facebook" />
+                        </a>
+                        <a href="https://youtube.com/@twm3" target="_blank" class="social-link" title="YouTube">
+                            <img src="img/Youtube-1.png" alt="YouTube" />
+                        </a>
+                        <a href="https://instagram.com/mo_hussien_20" target="_blank" class="social-link" title="Instagram">
+                            <img src="img/Instagram-1.png" alt="Instagram" />
+                        </a>
+                        <a href="https://t.me/teamworkm3" target="_blank" class="social-link" title="Telegram">
+                            <img src="img/Telegram-1.png" alt="Telegram" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-copyright">
+                <p>&copy; <span id="yearData"></span> جميع الحقوق محفوظة لفريق <span class="brand-highlight">TWM3</span> <i class="fas fa-heart heart"></i></p>
+            </div>
+
+            <div class="footer-bg-effects">
+                <div class="floating-particles">
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                    <div class="particle"></div>
+                </div>
+                <div class="wave-effect"></div>
+            </div>
+        </div>
+    </footer>
+    <!-- End Footer  -->
 
     <!-- Start up tp top  -->
     <div class="up">
@@ -924,13 +1016,75 @@
     </div>
     <!-- End up tp top  -->
 
+    <!-- Toast Container -->
+    <div id="courseToastContainer" class="course-toast-container"></div>
+
     <script src="app.js"></script>
     <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
     <script>window.disableGlobalPlyrAutoInit = true;</script>
-    <script src="js/ui-toast.js"></script>
-    <script src="js/alert-to-toast.js"></script>
     <script src="js/video-player.js"></script>
     <script>
+        // Simple Toast System
+        let activeToast = null; // Prevent multiple toasts
+
+        function showCourseToast(message, options = {}) {
+            const { type = 'success', title = '', timeout = 8000 } = options; // Increased default timeout
+
+            const container = document.getElementById('courseToastContainer');
+            if (!container) return;
+
+            // Remove existing toast if present
+            if (activeToast) {
+                activeToast.classList.remove('show');
+                setTimeout(() => {
+                    if (activeToast && activeToast.parentElement) {
+                        activeToast.remove();
+                    }
+                }, 300);
+            }
+
+            const toast = document.createElement('div');
+            toast.className = `course-toast ${type}`;
+
+            let content = '';
+            if (title) {
+                content += `<div class="course-toast-title">${title}</div>`;
+            }
+            content += `<div class="course-toast-content">${message}</div>`;
+
+            toast.innerHTML = `
+                <button class="course-toast-close" onclick="this.parentElement.remove(); activeToast = null;">×</button>
+                ${content}
+            `;
+
+            container.appendChild(toast);
+            activeToast = toast;
+
+            // Show the toast
+            setTimeout(() => {
+                if (toast && toast.parentElement) {
+                    toast.classList.add('show');
+                }
+            }, 10);
+
+            // Auto hide with longer delay
+            if (timeout > 0) {
+                setTimeout(() => {
+                    if (toast && toast.parentElement) {
+                        toast.classList.remove('show');
+                        setTimeout(() => {
+                            if (toast && toast.parentElement) {
+                                toast.remove();
+                                activeToast = null;
+                            }
+                        }, 300);
+                    }
+                }, timeout);
+            }
+
+            return toast;
+        }
+
         let currentCourse = null;
         let currentModuleIndex = 0;
         let currentLessonIndex = 0;
@@ -1069,14 +1223,11 @@
             if (!completedLessons.has(lessonKey)) {
                 markLessonAsCompleted(moduleIndex, lessonIndex);
             } else {
-                if (window.showToast) {
-                    window.showToast('هذا الدرس مكتمل بالفعل', {
-                        type: 'info',
-                        timeout: 3000,
-                        title: 'معلومة',
-                        icon: 'fas fa-check-circle'
-                    });
-                }
+                showCourseToast('هذا الدرس مكتمل بالفعل', {
+                    type: 'info',
+                    timeout: 6000,
+                    title: 'معلومة'
+                });
             }
         };
 
@@ -1092,9 +1243,7 @@
             }
 
             // Show error toast
-            if (window.showToast) {
-                window.showToast(`⚠️ تعذر عرض ملف PDF: ${lessonTitle}`, { type: 'error', timeout: 5000 });
-            }
+            showCourseToast(`⚠️ تعذر عرض ملف PDF: ${lessonTitle}`, { type: 'error', timeout: 5000 });
 
             console.error('PDF viewing failed, showing fallback for:', pdfSrc);
         }
@@ -1608,14 +1757,11 @@
 
             // Use setTimeout to ensure toast shows after DOM updates
             setTimeout(() => {
-                if (window.showToast) {
-                    window.showToast(`تم إكمال ${lessonTitle} بنجاح!`, {
-                        type: 'success',
-                        timeout: 5000,
-                        title: 'إنجاز رائع! 🎉',
-                        icon: 'fas fa-trophy'
-                    });
-                }
+                showCourseToast(`تم إكمال ${lessonTitle} بنجاح!`, {
+                    type: 'success',
+                    timeout: 5000,
+                    title: 'إنجاز رائع! 🎉'
+                });
             }, 100);
         }
 
@@ -1703,7 +1849,7 @@
                                 return false;
                             }
 
-                            const response = await fetch('/api/courses/progress/complete', {
+                            const response = await fetch('/api/progress/complete', {
                                 method: 'POST',
                                 headers: {
                                     'Content-Type': 'application/json',
@@ -1739,7 +1885,7 @@
                     const progressPercent = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
                     // Fetch updated progress summary to ensure we have latest data
-                    const summaryResponse = await fetch('/api/courses/progress/summary', {
+                    const summaryResponse = await fetch('/api/progress/summary', {
                         headers: { 'Authorization': 'Bearer ' + token }
                     });
 
@@ -2058,7 +2204,7 @@
                     }
                 });
 
-                const response = await fetch('/api/courses/progress/sync', {
+                const response = await fetch('/api/progress/sync', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2074,13 +2220,11 @@
                 if (response.ok) {
                     const result = await response.json();
                     console.log('Successfully synced progress to server:', result);
-                    if (window.showToast) {
-                        window.showToast('تم مزامنة التقدم مع السيرفر بنجاح', {
-                            type: 'success',
-                            timeout: 3000,
-                            title: 'مزامنة ناجحة'
-                        });
-                    }
+                    showCourseToast('تم مزامنة التقدم مع السيرفر بنجاح', {
+                        type: 'success',
+                        timeout: 3000,
+                        title: 'مزامنة ناجحة'
+                    });
                 } else {
                     console.error('Failed to sync progress to server:', response.status);
                     const errorText = await response.text().catch(() => 'Unknown error');

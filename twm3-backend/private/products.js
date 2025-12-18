@@ -62,7 +62,11 @@
     function initQuill() {
         const editorElement = document.getElementById('productLongDescription');
         if (editorElement && typeof Quill !== 'undefined') {
-            if (window.quill) return; // Already initialized
+            // If Quill already exists, destroy it first
+            if (window.quill) {
+                window.quill = null;
+            }
+            
             editorElement.innerHTML = ''; // Clear any existing content
 
             // VideoBlot should already be registered by initProducts()
@@ -92,32 +96,11 @@
                 placeholder: 'اكتب وصف المنتج هنا...'
             });
             
-            // Add custom upload video handler
-            addQuillVideoUploadHandler();
-        }
-    }
-
-    // Add Quill video upload handler
-    function addQuillVideoUploadHandler() {
-        if (!window.quill) return;
-        
-        // Try to find video button in toolbar
-        const toolbar = document.querySelector('.ql-toolbar');
-        if (toolbar) {
-            // Create custom button if not found
-            const videoBtnGroup = document.createElement('span');
-            videoBtnGroup.className = 'ql-formats';
-            const uploadVideoBtn = document.createElement('button');
-            uploadVideoBtn.type = 'button';
-            uploadVideoBtn.className = 'ql-uploadVideo';
-            uploadVideoBtn.title = 'رفع فيديو محلي';
-            uploadVideoBtn.innerHTML = '<i class="fas fa-video" style="font-size: 14px;"></i>';
-            uploadVideoBtn.onclick = (e) => {
-                e.preventDefault();
-                openQuillVideoUploadDialog();
-            };
-            videoBtnGroup.appendChild(uploadVideoBtn);
-            toolbar.appendChild(videoBtnGroup);
+            // Remove toolbar completely from DOM
+            const toolbar = document.querySelector('.ql-toolbar');
+            if (toolbar) {
+                toolbar.remove();
+            }
         }
     }
 
@@ -711,8 +694,10 @@
                 <td>${escapeHtml(product.category || '')}</td>
                 <td><span class="status ${product.inStock ? 'active' : 'inactive'}">${product.inStock ? 'متوفر' : 'غير متوفر'}</span></td>
                 <td>
-                    <button class="btn btn-primary btn-sm btn-edit" data-id="${product._id}"><i class="fas fa-edit"></i> تعديل</button>
-                    <button class="btn btn-danger btn-sm btn-delete" data-id="${product._id}"><i class="fas fa-trash"></i> حذف</button>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary btn-sm btn-edit" data-id="${product._id}"><i class="fas fa-edit"></i> </button>
+                        <button class="btn btn-danger btn-sm btn-delete" data-id="${product._id}"><i class="fas fa-trash"></i> </button>
+                    </div>
                 </td>
             `;
             tbody.appendChild(row);
@@ -746,7 +731,13 @@
     }
 
     async function deleteProduct(productId) {
-        if (!confirm('هل أنت متأكد من حذف هذا المنتج؟')) return;
+        const confirmed = await showConfirm({
+            title: 'تأكيد حذف المنتج',
+            message: 'هل أنت متأكد من حذف هذا المنتج؟',
+            confirmText: 'نعم، احذف المنتج',
+            cancelText: 'إلغاء'
+        });
+        if (!confirmed) return;
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(`/api/products/${productId}`, {
@@ -757,11 +748,11 @@
                 const errorData = await response.json().catch(() => ({}));
                 throw new Error(errorData.message || errorData.error || 'فشل في حذف المنتج');
             }
-            alert('تم حذف المنتج بنجاح!');
+            showToast('تم الحذف', 'تم حذف المنتج بنجاح', 'success');
             loadProducts();
         } catch (error) {
             console.error('Error deleting product:', error);
-            alert(`خطأ: ${error.message}`);
+            showToast('خطأ', error.message, 'error');
         }
     }
 
@@ -820,6 +811,8 @@
 
     // --- Expose functions to global scope ---
     window.initProducts = initProducts;
+    window.loadProducts = loadProducts;
+    window.renderProducts = renderProducts;
     window.openAddProductModal = openAddProductModal;
     window.editProduct = openEditProductModal;
     window.deleteProduct = deleteProduct;

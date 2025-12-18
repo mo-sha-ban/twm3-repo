@@ -309,64 +309,165 @@
     font-weight: 500;
 }
 
-/* Social Login */
-.social-login {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+/* OAuth Section */
+.oauth-section {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.oauth-buttons {
+    display: flex;
+    flex-direction: column;
     gap: 1rem;
     margin-bottom: 2rem;
 }
 
-.social-btn {
-    display: flex;
+.oauth-btn {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.75rem;
-    padding: 0.875rem 1rem;
+    gap: 1rem;
+    padding: 1rem 2rem;
     border: 2px solid var(--auth-border);
-    border-radius: 12px;
+    border-radius: 16px;
     text-decoration: none;
     font-weight: 600;
+    font-size: 1rem;
     transition: all var(--auth-transition);
     font-family: 'Marhey', cursive;
-    font-size: 0.95rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.social-btn img,
-.social-btn i {
-    width: 20px;
-    height: 20px;
-    font-size: 1.25rem;
+.oauth-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
 }
 
+.oauth-btn:hover::before {
+    left: 100%;
+}
+
+.oauth-btn img,
+.oauth-btn i {
+    width: 24px;
+    height: 24px;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.oauth-btn span {
+    flex: 1;
+    text-align: center;
+}
+
+/* OAuth Button Styles */
 .google-btn {
-    background: white;
-    color: #111;
-}
-
-.github-btn {
-    background: #24292e;
-    color: white;
-    border-color: #24292e;
-}
-
-.dark-theme .google-btn {
-    background: #f8f9fa;
-    border-color: #e5e7eb;
-}
-
-.social-btn:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-    border-color: var(--auth-primary);
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    color: #3c4043;
+    border-color: #dadce0;
 }
 
 .google-btn:hover {
-    background: #f8f9fa;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e8eaed 100%);
+    border-color: #c4c7c5;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(66, 133, 244, 0.3);
+}
+
+.github-btn {
+    background: linear-gradient(135deg, #24292e 0%, #1a1f24 100%);
+    color: #ffffff;
+    border-color: #24292e;
 }
 
 .github-btn:hover {
-    background: #1a1f24;
+    background: linear-gradient(135deg, #1a1f24 0%, #0d1117 100%);
+    border-color: #1a1f24;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+.microsoft-btn {
+    background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+    color: #ffffff;
+    border-color: #0078d4;
+}
+
+.microsoft-btn:hover {
+    background: linear-gradient(135deg, #005a9e 0%, #004578 100%);
+    border-color: #005a9e;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 120, 212, 0.4);
+}
+
+.dark-theme .google-btn {
+    background: linear-gradient(135deg, #3c4043 0%, #202124 100%);
+    color: #e8eaed;
+    border-color: #5f6368;
+}
+
+.dark-theme .google-btn:hover {
+    background: linear-gradient(135deg, #202124 0%, #1a1c1f 100%);
+    border-color: #3c4043;
+}
+
+/* OAuth Info */
+.oauth-info {
+    margin-bottom: 2rem;
+}
+
+.oauth-note,
+.oauth-privacy {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--auth-text-muted);
+    margin-bottom: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(33, 150, 243, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(33, 150, 243, 0.1);
+}
+
+.oauth-note i,
+.oauth-privacy i {
+    color: var(--auth-primary);
+    font-size: 1rem;
+}
+
+/* Auth Footer */
+.auth-footer {
+    text-align: center;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--auth-border);
+}
+
+.auth-footer p {
+    color: var(--auth-text-muted);
+    font-size: 0.85rem;
+    margin: 0;
+}
+
+.auth-footer a {
+    color: var(--auth-primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: color var(--auth-transition);
+}
+
+.auth-footer a:hover {
+    color: var(--auth-primary-dark);
+    text-decoration: underline;
 }
 
 /* Auth Switch */

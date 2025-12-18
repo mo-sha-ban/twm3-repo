@@ -244,11 +244,11 @@ body {
 }
 
 .content-section {
-    display: none;
+    display: none !important;
 }
 
 .content-section.active {
-    display: block;
+    display: block !important;
 }
 
 .section-header {
@@ -391,6 +391,32 @@ body {
 .status.admin {
     background: var(--primary-color);
     color: white;
+}
+
+.status.user {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
+}
+
+/* Status Badge Variant */
+.status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-sm);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: center;
+    display: inline-block;
+    min-width: 80px;
+}
+
+.status-badge.status-admin {
+    background: var(--primary-color);
+    color: white;
+}
+
+.status-badge.status-inactive {
+    background: var(--bg-tertiary);
+    color: var(--text-secondary);
 }
 
 /* Buttons */
@@ -922,10 +948,17 @@ form {
     .data-table td {
         padding: 0.75rem 0.5rem;
     }
+    .data-table td:last-child {
+        display: flex;
+    }
 
     .action-buttons {
-        flex-direction: column;
         gap: 0.25rem;
+    }
+
+    .action-buttons .btn {
+        padding: 0.4rem 0.5rem;
+        font-size: 0.75rem;
     }
 
     .modal-content {
@@ -1254,3 +1287,5 @@ form {
 .ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke {
     stroke: var(--primary-color);
 }
+
+

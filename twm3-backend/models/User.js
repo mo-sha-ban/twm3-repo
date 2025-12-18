@@ -13,6 +13,8 @@ const userSchema = new mongoose.Schema({
     avatarUrl: { type: String, default: "" },
     isAdmin: { type: Boolean, default: false },
     isVerified: { type: Boolean, default: false },
+    verificationToken: { type: String },
+    verificationExpires: { type: Date },
     isBlocked: { type: Boolean, default: false },
     // users this user has blocked
     blockedUsers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
