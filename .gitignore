@@ -10,3 +10,5 @@ uploads/
 dist/
 build/
 coverage/
+twm3-backend/.env
+twm3-backend/.env.production
