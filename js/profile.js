@@ -441,7 +441,10 @@ function getFullAvatarUrl(avatarUrl) {
     if (/^https?:\/\//i.test(avatarUrl)) return avatarUrl;
 
     // Some stored avatarUrl may already include leading slash; ensure single slash
-    const origin = window.location.origin && window.location.origin.includes('localhost:5000') ? window.location.origin : 'http://localhost:5000';
+    const origin = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+        ? 'http://localhost:5000'
+        : window.location.origin;
+        
     if (avatarUrl.startsWith('/')) return origin + avatarUrl;
     return origin + '/' + avatarUrl;
 }
