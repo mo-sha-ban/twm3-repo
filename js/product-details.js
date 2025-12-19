@@ -952,8 +952,50 @@
         }
     }
 
+    function showToast(title, message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `
+            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i>
+            <span>${message}</span>
+        `;
+        document.body.appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+
     function addToCart() {
-        alert(`تم إضافة ${quantity} من ${currentProduct.name} إلى السلة`);
+        if (!currentProduct) return;
+        
+        try {
+            const cartData = localStorage.getItem('cartItems');
+            let cartItems = cartData ? JSON.parse(cartData) : [];
+            
+            const productId = currentProduct._id || currentProduct.id;
+            const existingItemIndex = cartItems.findIndex(item => item.productId === productId);
+
+            if (existingItemIndex !== -1) {
+                 cartItems[existingItemIndex].quantity = (cartItems[existingItemIndex].quantity || 1) + quantity;
+            } else {
+                cartItems.push({
+                    productId: productId,
+                    quantity: quantity,
+                    addedAt: new Date().toISOString()
+                });
+            }
+
+            localStorage.setItem('cartItems', JSON.stringify(cartItems));
+            
+            if (window.updateCartBadge) window.updateCartBadge();
+            
+            showToast('نجاح', `تم إضافة ${quantity} من ${currentProduct.name} إلى السلة`, 'success');
+
+        } catch (error) {
+            console.error('Error adding to cart:', error);
+            showToast('خطأ', 'فشل إضافة المنتج للسلة', 'error');
+        }
     }
 
     function buyNow() {

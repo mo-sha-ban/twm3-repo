@@ -18,35 +18,8 @@ bars && list && bars.addEventListener('click', () =>{
    //  End nav menu 
 
 
-   //------------------------------- Start dark theme
-   const mode = document.getElementById('colorMode');
-   const body = document.querySelector('body');
+   // Theme Management handled by theme-manager.js
 
-   let getMode = localStorage.getItem('mode');
-   if (mode && getMode == 'dark') {
-      document.body.classList.add('dark-theme');
-      // Don't add 'active' class for dark mode - active shows sun (light mode)
-   }
-   if (mode && getMode == 'light') {
-      mode.classList.add('active'); // Active shows sun for light mode
-   }
-   if (mode) {
-      mode.onclick = () => {
-         mode.classList.toggle('active');
-         document.body.classList.toggle('dark-theme');
-
-         if(body && body.classList.contains('dark-theme')) {
-            localStorage.setItem('mode', 'dark');
-         } else {
-            localStorage.setItem('mode', 'light');
-         }
-      };
-   }
-
-
-
-
-   //------------------------------ End dark theme 
 
 // Global Modal Management
 function openModal(modalId) {

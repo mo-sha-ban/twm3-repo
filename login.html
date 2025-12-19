@@ -177,27 +177,24 @@
     <script>
         // Load config from backend endpoint /api/config
         document.addEventListener('DOMContentLoaded', function() {
-            // Using relative paths is safer and works for both local and prod if served from same origin/proxy
-            const googleBtn = document.querySelector('.google-btn');
-            const githubBtn = document.querySelector('.github-btn');
-            const microsoftBtn = document.querySelector('.microsoft-btn');
-            
-            // Default to relative paths which should work if /api is proxied
-            if (googleBtn) googleBtn.href = '/api/auth/google';
-            if (githubBtn) githubBtn.href = '/api/auth/github';
-            if (microsoftBtn) microsoftBtn.href = '/api/auth/microsoft';
-
             fetch('/api/config')
                 .then(response => response.json())
                 .then(config => {
-                    // Only override if we specifically get a different valid URL and we are not in simple proxy mode
-                    // But for this setup, hardcoding relative paths or using the config strictly if needed is key.
-                    // The issue was it was falling back to localhost. 
-                    
-                    // If we want to use the config's base url ONLY if it is not localhost (or if we are on localhost)
                     const apiBaseUrl = config.FRONTEND_BASE_URL;
-                    // Intentionally NOT overwriting with apiBaseUrl if it looks like we are in prod but getting localhost
-                    // For now, the relative paths set above /auth/google are likely correct given the root mounting in server.js
+                    if (apiBaseUrl) {
+                        const googleBtn = document.querySelector('.google-btn');
+                        const githubBtn = document.querySelector('.github-btn');
+                        const microsoftBtn = document.querySelector('.microsoft-btn');
+                        if (googleBtn) {
+                            googleBtn.href = apiBaseUrl + '/api/auth/google';
+                        }
+                        if (githubBtn) {
+                            githubBtn.href = apiBaseUrl + '/api/auth/github';
+                        }
+                        if (microsoftBtn) {
+                            microsoftBtn.href = apiBaseUrl + '/api/auth/microsoft';
+                        }
+                    }
                 })
                 .catch(error => console.error('Error loading config:', error));
         });

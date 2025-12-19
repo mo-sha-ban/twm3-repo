@@ -7,7 +7,7 @@ let isDarkMode = false;
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
     (async () => {
-        initializeTheme();
+        // initializeTheme(); // Handled by ThemeManager
         initializeSidebar();
         initializeProfile();
         await loadUserData();
@@ -17,33 +17,9 @@ document.addEventListener('DOMContentLoaded', function() {
     })();
 });
 
-// Theme Management
-function initializeTheme() {
-    const savedTheme = localStorage.getItem('theme');
-    isDarkMode = savedTheme === 'dark';
-    updateTheme();
-    
-    document.getElementById('theme-toggle').addEventListener('click', toggleTheme);
-}
+// Theme Management handled by theme-manager.js
+// No internal logic needed here anymore
 
-function toggleTheme() {
-    isDarkMode = !isDarkMode;
-    updateTheme();
-    localStorage.setItem('theme', isDarkMode ? 'dark' : 'light');
-}
-
-function updateTheme() {
-    const body = document.body;
-    const themeIcon = document.querySelector('#theme-toggle i');
-    
-    if (isDarkMode) {
-        body.setAttribute('data-theme', 'dark');
-        themeIcon.className = 'fas fa-sun';
-    } else {
-        body.removeAttribute('data-theme');
-        themeIcon.className = 'fas fa-moon';
-    }
-}
 
 // Sidebar Management
 function initializeSidebar() {
