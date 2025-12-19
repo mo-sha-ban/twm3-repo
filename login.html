@@ -183,9 +183,9 @@
             const microsoftBtn = document.querySelector('.microsoft-btn');
             
             // Default to relative paths which should work if /api is proxied
-            if (googleBtn) googleBtn.href = '/auth/google';
-            if (githubBtn) githubBtn.href = '/auth/github';
-            if (microsoftBtn) microsoftBtn.href = '/auth/microsoft';
+            if (googleBtn) googleBtn.href = '/api/auth/google';
+            if (githubBtn) githubBtn.href = '/api/auth/github';
+            if (microsoftBtn) microsoftBtn.href = '/api/auth/microsoft';
 
             fetch('/api/config')
                 .then(response => response.json())

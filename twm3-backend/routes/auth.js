@@ -56,7 +56,9 @@ router.get('/auth/google', (req, res) => {
         ];
         const params = {
             client_id: GOOGLE_CLIENT_ID,
-            redirect_uri: GOOGLE_CALLBACK_URL,
+            redirect_uri: (req.hostname === 'localhost' || req.hostname === '127.0.0.1')
+                ? 'http://localhost:5000/api/auth/google/callback'
+                : 'https://twm3.org/api/auth/google/callback',
             response_type: 'code',
             scope: scope.join(' '),
             access_type: 'offline',
@@ -87,7 +89,9 @@ router.get('/auth/google/callback', async (req, res) => {
                 code,
                 client_id: GOOGLE_CLIENT_ID,
                 client_secret: GOOGLE_CLIENT_SECRET,
-                redirect_uri: GOOGLE_CALLBACK_URL,
+                redirect_uri: (req.hostname === 'localhost' || req.hostname === '127.0.0.1')
+                    ? 'http://localhost:5000/api/auth/google/callback'
+                    : 'https://twm3.org/api/auth/google/callback',
                 grant_type: 'authorization_code'
             })
         });
