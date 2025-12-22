@@ -682,6 +682,7 @@ body.modal-open {
     background: #f7fafc;
     position: relative;
     overflow: hidden;
+    padding-top: 40px;
 }
 
 .primary-image-slot:hover {
@@ -2047,7 +2048,7 @@ body.modal-open {
           <button type="button" id="addVideoBtn" class="media-choice-btn"><i class="fas fa-video"></i><span>فيديو</span></button>
           <button type="button" id="addLinkBtn" class="media-choice-btn"><i class="fas fa-link"></i><span>رابط</span></button>
         </div>
-        <input type="file" id="media-file-input" style="display:none;" accept="image/*,video/*" />
+        <input type="file" id="media-file-input" style="display:none;" accept="image/*,video/*" multiple />
       </div>
     </div>
 
@@ -2175,7 +2176,7 @@ body.modal-open {
               <div class="form-group">
                 <label>رفع صورة من الجهاز</label>
                 <div class="file-upload-wrapper">
-                  <input type="file" id="adminImageFile" accept="image/*" style="display:none;">
+                  <input type="file" id="adminImageFile" accept="image/*" style="display:none;" multiple>
                   <button type="button" class="file-upload-btn" id="adminImageFileBtn">
                     <i class="fas fa-upload"></i>
                     اختر صورة
@@ -2207,7 +2208,7 @@ body.modal-open {
               <div class="form-group">
                 <label>رفع فيديو من الجهاز</label>
                 <div class="file-upload-wrapper">
-                  <input type="file" id="adminVideoFile" accept="video/*" style="display:none;">
+                  <input type="file" id="adminVideoFile" accept="video/*" style="display:none;" multiple>
                   <button type="button" class="file-upload-btn" id="adminVideoFileBtn">
                     <i class="fas fa-upload"></i>
                     اختر فيديو

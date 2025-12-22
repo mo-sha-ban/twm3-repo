@@ -239,7 +239,7 @@
               <i class="fas fa-eye"></i>
               عرض التفاصيل
             </button>
-            ${product.inStock ? `
+            ${(product.inStock !== false && product.available !== false) ? `
               <button class="btn btn-secondary" onclick="addToCart('${product._id}')">
                 <i class="fas fa-cart-plus"></i>
                 إضافة للسلة
@@ -297,8 +297,12 @@
               return;
           }
 
+          if (!product || product.inStock === false || product.available === false) {
+              showToast('هذا المنتج غير متوفر حالياً', 'error');
+              return;
+          }
+          
           // Check if product already in cart
-          const existingItemIndex = cartItems.findIndex(item => item.productId === productId);
 
           if (existingItemIndex !== -1) {
               // Product already in cart, update quantity

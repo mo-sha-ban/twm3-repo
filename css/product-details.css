@@ -591,6 +591,14 @@
     font-size: 1.2rem;
 }
 
+.product-availability.out-of-stock {
+    color: #f44336;
+}
+
+.product-availability.out-of-stock::before {
+    color: #f44336;
+}
+
 .product-share {
     display: inline-flex;
     align-items: center;
@@ -711,6 +719,21 @@
 .btn-small {
     padding: 10px 14px;
     border-radius: 10px;
+}
+
+.btn:disabled,
+.btn.out-of-stock {
+    background: #1e293b !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #64748b !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+    box-shadow: none !important;
+    opacity: 0.8;
+}
+
+.btn.out-of-stock i {
+    opacity: 0.5;
 }
 
 /* Additional Info Tabs */
@@ -1348,7 +1371,7 @@
 
 .product-gallery.is-fullscreen .main-image-wrapper {
     width: 100%;
-    height: calc(100vh - 160px);
+    height: calc(100vh - 220px);
     border-radius: var(--radius-lg);
 }
 

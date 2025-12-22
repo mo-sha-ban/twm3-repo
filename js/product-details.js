@@ -195,7 +195,30 @@
         if (elements.productCategory) elements.productCategory.textContent = getCategoryName(currentProduct.category);
         if (elements.productCategoryBreadcrumb) elements.productCategoryBreadcrumb.textContent = getCategoryName(currentProduct.category);
         if (elements.productBadge) elements.productBadge.textContent = currentProduct.badge || '';
-        if (elements.productAvailability) elements.productAvailability.textContent = currentProduct.available ? 'متوفر' : 'غير متوفر';
+        if (elements.productAvailability) {
+            const isAvailable = currentProduct.available !== false && currentProduct.inStock !== false;
+            elements.productAvailability.textContent = isAvailable ? 'متوفر' : 'غير متوفر';
+            elements.productAvailability.classList.toggle('out-of-stock', !isAvailable);
+            
+            // Disable purchase buttons if not available
+            if (!isAvailable) {
+                const buttons = [
+                    elements.addToCartBtn, elements.addToCartBtnMobile,
+                    elements.buyNowBtn, elements.buyNowBtnMobile
+                ];
+                buttons.forEach(btn => {
+                    if (btn) {
+                        btn.disabled = true;
+                        btn.classList.add('out-of-stock');
+                        // Update text for buy-now buttons
+                        if (btn.id && (btn.id.includes('buy-now') || btn.id.includes('add-to-cart'))) {
+                            const icon = btn.querySelector('i');
+                            btn.innerHTML = (icon ? icon.outerHTML + ' ' : '') + 'غير متوفر';
+                        }
+                    }
+                });
+            }
+        }
         if (elements.currentPrice) elements.currentPrice.textContent = `${currentProduct.price || 0} ج.م`;
         if (elements.productDescription) elements.productDescription.textContent = currentProduct.description || '';
         if (elements.productOldPrice) {
@@ -997,6 +1020,12 @@
     function addToCart() {
         if (!currentProduct) return;
         
+        const isAvailable = currentProduct.available !== false && currentProduct.inStock !== false;
+        if (!isAvailable) {
+            showToast('تنبيه', 'هذا المنتج غير متوفر حالياً', 'info');
+            return;
+        }
+        
         try {
             const cartData = localStorage.getItem('cart');
             let cartItems = cartData ? JSON.parse(cartData) : [];
@@ -1036,6 +1065,12 @@
 
     function buyNow() {
         if (!currentProduct) return;
+        
+        const isAvailable = currentProduct.available !== false && currentProduct.inStock !== false;
+        if (!isAvailable) {
+            showToast('تنبيه', 'هذا المنتج غير متوفر حالياً', 'info');
+            return;
+        }
         
         try {
             const cartData = localStorage.getItem('cart');
