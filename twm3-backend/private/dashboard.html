@@ -51,6 +51,90 @@
       })();
     </script>
     <style>
+      /* Card-based Options for Modals */
+      .pricing-options-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin: 1rem 0;
+      }
+      
+      .card-option {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        padding: 1.25rem;
+        background: var(--bg-secondary, #fff);
+        border: 2px solid var(--border-color, #eee);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+      }
+      
+      .card-option:hover {
+        border-color: var(--primary-color, #007bff);
+        background: var(--bg-hover, #f8f9fa);
+        transform: translateY(-2px);
+      }
+      
+      .card-option input[type="radio"],
+      .card-option input[type="checkbox"] {
+        margin-top: 0.25rem;
+        width: 1.25rem;
+        height: 1.25rem;
+        accent-color: var(--primary-color, #007bff);
+      }
+      
+      .option-content {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+      }
+      
+      .option-title {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--text-primary, #333);
+      }
+      
+      .option-content small {
+        color: var(--text-secondary, #666);
+        line-height: 1.4;
+      }
+      
+      .card-option input:checked + .checkbox-custom + .option-content .option-title,
+      .card-option input:checked ~ .option-content .option-title {
+        color: var(--primary-color, #007bff);
+      }
+      
+      .card-option input:checked {
+        border-color: var(--primary-color, #007bff);
+        background: var(--bg-tertiary, #eef6ff);
+      }
+
+      /* Fix for form sections in dark mode/modern theme */
+      .form-section {
+        background: var(--bg-secondary, #fff);
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 1px solid var(--border-color, #eee);
+        margin-bottom: 1.5rem;
+      }
+      
+      .form-section h4 {
+        margin-top: 0;
+        margin-bottom: 1rem;
+        border-bottom: 1px solid var(--border-color, #eee);
+        padding-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--primary-color, #007bff);
+      }
+    </style>
+    <style>
 /* New Unified Media Manager Styles */
 .media-manager {
     padding: 20px;
@@ -1554,6 +1638,10 @@ body.modal-open {
             <label for="lessonDescription">وصف الدرس</label>
             <textarea id="lessonDescription" rows="4" placeholder="أدخل وصفاً مختصراً للدرس..."></textarea>
           </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="lessonDuration">مدة الدرس (دقائق)</label>
+              <input type="number" id="lessonDuration" min="1" value="30" />
             </div>
           </div>
           <div class="form-group">
