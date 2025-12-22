@@ -681,7 +681,8 @@ const lessonUpload = multer({
 
         req._fileFilterPassed = false;
         return cb(null, false);
-    }
+    },
+    limits: { fileSize: 500 * 1024 * 1024 } // 500 MB
 }).fields([
     { name: 'lessonFile', maxCount: 1 } // فيديو أو PDF
 ]);
