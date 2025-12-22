@@ -20,6 +20,9 @@
     <link rel="stylesheet" href="../../css/dashboard.css">
     <link rel="stylesheet" href="../../css/comments.css">
 
+    <!-- Socket.IO Client -->
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+
     <script>
       // التحقق من تسجيل الدخول والصلاحيات
       (function () {
@@ -135,6 +138,61 @@
 }
 
 .media-slot:hover .remove-media-btn {
+    opacity: 1;
+}
+
+.promo-badge {
+    position: absolute;
+    top: 8px;
+    left: 36px;
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.4);
+}
+
+.promo-badge i {
+    font-size: 12px;
+}
+
+.promo-media-btn {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #6b7280;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    opacity: 0;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.promo-media-btn:hover {
+    background-color: white;
+    color: #fbbf24;
+    transform: scale(1.1);
+}
+
+.promo-media-btn.active {
+    background-color: #fbbf24;
+    color: white;
+    opacity: 1;
+}
+
+.media-slot:hover .promo-media-btn {
     opacity: 1;
 }
 
@@ -925,6 +983,20 @@ body.modal-open {
     box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
     transform: scale(1.05);
 }
+
+/* Additional smooth transitions for checkboxes */
+.checkbox-wrapper input[type="checkbox"]:checked + .checkbox-custom {
+    animation: checkPulse 0.25s ease-out;
+}
+
+@keyframes checkPulse {
+    0% {
+        transform: scale(0.8);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
 </style>
   </head>
   <body>
@@ -1071,7 +1143,6 @@ body.modal-open {
               <th>المدرب</th>
               <th>المدة</th>
               <th>السعر</th>
-              <th>التصنيف</th>
               <th>الإجراءات</th>
             </tr>
           </thead>
@@ -1352,16 +1423,89 @@ body.modal-open {
     <div id="courseContentModal" class="modal">
       <div class="modal-content">
         <div class="modal-header">
-          <h3 id="courseContentModalTitle">Course Content</h3>
+          <h3 id="courseContentModalTitle">محتوى الكورس</h3>
           <button class="modal-close" onclick="closeCourseContentModal()">×</button>
         </div>
-        <div class="modal-body">
-          <div class="section-actions">
-            <button id="add-unit-button" class="btn btn-primary" onclick="addUnitToCourse(window.currentCourseId)">
-              <i class="fas fa-plus"></i> إضافة وحدة جديدة
-            </button>
+        <div class="modal-body" style="max-height: 80vh; overflow-y: auto;">
+          <!-- Promo Video Section for Paid Courses -->
+          <div id="promoVideoSection" style="display: none; margin-bottom: 30px; padding: 20px; background: #f0f9ff; border-left: 4px solid #3b82f6; border-radius: 8px;">
+            <div style="display: flex; align-items: center; margin-bottom: 12px; gap: 12px;">
+              <i class="fas fa-star" style="color: #3b82f6; font-size: 1.5rem; margin-left: 10px;"></i>
+              <h4 style="margin: 0; color: #1e40af;">فيديو ترويجي (مميز للكورسات المدفوعة)</h4>
+              <div style="margin-left: auto; display:flex; gap:8px;">
+                <label style="display:flex; align-items:center; gap:6px; font-weight:600; color:#333;">نوع الفيديو:</label>
+                <select id="promoTypeSelect" onchange="selectPromoType(this.value)" style="padding:6px; border-radius:6px;">
+                  <option value="link">رابط</option>
+                  <option value="upload">رفع ملف</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group" id="promoLinkGroup" style="margin-bottom:12px;">
+              <label for="promoVideoUrl" style="display: block; margin-bottom: 8px; font-weight: 600; color: #333;">رابط الفيديو الترويجي</label>
+              <div style="display: flex; gap: 8px; margin-bottom: 6px;">
+                <input 
+                  type="url" 
+                  id="promoVideoUrl" 
+                  placeholder="أدخل رابط YouTube أو فيديو مباشر..."
+                  style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-family: monospace;"
+                />
+                <button type="button" class="btn btn-primary" onclick="updatePromoVideo(window.currentCourseId)" style="white-space: nowrap;">
+                  <i class="fas fa-save"></i> حفظ
+                </button>
+              </div>
+              <small style="color: #666;">يدعم YouTube أو روابط الفيديو المباشرة (MP4، WebM، إلخ)</small>
+            </div>
+
+            <div id="promoUploadGroup" style="display:none; margin-bottom:12px;">
+              <label for="promoVideoFile" style="display: block; margin-bottom: 5px; font-weight: bold;">رفع ملف فيديو:</label>
+              <input type="file" id="promoVideoFile" accept="video/*" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom:8px;">
+
+              <label for="promoThumbnailFile" style="display: block; margin-bottom: 5px; font-weight: bold;">صورة مصغرة (Thumbnail):</label>
+              <input type="file" id="promoThumbnailFile" accept="image/*" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+
+              <div style="margin-top:10px; display:flex; gap:8px;">
+                <button type="button" class="btn btn-primary" onclick="updatePromoVideo(window.currentCourseId)">
+                  <i class="fas fa-upload"></i> رفع وحفظ
+                </button>
+                <button type="button" class="btn btn-secondary" onclick="selectPromoType('link')">استخدام رابط بدلاً من رفع</button>
+              </div>
+            </div>
+
+            <div id="promoVideoPreview" style="margin-top: 15px;">
+              <p style="margin: 0 0 8px 0; font-weight: 600; color: #333;">معاينة:</p>
+              <div id="promoVideoContainer" style="position: relative; width: 100%; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 8px; background: #000;">
+                <iframe 
+                  id="promoVideoFrame"
+                  style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"
+                  allowfullscreen=""
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                ></iframe>
+              </div>
+            </div>
+
+            <div style="margin-top: 12px;">
+              <button type="button" class="btn btn-danger" onclick="removePromoVideo(window.currentCourseId)" style="width: 100%;">
+                <i class="fas fa-trash"></i> حذف الفيديو الترويجي
+              </button>
+            </div>
           </div>
-          <div id="modulesContainer"></div>
+
+          <!-- Course Units Section -->
+          <div style="margin-bottom: 20px;">
+            <div class="section-actions">
+              <h4 style="margin: 0 0 15px 0; color: #333;">وحدات الكورس</h4>
+              <div style="display: flex; gap: 10px; align-items: center;">
+                <button id="add-unit-button" class="btn btn-primary" onclick="addUnitToCourse(window.currentCourseId)">
+                  <i class="fas fa-plus"></i> إضافة وحدة جديدة
+                </button>
+                <button id="add-promo-button" class="btn btn-secondary" style="display: none;" onclick="openPromoEditor(window.currentCourseId)">
+                  <i class="fas fa-video"></i> إضافة فيديو ترويجي
+                </button>
+              </div>
+            </div>
+            <div id="modulesContainer"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -1410,9 +1554,7 @@ body.modal-open {
             <label for="lessonDescription">وصف الدرس</label>
             <textarea id="lessonDescription" rows="4" placeholder="أدخل وصفاً مختصراً للدرس..."></textarea>
           </div>
-          <div class="form-group">
-            <label for="lessonDuration">مدة الدرس (دقائق)</label>
-            <input type="number" id="lessonDuration" min="1" value="30" />
+            </div>
           </div>
           <div class="form-group">
             <label for="lessonType">نوع المحتوى</label>
@@ -1570,59 +1712,89 @@ body.modal-open {
           <button class="modal-close" onclick="closeCourseModal()">×</button>
         </div>
         <form id="addCourseForm">
-          <div class="form-group">
-            <label for="courseTitle">عنوان الكورس</label>
-            <input type="text" id="courseTitle" required />
-          </div>
-          <div class="form-group">
-            <label for="courseDescription">وصف الكورس</label>
-            <textarea id="courseDescription"></textarea>
-          </div>
-          <div class="form-group">
-            <label for="courseInstructor">المدرب</label>
-            <input type="text" id="courseInstructor" />
-          </div>
-          <div class="form-group">
-            <label for="courseDuration">المدة (ساعات)</label>
-            <input type="number" id="courseDuration" min="1" value="1" />
-          </div>
-          <div class="form-group">
-            <label for="courseIcon">أيقونة (FontAwesome)</label>
-            <input type="text" id="courseIcon" placeholder="fa-solid fa-book" />
+          <div class="form-section">
+            <h4><i class="fas fa-info-circle"></i> معلومات الكورس</h4>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="courseTitle">عنوان الكورس</label>
+                <input type="text" id="courseTitle" required />
+              </div>
+              <div class="form-group">
+                <label for="courseInstructor">المدرب</label>
+                <input type="text" id="courseInstructor" />
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="courseDescription">وصف الكورس</label>
+              <textarea id="courseDescription"></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="courseDuration">المدة (ساعات)</label>
+                <input type="number" id="courseDuration" min="1" value="1" />
+              </div>
+              <div class="form-group">
+                <label for="courseIcon">أيقونة (FontAwesome)</label>
+                <input type="text" id="courseIcon" placeholder="fa-solid fa-book" />
+              </div>
+            </div>
           </div>
 
-          <!-- Pricing Options -->
-          <div class="form-group">
-            <label>نوع التسعير</label>
-            <div class="pricing-options">
-              <label class="radio-label">
-                <input type="radio" name="pricingType" value="free" id="pricingFree" checked />
-                <span class="radio-custom"></span>
-                <span>مجاني</span>
-                <small>سيتمكن المستخدمون من الوصول للكورس بدون دفع</small>
+          <div class="form-section">
+            <h4><i class="fas fa-tags"></i> خيارات العرض والتسعير</h4>
+            <div class="pricing-options-grid">
+              <div class="form-group">
+                <label class="checkbox-label card-option">
+                  <input type="radio" name="pricingType" value="free" id="pricingFree" checked />
+                  <span class="checkbox-custom"></span>
+                  <div class="option-content">
+                    <span class="option-title">مجاني</span>
+                    <small>سيتمكن المستخدمون من الوصول بدون دفع</small>
+                  </div>
+                </label>
+              </div>
+              
+              <div class="form-group">
+                <label class="checkbox-label card-option">
+                  <input type="radio" name="pricingType" value="paid" id="pricingPaid" />
+                  <span class="checkbox-custom"></span>
+                  <div class="option-content">
+                    <span class="option-title">مدفوع</span>
+                    <small>تحديد سعر للكورس</small>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group" id="priceInputGroup" style="display: none;">
+              <label for="coursePrice">السعر (جنيه مصري)</label>
+              <input type="number" id="coursePrice" min="0" value="0" step="0.01" />
+            </div>
+
+            <div class="form-group" id="udemyLinkGroup" style="display: none;">
+              <label for="courseUdemyLink">
+                <i class="fab fa-udemy"></i>
+                رابط الكورس على Udemy
               </label>
-              <label class="radio-label">
-                <input type="radio" name="pricingType" value="paid" id="pricingPaid" />
-                <span class="radio-custom"></span>
-                <span>مدفوع</span>
-                <small>تحديد سعر للكورس</small>
+              <input type="url" id="courseUdemyLink" placeholder="https://www.udemy.com/course/..." />
+              <small style="display: block; margin-top: 0.5rem; color: var(--text-secondary);">
+                <i class="fas fa-info-circle"></i>
+                سيتم عرض زر للانتقال إلى Udemy في صفحة الكورس المدفوع
+              </small>
+            </div>
+
+            <div class="form-group">
+              <label class="checkbox-label card-option">
+                <input type="checkbox" id="courseFeatured" />
+                <span class="checkbox-custom"></span>
+                <div class="option-content">
+                  <span class="option-title">كورس مميز</span>
+                  <small>سيظهر الكورس بلون ذهبي مميز في الصفحة الرئيسية</small>
+                </div>
               </label>
             </div>
           </div>
 
-          <div class="form-group" id="priceInputGroup" style="display: none;">
-            <label for="coursePrice">السعر (جنيه مصري)</label>
-            <input type="number" id="coursePrice" min="0" value="0" step="0.01" />
-          </div>
-
-          <div class="form-group">
-            <label class="checkbox-label">
-              <input type="checkbox" id="courseFeatured" />
-              <span class="checkbox-custom"></span>
-              <span>كورس مميز</span>
-              <small>سيظهر الكورس بلون ذهبي مميز في الصفحة الرئيسية</small>
-            </label>
-          </div>
           <div class="form-actions">
             <button type="button" class="btn btn-secondary" onclick="closeCourseModal()">إلغاء</button>
             <button type="submit" class="btn btn-primary">حفظ</button>
@@ -2028,6 +2200,36 @@ body.modal-open {
         console.log('Media manager: initialized');
         const MAX_MEDIA_ITEMS = 20;
 
+        // Wire pricing type radio buttons
+        const pricingFree = document.getElementById('pricingFree');
+        const pricingPaid = document.getElementById('pricingPaid');
+        const priceInputGroup = document.getElementById('priceInputGroup');
+        const udemyLinkGroup = document.getElementById('udemyLinkGroup');
+
+        function togglePricingFields() {
+          const isPaid = pricingPaid && pricingPaid.checked;
+          if (priceInputGroup) {
+            priceInputGroup.style.display = isPaid ? 'block' : 'none';
+          }
+          if (udemyLinkGroup) {
+            udemyLinkGroup.style.display = isPaid ? 'block' : 'none';
+          }
+        }
+        
+        // Expose to global scope for use in edit mode
+        window.togglePricingFields = togglePricingFields;
+
+        if (pricingFree) {
+          pricingFree.addEventListener('change', togglePricingFields);
+        }
+        if (pricingPaid) {
+          pricingPaid.addEventListener('change', togglePricingFields);
+        }
+
+        // Initialize on page load
+        togglePricingFields();
+        console.log('Pricing type handler: initialized');
+
         window.openMediaChoice = function(e) {
           console.log('openMediaChoice: called');
             if (window.mediaItems.length >= MAX_MEDIA_ITEMS) {
@@ -2231,11 +2433,14 @@ body.modal-open {
           console.log('renderMediaGrid: called, mediaItems length=', (Array.isArray(window.mediaItems) ? window.mediaItems.length : 0));
             if(!mediaGrid) return;
             mediaGrid.innerHTML = '';
+            const promoVideoId = window.currentPromoVideoId || null;
+            
             if (Array.isArray(window.mediaItems)) {
             window.mediaItems.forEach(item => {
                 const slot = document.createElement('div');
                 slot.className = 'media-slot';
                 slot.dataset.id = item.id;
+                const isPromo = promoVideoId === String(item.id);
 
                 if (item.type === 'image') {
                     slot.innerHTML = `
@@ -2246,12 +2451,14 @@ body.modal-open {
                     slot.innerHTML = `
                         <video src="${item.previewUrl || item.url}" muted playsinline></video>
                         <div class="media-type-icon"><i class="fas fa-video"></i></div>
+                        ${isPromo ? '<div class="promo-badge"><i class="fas fa-star"></i> ترويجي</div>' : ''}
                     `;
                 } else if (item.type === 'youtube') {
                     const videoId = getYouTubeID(item.url);
                     slot.innerHTML = `
                         <img src="https://img.youtube.com/vi/${videoId}/0.jpg" alt="YouTube Video">
                         <div class="media-type-icon"><i class="fab fa-youtube"></i></div>
+                        ${isPromo ? '<div class="promo-badge"><i class="fas fa-star"></i> ترويجي</div>' : ''}
                     `;
                 } else {
                     slot.innerHTML = `
@@ -2262,7 +2469,22 @@ body.modal-open {
                     `;
                 }
 
-                slot.innerHTML += `<button type="button" class="remove-media-btn" onclick="removeMediaItem(${item.id})"><i class="fas fa-times"></i></button>`;
+                // إضافة أزرار التحكم
+                let buttonsHtml = '';
+                
+                // زر تعيين كفيديو ترويجي (للفيديوهات فقط)
+                if (item.type === 'video' || item.type === 'youtube') {
+                    if (isPromo) {
+                        buttonsHtml += `<button type="button" class="promo-media-btn active" onclick="setPromoVideo(${item.id}, true)" title="إلغاء التعيين كفيديو ترويجي"><i class="fas fa-star"></i></button>`;
+                    } else {
+                        buttonsHtml += `<button type="button" class="promo-media-btn" onclick="setPromoVideo(${item.id}, false)" title="تعيين كفيديو ترويجي"><i class="fas fa-star"></i></button>`;
+                    }
+                }
+                
+                // زر الحذف
+                buttonsHtml += `<button type="button" class="remove-media-btn" onclick="removeMediaItem(${item.id})"><i class="fas fa-times"></i></button>`;
+                
+                slot.innerHTML += buttonsHtml;
                 mediaGrid.appendChild(slot);
             });
             }
@@ -2293,6 +2515,17 @@ body.modal-open {
             window.mediaItems = window.mediaItems.filter(item => item.id !== id);
           } else {
             window.mediaItems = [];
+          }
+          renderMediaGrid();
+        }
+
+        window.setPromoVideo = function(id, isCurrentlyPromo) {
+          if (isCurrentlyPromo) {
+            // إلغاء التعيين
+            window.currentPromoVideoId = null;
+          } else {
+            // تعيين كفيديو ترويجي
+            window.currentPromoVideoId = String(id);
           }
           renderMediaGrid();
         }

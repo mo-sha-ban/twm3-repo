@@ -271,7 +271,8 @@ app.use(helmet({
                         "https://cdn.quilljs.com",
                         "https://www.google-analytics.com",
                         "https://analytics.google.com",
-                        "https://infird.com"
+                        "https://infird.com",
+                        "https://cdn.socket.io"
                     ],
             styleSrc: [
                 "'self'",
@@ -292,7 +293,10 @@ app.use(helmet({
                 "https://www.youtube-nocookie.com",
                 "https://cdn.quilljs.com",
                 "https://www.google-analytics.com",
-                "https://analytics.google.com"
+                "https://analytics.google.com",
+                "https://cdn.socket.io",
+                "ws://localhost:5000",
+                "wss://twm3.org"
             ],
             frameSrc: ["'self'", "https://www.youtube.com", "https://www.youtube-nocookie.com"],
             mediaSrc: ["'self'", "data:", "blob:", "https://cdn.plyr.io"],
@@ -598,6 +602,26 @@ app.post('/api/uploads/lesson-pdf', authToken, requireAuthToken, (req, res) => {
     lessonUpload.single('pdf')(req, res, (err) => {
         if (err) return res.status(400).json({ error: err.message || 'فشل رفع PDF' });
         if (!req.file) return res.status(400).json({ error: 'يرجى اختيار ملف PDF' });
+        const rel = '/uploads/' + req.file.filename;
+        return res.json({ url: rel, filename: req.file.filename });
+    });
+});
+
+// API: رفع الفيديو الترويجي للكورس
+app.post('/api/uploads/promo-video', authToken, requireAuthToken, (req, res) => {
+    lessonUpload.single('video')(req, res, (err) => {
+        if (err) return res.status(400).json({ error: err.message || 'فشل رفع الفيديو' });
+        if (!req.file) return res.status(400).json({ error: 'يرجى اختيار ملف فيديو' });
+        const rel = '/uploads/' + req.file.filename;
+        return res.json({ url: rel, filename: req.file.filename });
+    });
+});
+
+// API: رفع صورة الفيديو الترويجي (Thumbnail)
+app.post('/api/uploads/promo-thumbnail', authToken, requireAuthToken, (req, res) => {
+    lessonUpload.single('image')(req, res, (err) => {
+        if (err) return res.status(400).json({ error: err.message || 'فشل رفع الصورة' });
+        if (!req.file) return res.status(400).json({ error: 'يرجى اختيار ملف صورة' });
         const rel = '/uploads/' + req.file.filename;
         return res.json({ url: rel, filename: req.file.filename });
     });
@@ -1469,7 +1493,7 @@ app.use((err, req, res, next) => {
 app.put('/api/courses/:id', authToken, requireAuthToken, async (req, res) => {
     try {
         const courseId = req.params.id;
-        const { title, description, instructor, duration, price, category, tags, icon, categories, featured, isFree } = req.body;
+        const { title, description, instructor, duration, price, category, tags, icon, categories, featured, isFree, udemyLink, promoVideo, promoVideoId, promoThumbnail, introVideo } = req.body;
 
         // Defensive: if client incorrectly sends a POST while intending to update
         // a course, allow update-by-id when an id is provided in the body to
@@ -1498,6 +1522,11 @@ app.put('/api/courses/:id', authToken, requireAuthToken, async (req, res) => {
                     toUpdate.tags = tags !== undefined ? tags : toUpdate.tags;
                     toUpdate.icon = icon !== undefined ? icon : toUpdate.icon;
                     if (categories !== undefined) toUpdate.categories = Array.isArray(categories) ? categories : toUpdate.categories;
+                    if (udemyLink !== undefined) toUpdate.udemyLink = udemyLink;
+                    if (promoVideoId !== undefined) toUpdate.promoVideoId = promoVideoId;
+                    if (promoVideo !== undefined) toUpdate.promoVideo = promoVideo;
+                    if (promoThumbnail !== undefined) toUpdate.promoThumbnail = promoThumbnail;
+                    if (introVideo !== undefined) toUpdate.introVideo = introVideo;
                     toUpdate.updatedAt = new Date();
 
                     await toUpdate.save();
@@ -1525,6 +1554,11 @@ app.put('/api/courses/:id', authToken, requireAuthToken, async (req, res) => {
         if (categories !== undefined && Array.isArray(categories)) updateData.categories = categories;
         if (featured !== undefined) updateData.featured = featured;
         if (isFree !== undefined) updateData.isFree = isFree;
+        if (udemyLink !== undefined) updateData.udemyLink = udemyLink;
+        if (promoVideoId !== undefined) updateData.promoVideoId = promoVideoId;
+        if (promoVideo !== undefined) updateData.promoVideo = promoVideo;
+        if (promoThumbnail !== undefined) updateData.promoThumbnail = promoThumbnail;
+        if (introVideo !== undefined) updateData.introVideo = introVideo;
         
         // Always update the updatedAt timestamp
         updateData.updatedAt = new Date();
@@ -1576,6 +1610,18 @@ app.patch('/api/courses/:id', authToken, requireAuthToken, async (req, res) => {
         // فقط السماح بتحديث الحقول المعروفة
         if (updates.categories && Array.isArray(updates.categories)) {
             course.categories = updates.categories;
+        }
+        if (updates.udemyLink !== undefined) {
+            course.udemyLink = updates.udemyLink;
+        }
+        if (updates.promoVideo !== undefined) {
+            course.promoVideo = updates.promoVideo;
+        }
+        if (updates.promoThumbnail !== undefined) {
+            course.promoThumbnail = updates.promoThumbnail;
+        }
+        if (updates.introVideo !== undefined) {
+            course.introVideo = updates.introVideo;
         }
         // يمكن توسيع هذا إلى حقول أخرى لاحقاً إن لزم
 
@@ -1895,7 +1941,7 @@ app.post('/api/courses', authToken, requireAuthToken, async (req, res) => {
         try { console.log('[/api/courses] body preview:', JSON.stringify(req.body).slice(0,200)); } catch(_){}
     } catch(_) {}
     try {
-        const { title, description, instructor, duration, price, category, tags, icon, categories, featured, isFree } = req.body;
+        const { title, description, instructor, duration, price, category, tags, icon, categories, featured, isFree, udemyLink, promoVideoId } = req.body;
 
         // Basic duplicate prevention:
         // 1) If the same creator already has a course with the same title (case-insensitive),
@@ -1958,6 +2004,11 @@ app.post('/api/courses', authToken, requireAuthToken, async (req, res) => {
             icon: icon || 'fa-solid fa-book',
             featured: featured || false,
             isFree: isFree !== undefined ? isFree : true,
+            udemyLink: udemyLink || '',
+            promoVideoId: promoVideoId || null,
+            promoVideo: '',
+            promoThumbnail: '',
+            introVideo: '',
             createdBy: creator,
              	normalizedTitle: normalizedTitleLower,
             createdAt: new Date(),
@@ -1990,11 +2041,13 @@ app.post('/api/courses', authToken, requireAuthToken, async (req, res) => {
                 } catch (e2) { /* fallthrough */ }
             }
             console.error('خطأ في إنشاء/إيجاد الكورس:', err);
-            return res.status(500).json({ error: 'حدث خطأ أثناء إضافة الكورس' });
+            console.error('Error details:', err.message, err.stack);
+            return res.status(500).json({ error: 'حدث خطأ أثناء إضافة الكورس', details: err.message });
         }
     } catch (err) {
         console.error('خطأ في إضافة الكورس:', err);
-        res.status(500).json({ error: 'حدث خطأ أثناء إضافة الكورس' });
+        console.error('Error details:', err.message, err.stack);
+        res.status(500).json({ error: 'حدث خطأ أثناء إضافة الكورس', details: err.message });
     }
 });
 
@@ -2152,7 +2205,7 @@ app.put('/api/courses/:courseId/content', authToken, requireAuthToken, async (re
 app.get('/api/courses/:courseId/content', async (req, res) => {
     try {
         const course = await Course.findById(req.params.courseId);
-        
+
         if (!course) {
             return res.status(404).json({ error: 'الكورس غير موجود' });
         }
@@ -2167,6 +2220,63 @@ app.get('/api/courses/:courseId/content', async (req, res) => {
     } catch (err) {
         console.error('خطأ في جلب محتوى الكورس:', err);
         res.status(500).json({ error: 'حدث خطأ أثناء جلب محتوى الكورس' });
+    }
+});
+
+// تحديث الفيديو الترويجي للكورس
+app.put('/api/courses/:courseId/promo-video', authToken, requireAuthToken, async (req, res) => {
+    try {
+        const courseId = req.params.courseId;
+        const course = await Course.findById(courseId);
+
+        if (!course) {
+            return res.status(404).json({ error: 'الكورس غير موجود' });
+        }
+
+        // Check if user is admin or course creator
+        const userId = req.user && (req.user._id || req.user.id);
+        const isAdmin = req.user && req.user.isAdmin;
+        const isCreator = course.createdBy && String(course.createdBy) === String(userId);
+
+        if (!isAdmin && !isCreator) {
+            return res.status(403).json({ error: 'غير مصرح لك بتعديل هذا الكورس' });
+        }
+
+        const { promoVideo, promoThumbnail } = req.body;
+
+        // Handle file uploads if present
+        if (req.files) {
+            if (req.files.promoVideoFile && req.files.promoVideoFile[0]) {
+                const videoFile = req.files.promoVideoFile[0];
+                course.promoVideo = `/uploads/${videoFile.filename}`;
+            }
+
+            if (req.files.promoThumbnailFile && req.files.promoThumbnailFile[0]) {
+                const thumbnailFile = req.files.promoThumbnailFile[0];
+                course.promoThumbnail = `/uploads/${thumbnailFile.filename}`;
+            }
+        }
+
+        // Update URL fields if provided
+        if (promoVideo !== undefined) {
+            course.promoVideo = promoVideo;
+        }
+        if (promoThumbnail !== undefined) {
+            course.promoThumbnail = promoThumbnail;
+        }
+
+        course.updatedAt = new Date();
+        await course.save();
+
+        res.json({
+            success: true,
+            message: 'تم تحديث الفيديو الترويجي بنجاح',
+            promoVideo: course.promoVideo,
+            promoThumbnail: course.promoThumbnail
+        });
+    } catch (err) {
+        console.error('خطأ في تحديث الفيديو الترويجي:', err);
+        res.status(500).json({ error: 'فشل في تحديث الفيديو الترويجي' });
     }
 });
 

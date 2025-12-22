@@ -953,6 +953,10 @@
     }
 
     function showToast(title, message, type = 'info') {
+        if (window.showToast) {
+            return window.showToast(message, { type, title, timeout: 4000 });
+        }
+        
         const toast = document.createElement('div');
         toast.className = `toast toast-${type}`;
         toast.innerHTML = `
@@ -966,11 +970,35 @@
         }, 3000);
     }
 
+    function updateCartBadge() {
+        try {
+            const cartData = localStorage.getItem('cart');
+            const cartItems = cartData ? JSON.parse(cartData) : [];
+            const cartBadge = document.getElementById('cartBadge');
+
+            if (cartBadge) {
+                const count = cartItems.length;
+                cartBadge.textContent = count > 0 ? count : '';
+                cartBadge.classList.toggle('empty', count === 0);
+
+                if (count > 0) {
+                    cartBadge.classList.add('pulse');
+                    setTimeout(() => {
+                        cartBadge.classList.remove('pulse');
+                    }, 1500);
+                }
+            }
+        } catch (error) {
+            console.error('Error updating cart badge:', error);
+        }
+    }
+    window.updateCartBadge = updateCartBadge;
+
     function addToCart() {
         if (!currentProduct) return;
         
         try {
-            const cartData = localStorage.getItem('cartItems');
+            const cartData = localStorage.getItem('cart');
             let cartItems = cartData ? JSON.parse(cartData) : [];
             
             const productId = currentProduct._id || currentProduct.id;
@@ -978,15 +1006,23 @@
 
             if (existingItemIndex !== -1) {
                  cartItems[existingItemIndex].quantity = (cartItems[existingItemIndex].quantity || 1) + quantity;
+                 cartItems[existingItemIndex].qty = cartItems[existingItemIndex].quantity; // Keep for compatibility
             } else {
                 cartItems.push({
+                    id: productId,
                     productId: productId,
                     quantity: quantity,
+                    qty: quantity,
+                    title: currentProduct.name,
+                    name: currentProduct.name,
+                    price: currentProduct.price,
+                    image: currentProduct.image,
+                    category: currentProduct.category,
                     addedAt: new Date().toISOString()
                 });
             }
 
-            localStorage.setItem('cartItems', JSON.stringify(cartItems));
+            localStorage.setItem('cart', JSON.stringify(cartItems));
             
             if (window.updateCartBadge) window.updateCartBadge();
             
@@ -999,7 +1035,49 @@
     }
 
     function buyNow() {
-        alert('جاري توجيهك لصفحة الدفع...');
+        if (!currentProduct) return;
+        
+        try {
+            const cartData = localStorage.getItem('cart');
+            let cartItems = cartData ? JSON.parse(cartData) : [];
+            
+            const productId = currentProduct._id || currentProduct.id;
+            const existingItemIndex = cartItems.findIndex(item => (item.productId === productId || item.id === productId));
+
+            if (existingItemIndex !== -1) {
+                cartItems[existingItemIndex].quantity = (cartItems[existingItemIndex].quantity || 1) + quantity;
+                cartItems[existingItemIndex].qty = cartItems[existingItemIndex].quantity;
+            } else {
+                cartItems.push({
+                    id: productId,
+                    productId: productId,
+                    quantity: quantity,
+                    qty: quantity,
+                    title: currentProduct.name,
+                    name: currentProduct.name,
+                    price: currentProduct.price,
+                    image: currentProduct.image,
+                    category: currentProduct.category,
+                    addedAt: new Date().toISOString()
+                });
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cartItems));
+            
+            if (window.updateCartBadge) window.updateCartBadge();
+            
+            // Show custom "Buy Now" toast exactly as requested
+            showToast('جاري التوجيه', 'جاري التوجيه للسلة', 'success');
+
+            // Redirect after a short delay to allow toast to be seen
+            setTimeout(() => {
+                window.location.href = 'cart.html';
+            }, 800);
+
+        } catch (error) {
+            console.error('Error in buy now:', error);
+            showToast('خطأ', 'فشل في عملية الشراء الفوري', 'error');
+        }
     }
 
     function shareProduct(e){

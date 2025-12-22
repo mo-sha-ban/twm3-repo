@@ -287,8 +287,15 @@
   function addToCart(productId) {
       try {
           // Get current cart items from localStorage
-          const cartData = localStorage.getItem('cartItems');
+          const cartData = localStorage.getItem('cart');
           const cartItems = cartData ? JSON.parse(cartData) : [];
+
+          // Find product data
+          const product = allProducts.find(p => p._id === productId);
+          if (!product) {
+              showToast('المنتج غير موجود', 'error');
+              return;
+          }
 
           // Check if product already in cart
           const existingItemIndex = cartItems.findIndex(item => item.productId === productId);
@@ -298,10 +305,15 @@
               cartItems[existingItemIndex].quantity = (cartItems[existingItemIndex].quantity || 1) + 1;
               showToast('تم تحديث الكمية في السلة', 'success');
           } else {
-              // Add new product to cart with quantity 1
+              // Add new product to cart with quantity 1 and full product data
               cartItems.push({
                   productId: productId,
                   quantity: 1,
+                  price: product.price,
+                  name: product.name,
+                  title: product.name, // for compatibility
+                  image: product.image,
+                  category: product.category,
                   addedAt: new Date().toISOString()
               });
 
@@ -309,7 +321,7 @@
           }
 
           // Save updated cart
-          localStorage.setItem('cartItems', JSON.stringify(cartItems));
+          localStorage.setItem('cart', JSON.stringify(cartItems));
 
           // Update cart badge if we're on store page
           if (typeof updateCartBadge === 'function') {

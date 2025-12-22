@@ -17,65 +17,124 @@
     function initProducts() {
         console.log('Initializing Products module...');
         
-        // Register video blot BEFORE initializing Quill
-        const BlockEmbed = Quill.import('blots/block/embed');
-        class VideoBlot extends BlockEmbed {
-            static create(url) {
-                let node = super.create();
-                node.setAttribute('src', url);
-                node.setAttribute('controls', 'true');
-                node.setAttribute('preload', 'metadata');
-                node.setAttribute('playsinline', 'true');
-                node.style.maxWidth = '100%';
-                node.style.borderRadius = '8px';
-                node.style.display = 'block';
-                node.style.margin = '10px 0';
-                
-                const source = document.createElement('source');
-                source.setAttribute('src', url);
-                source.setAttribute('type', 'video/quicktime');
-                node.appendChild(source);
-                
-                console.log('🎥 VideoBlot.create called with URL:', url);
-                return node;
-            }
-
-            static value(node) {
-                return node.getAttribute('src');
-            }
-        }
-        VideoBlot.blotName = 'video';
-        VideoBlot.tagName = 'video';
-        try {
-            Quill.register(VideoBlot);
-            console.log('✅ VideoBlot registered globally');
-        } catch (e) {
-            console.warn('⚠️ VideoBlot already registered:', e.message);
+        // Setup event listeners first (basic functionality)
+        setupEventListeners();
+        
+        // Check if Quill is available for rich text editing
+        if (typeof Quill === 'undefined') {
+            console.warn('Quill is not available. Rich text editor will be disabled.');
+            loadProducts();
+            return;
         }
         
-        setupEventListeners();
+        // Register video blot for Quill
+        try {
+            const BlockEmbed = Quill.import('blots/block/embed');
+            
+            class VideoBlot extends BlockEmbed {
+                static create(url) {
+                    const node = super.create();
+                    node.setAttribute('src', url);
+                    node.setAttribute('controls', true);
+                    node.setAttribute('style', 'max-width: 100%; border-radius: 8px; margin: 10px 0; display: block;');
+                    return node;
+                }
+
+                static value(node) {
+                    return node.getAttribute('src');
+                }
+            }
+            
+            VideoBlot.blotName = 'video';
+            VideoBlot.tagName = 'VIDEO';
+            
+            try {
+                Quill.register({ 'formats/video': VideoBlot });
+                console.log('✅ VideoBlot registered successfully');
+            } catch (e) {
+                console.warn('⚠️ VideoBlot registration warning:', e.message);
+            }
+        } catch (error) {
+            console.error('❌ Failed to register VideoBlot:', error);
+        }
+        
+        // Initialize Quill editor
+        initQuill();
+        
+        // Load products data
         loadProducts();
         console.log('Products module initialized');
+    }
+    
+    // Initialize without rich text editor if Quill is not available
+    function initializeWithoutRichText() {
+        console.log('Initializing without rich text editor...');
+        
+        // Setup basic event listeners without rich text features
+        setupBasicEventListeners();
+        loadProducts();
+        console.log('✓ Products module initialized without rich text editor');
+    }
+    
+    // Setup only essential event listeners when Quill is not available
+    function setupBasicEventListeners() {
+        const addBtn = document.getElementById('add-product-button');
+        if (addBtn) {
+            console.log('setupBasicEventListeners: add-product-button found');
+            addBtn.addEventListener('click', (e) => {
+                console.log('add-product-button clicked', e);
+                if (typeof openAddProductModal === 'function') {
+                    openAddProductModal(e);
+                } else {
+                    console.warn('openAddProductModal is not a function at click time');
+                }
+            });
+        } else {
+            console.warn('setupBasicEventListeners: add-product-button NOT found');
+        }
+
+        const form = document.getElementById('addProductForm');
+        if (form) {
+            console.log('setupBasicEventListeners: addProductForm found');
+            form.addEventListener('submit', (e) => {
+                console.log('addProductForm submit');
+                handleProductSubmit(e);
+            });
+        } else {
+            console.warn('setupBasicEventListeners: addProductForm NOT found');
+        }
+
+        // Setup primary image handling even without Quill
+        setupPrimaryImageHandling();
+
+        const searchInput = document.getElementById('productSearch');
+        if (searchInput) {
+            searchInput.addEventListener('input', filterProducts);
+        }
+
+        const filterSelect = document.getElementById('productFilter');
+        if (filterSelect) {
+            filterSelect.addEventListener('change', filterProducts);
+        }
     }
 
     // Setup event listeners
     function initQuill() {
+        // Only proceed if Quill is available
+        if (typeof Quill === 'undefined') {
+            console.warn('Quill is not available. Skipping rich text editor initialization.');
+            return;
+        }
+
         const editorElement = document.getElementById('productLongDescription');
-        if (editorElement && typeof Quill !== 'undefined') {
+        if (editorElement) {
             // If Quill already exists, destroy it first
             if (window.quill) {
+                window.quill.off('text-change');
                 window.quill = null;
             }
             
             editorElement.innerHTML = ''; // Clear any existing content
-
-            // VideoBlot should already be registered by initProducts()
-            // If not already registered, do it here
-            try {
-                Quill.import('formats/video');
-            } catch (e) {
-                console.warn('⚠️ Video blot not found, will register in initQuill');
-            }
 
             window.quill = new Quill('#productLongDescription', {
                 theme: 'snow',
@@ -93,7 +152,7 @@
                         ['clean']
                     ]
                 },
-                placeholder: 'اكتب وصف المنتج هنا...'
+                placeholder: 'اكتب وصرح المنتج هنا...'
             });
             
             // Remove toolbar completely from DOM
@@ -101,6 +160,17 @@
             if (toolbar) {
                 toolbar.remove();
             }
+            
+            // Add event listener for video uploads
+            const videoButton = document.querySelector('.ql-video');
+            if (videoButton) {
+                videoButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openQuillVideoUploadDialog();
+                });
+            }
+        } else {
+            console.warn('productLongDescription element not found');
         }
     }
 
@@ -306,6 +376,11 @@
         const filterSelect = document.getElementById('productFilter');
         if (filterSelect) {
             filterSelect.addEventListener('change', filterProducts);
+        }
+        
+        // Additional safety check for Quill
+        if (typeof Quill === 'undefined') {
+            console.warn('Quill editor not available - some features will be disabled');
         }
     }
 
@@ -825,9 +900,25 @@
     window.removeYoutubeUrl = () => console.warn('removeYoutubeUrl is deprecated');
     window.removeAdditionalImage = () => console.warn('removeAdditionalImage is deprecated');
 
+    // التحقق من وجود Quill قبل بدء التهيئة
+    function initializeWhenReady() {
+        console.log('Checking Quill availability... Document readyState:', document.readyState);
+        
+        if (typeof Quill !== 'undefined') {
+            console.log('Quill library detected, initializing products module...');
+            initProducts();
+        } else {
+            console.warn('Quill library not available, initializing without rich text features...');
+            setupEventListeners();
+            loadProducts();
+        }
+    }
+
+    // بدء عملية التهيئة بناءً على حالة تحميل المستند
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initProducts);
+        document.addEventListener('DOMContentLoaded', initializeWhenReady);
     } else {
-        initProducts();
+        // إذا كان المستند جاهزًا بالفعل، ننفذ مباشرة
+        setTimeout(initializeWhenReady, 50);
     }
 })();

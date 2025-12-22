@@ -26,6 +26,37 @@ router.get('/:id/content', auth, courseController.getCourseContent);
 // إضافة وحدة جديدة
 router.post('/:id/unit', auth, courseController.addUnit);
 
+// حذف وحدة
+router.delete('/unit/:unitId', auth, async (req, res) => {
+    try {
+        const { unitId } = req.params;
+        const Course = require('../models/Course');
+        
+        // البحث عن الكورس الذي يحتوي على الوحدة
+        const course = await Course.findOne({ 'units._id': unitId });
+        if (!course) {
+            return res.status(404).json({ error: 'Course or unit not found' });
+        }
+        
+        // الحصول على الوحدة
+        const unit = course.units.id(unitId);
+        if (!unit) {
+            return res.status(404).json({ error: 'Unit not found' });
+        }
+        
+        // حذف الوحدة
+        unit.remove();
+        
+        // حفظ التغييرات
+        await course.save();
+        
+        res.json({ message: 'Unit deleted successfully' });
+    } catch (error) {
+        console.error('Delete unit error:', error);
+        res.status(500).json({ error: 'Failed to delete unit' });
+    }
+});
+
 // إضافة درس جديد (ملف أو رابط) عبر unitId
 router.post('/unit/:unitId/lesson', auth, upload.single('file'), courseController.addLesson);
 
@@ -44,51 +75,66 @@ router.get('/progress/summary', auth, courseController.getProgressSummary);
 // تفاصيل تقدم المستخدم في كورس محدد
 router.get('/:courseId/progress', auth, courseController.getCourseProgress);
 
-// -------------------- الكود المضاف: إضافة درس بشكل مباشر عبر الكورس والوحدة --------------------
-
-router.post('/courses/:courseId/units/:unitId/lessons', auth, async (req, res) => {
+// -------------------- كود إضافة درس عبر الكورس والوحدة (يدعم ملفات multipart) --------------------
+router.post('/:courseId/units/:unitId/lessons', auth, upload.single('lessonFile'), async (req, res) => {
     try {
         const { courseId, unitId } = req.params;
-        const { title, description, videoUrl, type, duration } = req.body;
 
-        console.log("📥 بيانات الدرس:", req.body);
+        // Multer populates req.body (text fields) and req.file (uploaded file)
+        console.log('📥 إضافة درس - body:', req.body, 'file:', req.file && req.file.filename);
 
-        const Course = require('../models/Course'); // تأكد من المسار حسب مشروعك
+        const { title, description, videoUrl, fileUrl, externalUrl, type, duration, isFree, specialization } = req.body || {};
+
+        if (!title) return res.status(400).json({ error: 'Missing lesson title' });
+
+        const Course = require('../models/Course');
 
         // البحث عن الكورس والتأكد من وجوده
         const course = await Course.findById(courseId);
-        if (!course) {
-            return res.status(404).json({ error: 'Course not found' });
-        }
+        if (!course) return res.status(404).json({ error: 'Course not found' });
 
         // البحث عن الوحدة داخل الكورس
         const unit = course.units.id(unitId);
-        if (!unit) {
-            return res.status(404).json({ error: 'Unit not found' });
+        if (!unit) return res.status(404).json({ error: 'Unit not found' });
+
+        // Determine uploaded file path if any
+        let uploadedPath = null;
+        if (req.file && req.file.filename) {
+            uploadedPath = `/uploads/videos/${req.file.filename}`;
         }
 
-        // إنشاء الدرس
+        // Build new lesson object depending on type
         const newLesson = {
-            title,
-            description,
-            videoUrl,
-            type,
-            duration,
+            title: title,
+            description: description || '',
+            type: type || 'video',
+            duration: Number(duration) || 0,
+            isFree: isFree === 'true' || isFree === true,
+            specialization: specialization || undefined,
         };
+
+        if ((type || 'video') === 'video') {
+            if (uploadedPath) newLesson.videoUrl = uploadedPath;
+            else if (videoUrl) newLesson.videoUrl = videoUrl;
+        } else if ((type || '') === 'pdf') {
+            if (uploadedPath) newLesson.fileUrl = uploadedPath;
+            else if (fileUrl) newLesson.fileUrl = fileUrl;
+        } else if ((type || '') === 'url') {
+            newLesson.externalUrl = externalUrl || '';
+        }
 
         // إضافة الدرس للوحدة
         unit.lessons.push(newLesson);
 
-        // تحديث عدد الدروس والمدة
-        course.totalLessons += 1;
-        course.totalDuration += parseInt(duration);
+        // تحديث عداد الدروس والمدة
+        course.totalLessons = (course.totalLessons || 0) + 1;
+        course.totalDuration = (course.totalDuration || 0) + (Number(newLesson.duration) || 0);
 
-        // حفظ الكورس
         await course.save();
 
         res.status(201).json({ message: '✅ تمت إضافة الدرس بنجاح', lesson: newLesson });
     } catch (error) {
-        console.error("❌ خطأ أثناء إضافة الدرس:", error);
+        console.error('❌ خطأ أثناء إضافة الدرس:', error);
         res.status(500).json({ error: 'حدث خطأ أثناء إضافة الدرس', details: error.message });
     }
 });

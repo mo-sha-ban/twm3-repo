@@ -2,16 +2,6 @@
 (function () {
   const API_BASE = '';
 
-  // قائمة التصنيفات المتاحة للاستخدام في الفلاتر والنموذج
-  const CATEGORY_LIST = [
-    { value: 'programming', label: 'برمجة' },
-    { value: 'ethical-hacking', label: 'اختراق أخلاقي' },
-    { value: 'cybersecurity', label: 'سايبر سكيورتي' },
-    { value: 'mobile-development', label: 'تطوير تطبيقات' },
-    { value: 'web-development', label: 'تطوير مواقع' },
-    { value: 'video-editing', label: 'مونتاج' },
-    { value: 'other', label: 'أخرى' }
-  ];
 
   const Courses = {
     init() {
@@ -67,40 +57,33 @@
     },
 
         // عرض الكورسات في الجدول
-        renderCourses: function(courses) {
-            try {
-                const tbody = document.getElementById('courses-table');
-                if (!tbody) {
-                    console.error('courses-table element not found');
-                    return;
-                }
-                if (!Array.isArray(courses) || courses.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="9">لا توجد كورسات</td></tr>';
-                    return;
-                }
-
-                tbody.innerHTML = courses.map((c, idx) => `
-                    <tr data-id="${c._id}">
-                        <td>${idx + 1}</td>
-                        <td>${(c.icon || '') ? `<i class="${c.icon}"></i>` : ''} ${c.title || ''}</td>
-                        <td>${(c.instructor || '')}</td>
-                        <td>${(c.categories || []).map(cat => cat.mainCategory).join(', ')}</td>
-                        <td>${c.duration || ''}</td>
-                        <td>${c.price || ''}</td>
-                        <td>${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : ''}</td>
-                        <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-primary" onclick="editCourse('${c._id}')" title="تعديل"><i class="fas fa-edit"></i></button>
-                                <button class="btn btn-secondary" onclick="manageCourseContent('${c._id}','${(c.title||'').replace(/'/g, "\\'")}', )" title="محتوى"><i class="fas fa-folder-open"></i></button>
-                                <button class="btn btn-danger" onclick="deleteCourse('${c._id}')" title="حذف"><i class="fas fa-trash"></i></button>
-                            </div>
-                        </td>
-                    </tr>
-                `).join('');
-            } catch (err) {
-                console.error('Error rendering courses:', err);
-            }
-        },
+    renderCourses(courses) {
+      const tbody = document.getElementById('courses-table');
+      if (!tbody) return;
+      if (!Array.isArray(courses) || courses.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7">لا توجد كورسات</td></tr>';
+        return;
+      }
+      tbody.innerHTML = courses.map((course, idx) => {
+        return `
+          <tr>
+            <td>${idx + 1}</td>
+            <td>${escapeHtml(course.title || '')}</td>
+            <td>${escapeHtml((course.description || '').substring(0, 80))}</td>
+            <td>${escapeHtml(course.instructor || '')}</td>
+            <td>${course.duration || 0} ساعة</td>
+            <td>${course.isFree ? 'مجاني' : (course.price || 0) + ' جنيه'}</td>
+            <td>
+              <div class="action-buttons">
+                  <button class="btn btn-primary" onclick="editCourse('${course._id}')" title="تعديل"><i class="fas fa-edit"></i></button>
+                  <button class="btn btn-secondary" onclick="manageCourseContent('${course._id}','${(course.title||'').replace(/'/g, "\\'")}' )" title="محتوى"><i class="fas fa-folder-open"></i></button>
+                  <button class="btn btn-danger" onclick="deleteCourse('${course._id}')" title="حذف"><i class="fas fa-trash"></i></button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    },
 
     // إنشاء أو ربط واجهة الفلاتر أعلى جدول الكورسات
     initializeFilters() {
@@ -121,120 +104,6 @@
       const titleEl = document.getElementById('courseModalTitle');
       if (titleEl) titleEl.textContent = 'إضافة كورس جديد';
 
-      // إضافة حقل اختيار التصنيفات
-      // Try to find an existing categories container first
-      let categoriesContainer = document.getElementById('categories-container');
-      let categoryGroup = null;
-      
-      // If no existing container, find where to insert it
-      if (!categoriesContainer) {
-        const iconEl = document.getElementById('courseIcon');
-        if (iconEl && iconEl.parentElement) {
-          categoryGroup = iconEl.parentElement;
-        } else {
-          categoryGroup = document.querySelector('.form-group:has(#courseCategory)');
-        }
-      }
-      
-      // Only create new categories UI if we don't already have one
-      if (!categoriesContainer && categoryGroup) {
-          // Create new div for categories
-          categoriesContainer = document.createElement('div');
-          categoriesContainer.id = 'categories-container';
-
-          // Find the proper insertion point - before the form actions
-          const form = document.getElementById('addCourseForm');
-          if (!form) return;
-
-          const formActions = form.querySelector('.form-actions');
-          if (!formActions) return;
-
-          // Insert before form actions
-          form.insertBefore(categoriesContainer, formActions);
-
-          // Remove legacy elements if present
-          const legacyCat = document.getElementById('courseCategory');
-          if (legacyCat && legacyCat.parentElement) legacyCat.parentElement.remove();
-          const tagElement = document.getElementById('courseTags');
-          if (tagElement && tagElement.parentElement) tagElement.parentElement.remove();
-
-          categoriesContainer.innerHTML = `
-          <div id="categories-container">
-            <label>التصنيفات</label>
-            <div class="categories-list">
-              <label class="category-checkbox">
-                <input type="checkbox" name="categories" value="programming" class="category-input">
-                <span class="category-label">برمجة</span>
-              </label>
-              <label class="category-checkbox">
-                <input type="checkbox" name="categories" value="ethical-hacking" class="category-input">
-                <span class="category-label">اختراق أخلاقي</span>
-              </label>
-              <label class="category-checkbox">
-                <input type="checkbox" name="categories" value="cybersecurity" class="category-input">
-                <span class="category-label">سايبر سكيورتي</span>
-              </label>
-              <label class="category-checkbox">
-                <input type="checkbox" name="categories" value="mobile-development" class="category-input">
-                <span class="category-label">تطوير تطبيقات</span>
-              </label>
-              <label class="category-checkbox">
-                <input type="checkbox" name="categories" value="web-development" class="category-input">
-                <span class="category-label">تطوير مواقع</span>
-              </label>
-              <label class="category-checkbox">
-                <input type="checkbox" name="categories" value="video-editing" class="category-input">
-                <span class="category-label">مونتاج</span>
-              </label>
-            </div>
-          </div>
-        `;
-
-        // إضافة التنسيقات المطلوبة
-        const style = document.createElement('style');
-        style.textContent = `
-          .categories-list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-          }
-          
-          .category-checkbox {
-            display: flex;
-            align-items: center;
-            padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            transition: all 0.3s ease;
-          }
-          
-          .category-checkbox:hover {
-            border-color: var(--primary-color);
-            background: var(--bg-tertiary);
-          }
-          
-          .category-input {
-            margin-right: 8px;
-          }
-          
-          .category-label {
-            font-size: 0.9rem;
-            color: var(--text-primary);
-          }
-
-          .category-checkbox input:checked + .category-label {
-            color: var(--primary-color);
-            font-weight: 600;
-          }
-
-          .category-checkbox input:checked {
-            accent-color: var(--primary-color);
-          }
-        `;
-        document.head.appendChild(style);
-      }
 
       // إعادة تعيين النموذج عند فتح إضافة جديد (فقط إذا لم يكن في وضع التعديل)
       const form = document.getElementById('addCourseForm');
@@ -290,7 +159,9 @@
             instructor: document.getElementById('courseInstructor'),
             duration: document.getElementById('courseDuration'),
             price: document.getElementById('coursePrice'),
-            icon: document.getElementById('courseIcon')
+            icon: document.getElementById('courseIcon'),
+            udemyLink: document.getElementById('courseUdemyLink')
+            // promoVideo and promoThumbnail removed - now managed in course content modal
           };
 
           // Check if any required element is missing
@@ -319,46 +190,30 @@
           elements.instructor.value = course.instructor || '';
           elements.duration.value = course.duration || '';
           elements.icon.value = course.icon || '';
+          elements.udemyLink.value = course.udemyLink || '';
 
           // Set pricing options
           const freeRadio = document.getElementById('pricingFree');
           const paidRadio = document.getElementById('pricingPaid');
           const priceGroup = document.getElementById('priceInputGroup');
+          const udemyLinkGroup = document.getElementById('udemyLinkGroup');
+          // Promo video and thumbnail now managed in course content modal
           const featuredEl = document.getElementById('courseFeatured');
 
           const isFree = course.isFree !== false; // default to true if not set
           if (freeRadio) freeRadio.checked = isFree;
           if (paidRadio) paidRadio.checked = !isFree;
           if (priceGroup) priceGroup.style.display = isFree ? 'none' : 'block';
+          if (udemyLinkGroup) udemyLinkGroup.style.display = isFree ? 'none' : 'block';
           if (!isFree) {
             elements.price.value = course.price || '';
           }
 
           if (featuredEl) featuredEl.checked = course.featured || false;
 
-          // Update categories
-          const categoryInputs = document.querySelectorAll('.category-input');
-          if (categoryInputs.length === 0) {
-            throw new Error('Categories UI not initialized');
-          }
+          // Promo video and thumbnail URLs removed from this form
+          // They are now managed in the course content modal
 
-          // Set category checkboxes WITHOUT auto-update listeners
-          // In edit mode, we want all changes to be saved together via the form submit
-          categoryInputs.forEach(input => {
-            input.checked = course.categories && Array.isArray(course.categories) &&
-              course.categories.some(cat => cat.mainCategory === input.value);
-              
-            // Remove any existing change handlers to prevent auto-update
-            // We want the user to submit the form to save all changes together
-            if (input._hasChangeHandler) {
-              const oldHandler = input._changeHandler;
-              if (oldHandler) {
-                input.removeEventListener('change', oldHandler);
-              }
-              input._hasChangeHandler = false;
-              input._changeHandler = null;
-            }
-          });
 
         } catch (err) {
           console.error('Error loading course:', err);
@@ -388,12 +243,6 @@
       if (form) form.reset();
       window.editingCourseId = null;
 
-      // تنظيف مجموعات التصنيفات الإضافية
-      const categoriesContainer = document.getElementById('categories-container');
-      if (categoriesContainer) {
-        const categoryGroups = categoriesContainer.querySelectorAll('.category-group:not(:first-child)');
-        categoryGroups.forEach(group => group.remove());
-      }
     },
 
     handleAddCourseSubmit(e) {
@@ -407,6 +256,8 @@
         const durEl = get('courseDuration');
         const priceEl = get('coursePrice');
         const iconEl = get('courseIcon');
+        const udemyLinkEl = get('courseUdemyLink');
+        // promoVideo and promoThumbnail removed - managed in course content modal
 
         if (!titleEl || !descEl) {
           // In a lightweight test page some fields may be missing — fail gracefully
@@ -415,11 +266,7 @@
           return;
         }
 
-        // جمع التصنيفات المختارة
-        const categoryInputs = document.querySelectorAll('.category-input:checked');
-        const categories = Array.from(categoryInputs).map(input => ({
-          mainCategory: input.value
-        }));
+        // collect other data
 
         const freeRadio = document.getElementById('pricingFree');
         const paidRadio = document.getElementById('pricingPaid');
@@ -435,17 +282,17 @@
           instructor: (instrEl && instrEl.value || '').trim(),
           duration: Number((durEl && durEl.value) || 0) || 0,
           price: price,
-          categories: categories.map(cat => ({
-            mainCategory: cat.mainCategory
-          })),
+          categories: [],
           icon: (iconEl && iconEl.value || '').trim(),
           isFree: isFree,
-          featured: featuredEl ? featuredEl.checked : false
+          featured: featuredEl ? featuredEl.checked : false,
+          udemyLink: (udemyLinkEl && udemyLinkEl.value || '').trim()
+          // promoVideo and promoThumbnail removed - managed in course content modal
         };
 
-        const token = localStorage.getItem('token');
         const method = window.editingCourseId ? 'PUT' : 'POST';
         const url = window.editingCourseId ? `/api/courses/${window.editingCourseId}` : '/api/courses';
+        const token = localStorage.getItem('token');
 
         fetch(url, {
           method,
@@ -495,13 +342,17 @@
       const freeRadio = document.getElementById('pricingFree');
       const paidRadio = document.getElementById('pricingPaid');
       const priceGroup = document.getElementById('priceInputGroup');
+      const udemyLinkGroup = document.getElementById('udemyLinkGroup');
+      // Promo video and thumbnail now managed in course content modal
 
       if (freeRadio && paidRadio && priceGroup) {
         const updatePriceVisibility = () => {
           if (paidRadio.checked) {
             priceGroup.style.display = 'block';
+            if (udemyLinkGroup) udemyLinkGroup.style.display = 'block';
           } else {
             priceGroup.style.display = 'none';
+            if (udemyLinkGroup) udemyLinkGroup.style.display = 'none';
           }
         };
 
@@ -577,78 +428,3 @@
   // expose
   window.Courses = Courses;
 })();
-
-function getCategoryName(category) {
-  const categories = {
-    'programming': 'برمجة',
-    'ethical-hacking': 'اختراق أخلاقي',
-    'cybersecurity': 'سايبر سكيورتي',
-    'mobile-development': 'تطوير تطبيقات',
-    'web-development': 'تطوير مواقع',
-    'video-editing': 'مونتاج'
-  };
-  return categories[category] || category;
-}
-
-function getSubCategoryName(subCategory) {
-  const subCategories = {
-    // Programming
-    'python': 'بايثون',
-    'javascript': 'جافاسكريبت',
-    'java': 'جافا',
-    'cpp': 'سي++',
-    'csharp': 'سي شارب',
-    'php': 'PHP',
-    // Web Development
-    'frontend': 'تطوير واجهات',
-    'backend': 'تطوير خلفي',
-    'fullstack': 'تطوير متكامل',
-    'react': 'رياكت',
-    'angular': 'أنجولر',
-    'vue': 'فيو',
-    // Mobile Development
-    'android': 'أندرويد',
-    'ios': 'آي أو إس',
-    'flutter': 'فلاتر',
-    'react-native': 'رياكت نيتف',
-    // Cybersecurity
-    'network-security': 'أمن الشبكات',
-    'web-security': 'أمن المواقع',
-    'malware-analysis': 'تحليل البرمجيات الخبيثة',
-    'incident-response': 'الاستجابة للحوادث',
-    // Ethical Hacking
-    'penetration-testing': 'اختبار الاختراق',
-    'vulnerability-assessment': 'تقييم الثغرات',
-    'social-engineering': 'الهندسة الاجتماعية',
-    // Video Editing
-    'premiere-pro': 'بريمير برو',
-    'after-effects': 'أفتر إفكتس',
-    'davinci-resolve': 'دافنشي ريزولف'
-  };
-  return subCategories[subCategory] || subCategory;
-}
-
-function updateSubCategories(mainCategory, subCategoriesSelect) {
-  const subCategories = {
-    'programming': ['python', 'javascript', 'java', 'cpp', 'csharp', 'php'],
-    'ethical-hacking': ['penetration-testing', 'vulnerability-assessment', 'social-engineering'],
-    'cybersecurity': ['network-security', 'web-security', 'malware-analysis', 'incident-response'],
-    'web-development': ['frontend', 'backend', 'fullstack', 'react', 'angular', 'vue'],
-    'mobile-development': ['android', 'ios', 'flutter', 'react-native'],
-    'video-editing': ['premiere-pro', 'after-effects', 'davinci-resolve'],
-    'other': []
-  };
-
-  // Clear existing options
-  subCategoriesSelect.innerHTML = '';
-
-  if (!mainCategory || !subCategories[mainCategory]) return;
-
-  // Add new options
-  subCategories[mainCategory].forEach(subCat => {
-    const option = document.createElement('option');
-    option.value = subCat;
-    option.textContent = getSubCategoryName(subCat);
-    subCategoriesSelect.appendChild(option);
-  });
-}

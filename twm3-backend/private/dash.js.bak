@@ -401,6 +401,27 @@ if (!window.Courses) {
                     }
                 } catch (e) { console.warn('Failed to set pricing type:', e); }
                 
+                // Set categories checkboxes - both old and new methods
+                try {
+                    // Method 1: New checkbox method
+                    const newCheckboxes = document.querySelectorAll('input[name="courseCategories"]');
+                    const categories = Array.isArray(course.categories) ? course.categories : [];
+                    
+                    newCheckboxes.forEach(checkbox => {
+                        // Check if this category is in the course's categories
+                        const isChecked = categories.some(cat => {
+                            // Handle both string and object formats
+                            const catValue = typeof cat === 'string' ? cat : cat.mainCategory;
+                            return catValue === checkbox.value;
+                        });
+                        checkbox.checked = isChecked;
+                    });
+                    
+                    // Method 2: Old category-input method (if available)
+                    document.querySelectorAll('.category-input').forEach(input => {
+                        input.checked = categories && Array.isArray(categories) && categories.some(c => c.mainCategory === input.value);
+                    });
+                } catch (e) { /* ignore if elements not present */ }
                 
                 (function(){ const el = document.getElementById('courseTags'); if (el) el.value = (course.tags || []).join(', '); })();
                 document.getElementById('courseIcon').value = course.icon || '';
@@ -696,7 +717,7 @@ if (!window.Courses) {
       const tbody = document.getElementById('courses-table');
       if (!tbody) return;
       if (!Array.isArray(courses) || courses.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7">لا توجد كورسات</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8">لا توجد كورسات</td></tr>';
         return;
       }
       tbody.innerHTML = courses.map((course, idx) => {
@@ -708,6 +729,10 @@ if (!window.Courses) {
             <td>${escapeHtml(course.instructor || '')}</td>
             <td>${course.duration || 0} ساعة</td>
             <td>${course.isFree ? 'مجاني' : (course.price || 0) + ' جنيه'}</td>
+            <!-- Categories column HIDDEN -->
+            <!-- <td>${course.categories && Array.isArray(course.categories) && course.categories.length ? 
+              course.categories.map(cat => escapeHtml(getCategoryName(cat.mainCategory))).join('، ') 
+              : '---'}</td> -->
             <td>
               <div class="action-buttons">
                   <button class="btn btn-primary" onclick="editCourse('${course._id}')" title="تعديل"><i class="fas fa-edit"></i></button>
@@ -2173,7 +2198,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     // تعيين القسم الافتراضي
     switchSection('users');
-});
+}); // Close DOMContentLoaded event listener
 
 
 
@@ -2268,9 +2293,6 @@ function switchSection(sectionId) {
     
     console.log('=== SECTION SWITCH COMPLETE ===');
 }
-
-
-
 
 // تأكد من وجود Quill في النطاق العام
 let Quill = window.Quill;
@@ -2641,41 +2663,30 @@ function displayCourseContent(courseContent, course) {
     const isPaid = course && !course.isFree;
     console.log('Course data:', course);
     console.log('Is paid course:', isPaid);
-    
-    // Show/hide promo video section in modal (robust detection for paid courses)
-    const promoSection = document.getElementById('promoVideoSection');
-    const isPaidRobust = (course && (
-        (typeof course.isFree !== 'undefined' && course.isFree === false) ||
-        (typeof course.isPaid !== 'undefined' && course.isPaid === true) ||
-        (typeof course.price !== 'undefined' && Number(course.price) > 0) ||
-        (typeof course.paid !== 'undefined' && course.paid === true)
-    ));
-
-    if (promoSection) {
-        promoSection.style.display = isPaidRobust ? 'block' : 'none';
-        // Also toggle the add-promo-button if present
-        const addPromoBtn = document.getElementById('add-promo-button');
-        if (addPromoBtn) addPromoBtn.style.display = isPaidRobust ? 'inline-block' : 'none';
-
-        if (isPaidRobust) {
-            // Load existing promo video URL if available
-            const promoUrlInput = document.getElementById('promoVideoUrl');
-            if (promoUrlInput && course && course.promoVideo) {
-                promoUrlInput.value = course.promoVideo;
-                // Update the iframe preview if there's a valid URL
-                if (typeof updatePromoVideoPreview === 'function') updatePromoVideoPreview(course.promoVideo);
-            }
-            // Default promo type to link when showing
-            try { selectPromoType('link'); } catch(e) {}
-        }
-    }
-
-    // Show/hide the 'Add Promo Video' button next to 'Add Unit'
-    try {
-        const addPromoBtn = document.getElementById('add-promo-button');
-        if (addPromoBtn) addPromoBtn.style.display = isPaid ? 'inline-block' : 'none';
-    } catch (e) {
-        console.warn('Could not toggle add-promo-button visibility', e);
+    if (isPaid) {
+        console.log('Adding promotional video section for paid course');
+        html += `
+            <div class="promo-video-section" style="border: 1px solid #ddd; margin: 10px 0; padding: 15px; border-radius: 8px; background-color: #f9f9f9;">
+                <h4 style="margin: 0 0 15px 0; color: #333;">فيديو ترويجي للكورس</h4>
+                <div class="promo-video-form" style="display: flex; flex-direction: column; gap: 10px;">
+                    <div class="form-group">
+                        <label for="promoVideoUrl" style="display: block; margin-bottom: 5px; font-weight: bold;">رابط الفيديو الترويجي (YouTube أو Google Drive):</label>
+                        <input type="url" id="promoVideoUrl" placeholder="https://www.youtube.com/watch?v=... أو https://drive.google.com/file/d/..." style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" value="${course && course.promoVideo ? course.promoVideo : ''}">
+                    </div>
+                    <div class="form-group">
+                        <label for="promoVideoFile" style="display: block; margin-bottom: 5px; font-weight: bold;">أو رفع ملف فيديو:</label>
+                        <input type="file" id="promoVideoFile" accept="video/*" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                    </div>
+                    <div class="form-group">
+                        <label for="promoThumbnailFile" style="display: block; margin-bottom: 5px; font-weight: bold;">صورة مصغرة (Thumbnail):</label>
+                        <input type="file" id="promoThumbnailFile" accept="image/*" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                    </div>
+                    <button onclick="updatePromoVideo('${window.currentCourseId || currentCourseId}')" class="btn btn-primary" style="align-self: flex-start; padding: 8px 16px;">
+                        <i class="fas fa-save"></i> حفظ الفيديو الترويجي
+                    </button>
+                </div>
+            </div>
+        `;
     }
 
     if (!courseContent.units || courseContent.units.length === 0) {
@@ -2687,92 +2698,46 @@ function displayCourseContent(courseContent, course) {
             console.error('currentCourseId غير محدد');
             html += '<p>خطأ: لم يتم تحديد الكورس</p>';
         } else {
-            courseContent.units.forEach((unit, unitIndex) => {
-                html += `
-                    <div class="module-item" style="border: 1px solid #ddd; margin: 10px 0; padding: 15px; border-radius: 8px;">
-                        <div class="module-header" style="display: flex; justify-content: space-between; align-items: center;">
-                            <h4 style="margin: 0;">الوحدة ${unitIndex + 1}: ${unit.title}</h4>
-                            <div class="module-actions">
-                                <button onclick="addLessonToUnit('${courseIdToUse}', '${unit._id}')" class="btn btn-sm btn-primary" style="margin-left: 8px;">
-                                    <i class="fas fa-plus"></i> إضافة درس
-                                </button>
-                                <button onclick="deleteUnit('${courseIdToUse}', '${unit._id}')" class="btn btn-sm btn-danger">
-                                    <i class="fas fa-trash"></i> حذف
-                                </button>
-                            </div>
-                        </div>
-                        <div class="lessons-list" style="margin-top: 15px;">
-                            ${unit.lessons && unit.lessons.length > 0 ?
-                                unit.lessons.map((lesson, lessonIndex) => `
-                                    <div class="lesson-item" style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee;">
-                                        <span>الدرس ${lessonIndex + 1}: ${lesson.title}</span>
-                                        <div class="lesson-actions">
-                                            <button onclick="editLesson('${courseIdToUse}', '${unit._id}', '${lesson._id}')" class="btn btn-sm btn-secondary" style="margin-left: 5px;">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button onclick="deleteLesson('${courseIdToUse}', '${unit._id}', '${lesson._id}')" class="btn btn-sm btn-danger">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </div>
-                                `).join('')
-                                : '<p style="text-align: center; color: #999; margin: 10px 0;">لا توجد دروس في هذه الوحدة</p>'
-                            }
+    
+        courseContent.units.forEach((unit, unitIndex) => {
+            html += `
+                <div class="module-item" style="border: 1px solid #ddd; margin: 10px 0; padding: 15px; border-radius: 8px;">
+                    <div class="module-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <h4 style="margin: 0;">الوحدة ${unitIndex + 1}: ${unit.title}</h4>
+                        <div class="module-actions">
+                            <button onclick="addLessonToUnit('${courseIdToUse}', '${unit._id}')" class="btn btn-sm btn-primary" style="margin-left: 8px;">
+                                <i class="fas fa-plus"></i> إضافة درس
+                            </button>
+                            <button onclick="deleteUnit('${courseIdToUse}', '${unit._id}')" class="btn btn-sm btn-danger">
+                                <i class="fas fa-trash"></i> حذف
+                            </button>
                         </div>
                     </div>
-                `;
-            });
-        }
+                    <div class="lessons-list" style="margin-top: 15px;">
+                        ${unit.lessons && unit.lessons.length > 0 ?
+                            unit.lessons.map((lesson, lessonIndex) => `
+                                <div class="lesson-item" style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee;">
+                                    <span>الدرس ${lessonIndex + 1}: ${lesson.title}</span>
+                                    <div class="lesson-actions">
+                                        <button onclick="editLesson('${courseIdToUse}', '${unit._id}', '${lesson._id}')" class="btn btn-sm btn-secondary" style="margin-left: 5px;">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button onclick="deleteLesson('${courseIdToUse}', '${unit._id}', '${lesson._id}')" class="btn btn-sm btn-danger">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `).join('')
+                            : '<p style="text-align: center; color: #999; margin: 10px 0;">لا توجد دروس في هذه الوحدة</p>'
+                        }
+                    </div>
+                </div>
+            `;
+        });
     }
 
     container.innerHTML = html;
 }
-
-// Open / focus the promo editor inside the course content modal
-function openPromoEditor(courseId) {
-    try {
-        const promoSection = document.getElementById('promoVideoSection');
-        if (!promoSection) return;
-        // Ensure promo section is visible (it should be for paid courses)
-        promoSection.style.display = 'block';
-        // If modal is hidden for some reason, open it
-        const modal = document.getElementById('courseContentModal');
-        if (modal && !modal.classList.contains('show')) {
-            modal.style.display = 'flex';
-            modal.classList.add('show');
-            document.body.style.overflow = 'hidden';
-        }
-        // Scroll promo section into view and focus URL input
-        setTimeout(() => {
-            promoSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            const promoUrl = document.getElementById('promoVideoUrl');
-            if (promoUrl) promoUrl.focus();
-        }, 120);
-    } catch (err) {
-        console.error('openPromoEditor failed', err);
-    }
-}
-
-window.openPromoEditor = openPromoEditor;
-
-// Select promo type: 'link' or 'upload'
-function selectPromoType(type) {
-    try {
-        const linkGroup = document.getElementById('promoLinkGroup');
-        const uploadGroup = document.getElementById('promoUploadGroup');
-        if (type === 'upload') {
-            if (linkGroup) linkGroup.style.display = 'none';
-            if (uploadGroup) uploadGroup.style.display = 'block';
-        } else {
-            if (linkGroup) linkGroup.style.display = 'block';
-            if (uploadGroup) uploadGroup.style.display = 'none';
-        }
-    } catch (err) {
-        console.warn('selectPromoType failed', err);
-    }
-}
-
-window.selectPromoType = selectPromoType;
 
 function closeCourseContentModal() {
     const modal = document.getElementById('courseContentModal');

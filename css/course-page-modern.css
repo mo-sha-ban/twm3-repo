@@ -352,3 +352,344 @@
     margin-top: 0.5rem;
     text-align: center;
 }
+
+/* Modern Course Content Management Styles */
+
+.promo-video-section {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+body.dark .promo-video-section {
+  background: rgba(30, 30, 40, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.promo-video-section .section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.dark .promo-video-section .section-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.promo-video-section .section-header h3 {
+  margin: 0;
+  color: #1a202c;
+  font-size: 1.3rem;
+}
+
+body.dark .promo-video-section .section-header h3 {
+  color: #e2e8f0;
+}
+
+.promo-video-section .section-header h3 i {
+  color: #f59e0b;
+}
+
+.promo-video-content {
+  margin-top: 15px;
+}
+
+.promo-video-preview {
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+
+.promo-video-preview.youtube-preview {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+  height: 0;
+}
+
+.promo-video-preview.youtube-preview iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.promo-video-preview.local-preview video {
+  width: 100%;
+  border-radius: 8px;
+  background: #000;
+}
+
+.unit-item {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+body.dark .unit-item {
+  background: rgba(30, 30, 40, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.unit-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.unit-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.dark .unit-header {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.unit-title {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #1a202c;
+}
+
+body.dark .unit-title {
+  color: #e2e8f0;
+}
+
+.unit-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.unit-description {
+  color: #4a5568;
+  margin-bottom: 20px;
+  line-height: 1.6;
+}
+
+body.dark .unit-description {
+  color: #a0aec0;
+}
+
+.unit-lessons h4 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #1a202c;
+  font-size: 1.1rem;
+}
+
+body.dark .unit-lessons h4 {
+  color: #e2e8f0;
+}
+
+.lesson-item {
+  background: rgba(247, 250, 252, 0.8);
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+body.dark .lesson-item {
+  background: rgba(45, 55, 72, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.lesson-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.lesson-title {
+  font-weight: 500;
+  color: #2d3748;
+  font-size: 1rem;
+}
+
+body.dark .lesson-title {
+  color: #e2e8f0;
+}
+
+.lesson-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.lesson-description {
+  color: #4a5568;
+  font-size: 0.9rem;
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+body.dark .lesson-description {
+  color: #a0aec0;
+}
+
+.lesson-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 0.8rem;
+}
+
+.lesson-type, .lesson-duration {
+  background: rgba(66, 153, 225, 0.1);
+  color: #2b6cb0;
+  padding: 3px 8px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+body.dark .lesson-type, 
+body.dark .lesson-duration {
+  background: rgba(66, 153, 225, 0.2);
+  color: #63b3ed;
+}
+
+.no-lessons {
+  color: #718096;
+  font-style: italic;
+  text-align: center;
+  padding: 15px;
+}
+
+body.dark .no-lessons {
+  color: #a0aec0;
+}
+
+.add-unit-section {
+  margin-bottom: 30px;
+}
+
+.add-unit-form {
+  background: rgba(247, 250, 252, 0.9);
+  border-radius: 10px;
+  padding: 20px;
+  margin-top: 15px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+body.dark .add-unit-form {
+  background: rgba(45, 55, 72, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.add-unit-form .form-control {
+  width: 100%;
+  margin-bottom: 15px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  font-family: inherit;
+  font-size: 0.95rem;
+}
+
+body.dark .add-unit-form .form-control {
+  background: rgba(26, 32, 44, 0.8);
+  border: 1px solid #4a5568;
+  color: #e2e8f0;
+}
+
+.add-unit-form textarea.form-control {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.add-lesson-form {
+  background: rgba(247, 250, 252, 0.9);
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 15px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+body.dark .add-lesson-form {
+  background: rgba(45, 55, 72, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.add-lesson-form .form-control {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 8px 10px;
+  border-radius: 5px;
+  border: 1px solid #e2e8f0;
+  font-family: inherit;
+  font-size: 0.9rem;
+}
+
+body.dark .add-lesson-form .form-control {
+  background: rgba(26, 32, 44, 0.8);
+  border: 1px solid #4a5568;
+  color: #e2e8f0;
+}
+
+.add-lesson-form .form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.no-units-message {
+  text-align: center;
+  padding: 40px 20px;
+  color: #718096;
+  background: rgba(247, 250, 252, 0.6);
+  border-radius: 10px;
+  border: 1px dashed rgba(0, 0, 0, 0.1);
+}
+
+body.dark .no-units-message {
+  color: #a0aec0;
+  background: rgba(45, 55, 72, 0.6);
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 0.8rem;
+}
+
+.btn-outline-primary {
+  background: transparent;
+  border: 1px solid #3182ce;
+  color: #3182ce;
+}
+
+.btn-outline-primary:hover {
+  background: #3182ce;
+  color: white;
+}
+
+body.dark .btn-outline-primary {
+  border: 1px solid #63b3ed;
+  color: #63b3ed;
+}
+
+body.dark .btn-outline-primary:hover {
+  background: #63b3ed;
+  color: #1a202c;
+}
+
+.edit-promo-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}

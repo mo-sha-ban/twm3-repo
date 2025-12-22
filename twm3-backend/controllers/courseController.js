@@ -12,18 +12,28 @@ exports.getCourseContent = async (req, res) => {
 
 // إضافة وحدة جديدة
 exports.addUnit = async (req, res) => {
-  const { title } = req.body;
+  const { title, description } = req.body;
   const course = await Course.findById(req.params.id);
   if (!course) return res.status(404).json({ error: 'Course not found' });
-  course.units.push({ title, lessons: [] });
+  
+  // إنشاء ID يدوي للوحدة
+  const unitId = new mongoose.Types.ObjectId();
+  
+  course.units.push({ 
+    _id: unitId,
+    title, 
+    description,
+    lessons: [] 
+  });
+  
   await course.save();
-  res.json(course);
+  res.json({...course._doc, newUnitId: unitId});
 };
 
 exports.addLesson = async (req, res) => {
   try {
     const { unitId } = req.params;
-    const { title, videoUrl, description } = req.body;
+    const { title, videoUrl, description, duration, type, isFree, specialization } = req.body;
 
     const course = await Course.findOne({ 'units._id': unitId });
     if (!course) return res.status(404).json({ error: 'Course not found' });
@@ -38,6 +48,10 @@ exports.addLesson = async (req, res) => {
       title,
       videoUrl,
       description,
+      duration: duration || 0,
+      type: type || 'video',
+      isFree: isFree || false,
+      specialization: specialization || 'cybersecurity'
     };
 
     // إضافة الدرس داخل الوحدة
@@ -56,7 +70,12 @@ exports.addLesson = async (req, res) => {
 
     await course.save();
 
-    res.status(201).json({ message: 'تم إضافة الدرس بنجاح', lesson: newLesson });
+    res.status(201).json({ 
+      message: 'تم إضافة الدرس بنجاح', 
+      lesson: newLesson,
+      courseId: course._id,
+      unitId: unit._id
+    });
   } catch (error) {
     console.error('Add lesson error:', error);
     res.status(500).json({ error: 'حدث خطأ أثناء إضافة الدرس' });
@@ -67,8 +86,8 @@ exports.addLesson = async (req, res) => {
 // تعديل درس
 exports.editLesson = async (req, res) => {
   const { unitId, lessonId } = req.params;
-  const { title, videoUrl, description, fileUrl, externalUrl, content, duration, type, isFree } = req.body;
-  console.log('editLesson payload:', { unitId, lessonId, title, videoUrl, fileUrl, externalUrl, content, duration, type, isFree });
+  const { title, videoUrl, description, fileUrl, externalUrl, content, duration, type, isFree, specialization } = req.body;
+  console.log('editLesson payload:', { unitId, lessonId, title, videoUrl, fileUrl, externalUrl, content, duration, type, isFree, specialization });
   const course = await Course.findOne({ 'units._id': unitId });
   if (!course) return res.status(404).json({ error: 'Course not found' });
   const unit = course.units.id(unitId);
@@ -78,6 +97,7 @@ exports.editLesson = async (req, res) => {
   if (typeof duration !== 'undefined') lesson.duration = duration;
   if (typeof type !== 'undefined') lesson.type = type;
   if (typeof isFree !== 'undefined') lesson.isFree = isFree;
+  if (typeof specialization !== 'undefined') lesson.specialization = specialization;
   if (typeof description !== 'undefined') lesson.description = description;
   if (typeof videoUrl !== 'undefined') { lesson.videoUrl = videoUrl; lesson.fileUrl = undefined; lesson.externalUrl = undefined; lesson.content = undefined; }
   if (typeof fileUrl !== 'undefined') { lesson.fileUrl = fileUrl; lesson.videoUrl = undefined; lesson.externalUrl = undefined; lesson.content = undefined; }
@@ -94,7 +114,9 @@ exports.deleteLesson = async (req, res) => {
   const course = await Course.findOne({ 'units._id': unitId });
   if (!course) return res.status(404).json({ error: 'Course not found' });
   const unit = course.units.id(unitId);
-  unit.lessons.id(lessonId).remove();
+  const lesson = unit.lessons.id(lessonId);
+  if (!lesson) return res.status(404).json({ error: 'Lesson not found' });
+  lesson.remove();
   await course.save();
   res.json(unit);
 };

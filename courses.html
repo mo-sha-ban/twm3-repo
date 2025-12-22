@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://www.youtube.com https://www.youtube-nocookie.com https://cdn.plyr.io https://cdnjs.cloudflare.com https://www.google.com https://apis.google.com https://ssl.gstatic.com https://www.gstatic.com https://*.youtube.com https://*.gstatic.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; connect-src 'self' https: http:;">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/courses-carousel.css">
@@ -327,10 +328,27 @@
             overflow: hidden;
             backdrop-filter: blur(18px) saturate(150%);
             -webkit-backdrop-filter: blur(18px) saturate(150%);
-            transition: transform var(--courses-transition-medium),
-                        box-shadow var(--courses-transition-medium),
-                        border-color var(--courses-transition-medium),
-                        background var(--courses-transition-medium);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .course-paid-badge {
+            position: relative;
+            z-index: 1;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #fff;
+            font-size: 11px;
+            font-weight: 800;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 8px 18px rgba(245, 158, 11, 0.55);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            white-space: nowrap;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .course-card::before {
@@ -468,6 +486,14 @@
             align-items: center;
         }
 
+        .course-card.paid-course .course-cta {
+            gap: 8px;
+        }
+
+        .course-card.paid-course .course-cta a:first-child {
+            flex: 1.5;
+        }
+
         .course-cta a {
             flex: 1;
             display: inline-flex;
@@ -492,6 +518,632 @@
         .course-cta a:hover {
             transform: translateY(-1px);
             box-shadow: 0 16px 36px rgba(37, 99, 235, 0.65);
+        }
+
+        /* ============================================
+           Paid Course - Premium 3D Liquid Glass Design
+           ============================================ */
+        .course-card.paid-course {
+            background: 
+                linear-gradient(135deg, rgba(255, 215, 0, 0.08) 0%, rgba(212, 175, 55, 0.12) 100%),
+                rgba(255, 255, 255, 0.75);
+            border: 2px solid rgba(255, 215, 0, 0.35);
+            box-shadow:
+                0 25px 70px rgba(212, 175, 55, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.5) inset,
+                0 10px 40px rgba(255, 215, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            perspective: 1000px;
+        }
+
+        body.dark .course-card.paid-course,
+        :root.dark-theme .course-card.paid-course {
+            background: 
+                linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(212, 175, 55, 0.2) 100%),
+                rgba(15, 23, 42, 0.85);
+            border: 2px solid rgba(255, 215, 0, 0.45);
+        }
+
+        /* 3D Liquid Glass Effect */
+        .course-card.paid-course::before {
+            content: '';
+            position: absolute;
+            top: -60%;
+            left: -60%;
+            width: 220%;
+            height: 220%;
+            background: 
+                radial-gradient(circle at 30% 30%, rgba(255, 215, 0, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 70% 70%, rgba(250, 218, 94, 0.3) 0%, transparent 50%);
+            animation: liquidFloat 8s ease-in-out infinite;
+            z-index: 0;
+            filter: blur(40px);
+            opacity: 0.6;
+        }
+
+        @keyframes liquidFloat {
+            0%, 100% { 
+                transform: translate(-50%, -50%) rotate(0deg) scale(1);
+                opacity: 0.5;
+            }
+            33% { 
+                transform: translate(-45%, -55%) rotate(120deg) scale(1.1);
+                opacity: 0.7;
+            }
+            66% { 
+                transform: translate(-55%, -45%) rotate(240deg) scale(0.95);
+                opacity: 0.6;
+            }
+        }
+
+        /* 3D Depth Layers */
+        .course-card.paid-course::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: 
+                linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
+                linear-gradient(225deg, rgba(255, 215, 0, 0.1) 0%, transparent 50%);
+            z-index: 0;
+            pointer-events: none;
+            border-radius: inherit;
+        }
+
+        .course-card.paid-course > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .course-card.paid-course:hover {
+            transform: translateY(-12px) rotateX(2deg) scale(1.02);
+            border-color: rgba(255, 215, 0, 0.6);
+            box-shadow:
+                0 35px 100px rgba(212, 175, 55, 0.45),
+                0 0 0 2px rgba(255, 255, 255, 0.6) inset,
+                0 15px 60px rgba(255, 215, 0, 0.35),
+                0 5px 20px rgba(255, 215, 0, 0.2);
+        }
+
+        .course-card.paid-course .course-icon {
+            background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #FADA5E 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 4px 12px rgba(212, 175, 55, 0.5));
+            position: relative;
+        }
+
+        .course-card.paid-course .course-icon::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(212, 175, 55, 0.3));
+            border-radius: inherit;
+            z-index: -1;
+            filter: blur(8px);
+        }
+
+        .course-card.paid-course .course-title-area h2 {
+            background: linear-gradient(135deg, #D4AF37 0%, #FFD700 50%, #FADA5E 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 8px rgba(212, 175, 55, 0.3);
+        }
+
+        /* Premium Features Section */
+        .paid-course-features {
+            margin: 12px 0;
+            padding: 14px;
+            background: 
+                linear-gradient(135deg, rgba(255, 215, 0, 0.08) 0%, rgba(239, 223, 187, 0.12) 100%),
+                rgba(255, 255, 255, 0.5);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 215, 0, 0.25);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        body.dark .paid-course-features,
+        :root.dark-theme .paid-course-features {
+            background: 
+                linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, rgba(212, 175, 55, 0.15) 100%),
+                rgba(15, 23, 42, 0.6);
+        }
+
+        .paid-course-features h3 {
+            font-size: 13px;
+            font-weight: 800;
+            color: #D4AF37;
+            margin: 0 0 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .paid-course-features h3 i {
+            font-size: 14px;
+            color: #FFD700;
+        }
+
+        .paid-course-features ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .paid-course-features li {
+            font-size: 11px;
+            color: var(--courses-text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 8px;
+            background: rgba(255, 255, 255, 0.4);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 215, 0, 0.15);
+            transition: all 0.2s ease;
+        }
+
+        body.dark .paid-course-features li,
+        :root.dark-theme .paid-course-features li {
+            background: rgba(15, 23, 42, 0.4);
+            color: #e5e7eb;
+        }
+
+        .paid-course-features li:hover {
+            background: rgba(255, 215, 0, 0.15);
+            border-color: rgba(255, 215, 0, 0.3);
+            transform: translateX(4px);
+        }
+
+        .paid-course-features li i {
+            font-size: 10px;
+            color: #D4AF37;
+            flex-shrink: 0;
+        }
+
+        /* Promotional Video Section */
+        .paid-course-promo {
+            margin: 12px 0;
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: 
+                linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(212, 175, 55, 0.15) 100%),
+                rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .paid-course-promo:hover {
+            border-color: rgba(255, 215, 0, 0.5);
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3);
+            transform: translateY(-2px);
+        }
+
+        body.dark .paid-course-promo,
+        :root.dark-theme .paid-course-promo {
+            background: 
+                linear-gradient(135deg, rgba(255, 215, 0, 0.06) 0%, rgba(212, 175, 55, 0.08) 100%),
+                rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(255, 215, 0, 0.25);
+        }
+
+        body.dark .paid-course-promo:hover,
+        :root.dark-theme .paid-course-promo:hover {
+            border-color: rgba(255, 215, 0, 0.45);
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.2);
+        }
+
+        .paid-course-promo-thumbnail {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(212, 175, 55, 0.3));
+            overflow: hidden;
+        }
+
+        body.dark .paid-course-promo-thumbnail,
+        :root.dark-theme .paid-course-promo-thumbnail {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(212, 175, 55, 0.15));
+        }
+
+        .paid-course-promo-thumbnail img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .paid-course-promo:hover .paid-course-promo-thumbnail img {
+            transform: scale(1.08);
+        }
+
+        .promo-placeholder {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.15), rgba(212, 175, 55, 0.25));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(212, 175, 55, 0.5);
+            font-size: 28px;
+        }
+
+        body.dark .promo-placeholder,
+        :root.dark-theme .promo-placeholder {
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.08), rgba(212, 175, 55, 0.12));
+            color: rgba(255, 215, 0, 0.4);
+        }
+
+        .paid-course-promo-play {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            background: 
+                linear-gradient(135deg, rgba(255, 215, 0, 0.95), rgba(212, 175, 55, 0.95));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 
+                0 8px 24px rgba(212, 175, 55, 0.5),
+                0 0 0 8px rgba(255, 215, 0, 0.2);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .paid-course-promo:hover .paid-course-promo-play {
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 
+                0 12px 32px rgba(212, 175, 55, 0.6),
+                0 0 0 12px rgba(255, 215, 0, 0.3);
+        }
+
+        body.dark .paid-course-promo-play,
+        :root.dark-theme .paid-course-promo-play {
+            background: 
+                linear-gradient(135deg, rgba(255, 215, 0, 0.85), rgba(212, 175, 55, 0.85));
+            box-shadow: 
+                0 8px 24px rgba(212, 175, 55, 0.35),
+                0 0 0 8px rgba(255, 215, 0, 0.15);
+        }
+
+        body.dark .paid-course-promo:hover .paid-course-promo-play,
+        :root.dark-theme .paid-course-promo:hover .paid-course-promo-play {
+            box-shadow: 
+                0 12px 32px rgba(212, 175, 55, 0.4),
+                0 0 0 12px rgba(255, 215, 0, 0.2);
+        }
+
+        .paid-course-promo-play i {
+            font-size: 24px;
+            color: #fff;
+            margin-left: 4px;
+        }
+
+        .paid-course-promo-label {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            font-size: 11px;
+            font-weight: 700;
+            color: #D4AF37;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        body.dark .paid-course-promo-label,
+        :root.dark-theme .paid-course-promo-label {
+            background: rgba(15, 23, 42, 0.6);
+            color: #FADA5E;
+        }
+
+        .paid-course-promo-label i {
+            font-size: 12px;
+        }
+
+        .course-card.paid-course .course-cta a {
+            background: linear-gradient(135deg, #FFD700 0%, #D4AF37 50%, #FADA5E 100%);
+            box-shadow:
+                0 12px 30px rgba(212, 175, 55, 0.5),
+                0 0 0 2px rgba(255, 255, 255, 0.3) inset;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .course-card.paid-course .course-cta a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .course-card.paid-course .course-cta a:hover::before {
+            left: 100%;
+        }
+
+        .course-card.paid-course .course-cta a:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow:
+                0 16px 40px rgba(212, 175, 55, 0.6),
+                0 0 0 3px rgba(255, 255, 255, 0.4) inset;
+        }
+
+        .course-card.paid-course .course-price-pill:not(.free) {
+            background: linear-gradient(135deg, #FFD700 0%, #D4AF37 100%);
+            color: #78350f;
+            border: 2px solid rgba(255, 255, 255, 0.4);
+            box-shadow:
+                0 4px 16px rgba(212, 175, 55, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+            font-weight: 800;
+            animation: pricePulse 2s ease-in-out infinite;
+        }
+
+        .course-card.paid-course .course-paid-badge {
+            background: linear-gradient(135deg, #D4AF37 0%, #FFD700 100%);
+            box-shadow: 0 8px 18px rgba(212, 175, 55, 0.55);
+            color: #78350f;
+        }
+
+        /* ============================================
+                   Featured Course - Liquid Glass Design
+                   ============================================ */
+        .course-card.featured-course {
+            background:
+                linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(59, 130, 246, 0.12) 100%),
+                rgba(255, 255, 255, 0.75);
+            border: 2px solid rgba(139, 92, 246, 0.35);
+            box-shadow:
+                0 25px 70px rgba(139, 92, 246, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.5) inset,
+                0 10px 40px rgba(139, 92, 246, 0.2);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            perspective: 1000px;
+        }
+
+        body.dark .course-card.featured-course,
+        :root.dark-theme .course-card.featured-course {
+            background:
+                linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(59, 130, 246, 0.2) 100%),
+                rgba(15, 23, 42, 0.85);
+            border: 2px solid rgba(139, 92, 246, 0.45);
+        }
+
+        /* Liquid Glass Effect for Featured */
+        .course-card.featured-course::before {
+            content: '';
+            position: absolute;
+            top: -60%;
+            left: -60%;
+            width: 220%;
+            height: 220%;
+            background:
+                radial-gradient(circle at 30% 30%, rgba(139, 92, 246, 0.4) 0%, transparent 50%),
+                radial-gradient(circle at 70% 70%, rgba(124, 58, 237, 0.3) 0%, transparent 50%);
+            animation: liquidFloatFeatured 8s ease-in-out infinite;
+            z-index: 0;
+            filter: blur(40px);
+            opacity: 0.6;
+        }
+
+        @keyframes liquidFloatFeatured {
+            0%, 100% {
+                transform: translate(-50%, -50%) rotate(0deg) scale(1);
+                opacity: 0.5;
+            }
+            33% {
+                transform: translate(-45%, -55%) rotate(120deg) scale(1.1);
+                opacity: 0.7;
+            }
+            66% {
+                transform: translate(-55%, -45%) rotate(240deg) scale(0.95);
+                opacity: 0.6;
+            }
+        }
+
+        /* 3D Depth Layers for Featured */
+        .course-card.featured-course::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
+                linear-gradient(225deg, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+            z-index: 0;
+            pointer-events: none;
+            border-radius: inherit;
+        }
+
+        .course-card.featured-course > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .course-card.featured-course:hover {
+            transform: translateY(-12px) rotateX(2deg) scale(1.02);
+            border-color: rgba(139, 92, 246, 0.6);
+            box-shadow:
+                0 35px 100px rgba(139, 92, 246, 0.45),
+                0 0 0 2px rgba(255, 255, 255, 0.6) inset,
+                0 15px 60px rgba(139, 92, 246, 0.35),
+                0 5px 20px rgba(139, 92, 246, 0.2);
+        }
+
+        .course-card.featured-course .course-icon {
+            background: linear-gradient(135deg, #8B5CF6 0%, #3B82F6 50%, #6366F1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 4px 12px rgba(139, 92, 246, 0.5));
+            position: relative;
+        }
+
+        .course-card.featured-course .course-icon::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.3));
+            border-radius: inherit;
+            z-index: -1;
+            filter: blur(8px);
+        }
+
+        .course-card.featured-course .course-title-area h2 {
+            background: linear-gradient(135deg, #7C3AED 0%, #3B82F6 50%, #6366F1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+        }
+
+        .course-card.featured-course .course-featured-badge {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.95), rgba(124, 58, 237, 0.98));
+            color: #e9d5ff;
+            box-shadow: 0 8px 18px rgba(139, 92, 246, 0.55);
+        }
+
+        .course-card.featured-course .course-cta a {
+            background: linear-gradient(135deg, #8B5CF6 0%, #3B82F6 50%, #6366F1 100%);
+            box-shadow:
+                0 12px 30px rgba(139, 92, 246, 0.5),
+                0 0 0 2px rgba(255, 255, 255, 0.3) inset;
+        }
+
+        .course-card.featured-course .course-cta a:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow:
+                0 16px 40px rgba(139, 92, 246, 0.6),
+                0 0 0 3px rgba(255, 255, 255, 0.4) inset;
+        }
+
+        /* Udemy Link Button */
+        .udemy-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+            color: white;
+            font-size: 12px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: all var(--courses-transition-fast);
+            box-shadow: 0 8px 20px rgba(168, 85, 247, 0.4);
+            flex-shrink: 0;
+        }
+
+        .udemy-link:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 12px 30px rgba(168, 85, 247, 0.6);
+            background: linear-gradient(135deg, #9333ea 0%, #6d28d9 100%);
+        }
+
+        .udemy-link i {
+            font-size: 13px;
+        }
+
+        /* بطاقة معلومات الكورس المدفوع */
+        .paid-course-info-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            z-index: 10;
+            box-shadow: 0 10px 25px rgba(236, 72, 153, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            animation: badgePulse 2s ease-in-out infinite;
+        }
+
+        @keyframes badgePulse {
+            0%, 100% {
+                transform: scale(1);
+                filter: brightness(1);
+            }
+            50% {
+                transform: scale(1.05);
+                filter: brightness(1.1);
+            }
+        }
+
+        .course-card {
+            position: relative;
+        }
+
+        /* تحسين ألوان الشارات */
+        .course-paid-badge {
+            animation: badgePop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes badgePop {
+            0% {
+                opacity: 0;
+                transform: scale(0.8) rotate(-10deg);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) rotate(0deg);
+            }
+        }
+
+        @keyframes pricePulse {
+            0%, 100% {
+                box-shadow: 
+                    0 4px 16px rgba(99, 102, 241, 0.4),
+                    0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+            }
+            50% {
+                box-shadow: 
+                    0 6px 24px rgba(99, 102, 241, 0.6),
+                    0 0 0 2px rgba(255, 255, 255, 0.3) inset;
+            }
         }
 
         .courses-state {
@@ -656,8 +1308,7 @@
             <div class="footer-main">
                 <div class="footer-brand">
                     <div class="brand-logo">
-                        <img src="img/logo.png" alt="TWM3 Logo" />
-                        <div class="logo-glow"></div>
+                        <img src="img/loogo.png" alt="TWM3 Logo" />
                     </div>
                     <h3>TWM3</h3>
                     <p>فريق عمل متخصص في البرمجة والأمن السيبراني</p>
@@ -734,6 +1385,16 @@
         let filteredCourses = [];
         let activeFilter = 'all';
 
+        function escapeHtml(str) {
+            if (str === null || str === undefined) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
         function renderCourses(courses) {
             grid.innerHTML = '';
             if (!courses.length) {
@@ -749,31 +1410,55 @@
                 const icon = course.icon || 'fa-solid fa-book';
                 const title = course.title || 'بدون عنوان';
                 const description = course.description || '';
-                const instructor = course.instructor || 'غير محدد';
-                const priceValue = (course.price !== undefined && course.price !== null) ? course.price : 0;
+                const instructor = course.instructor || (course.author || 'غير محدد');
                 const isFeatured = course.featured || false;
-                const isFree = course.isFree !== false; // default true
-                const link = `course-page.html?id=${course._id}`;
+
+                // determine free vs paid
+                const payField = (String(course.pay || '')).toLowerCase();
+                const rawPrice = course.price;
+                const priceIsStringFree = (typeof rawPrice === 'string' && rawPrice.toLowerCase() === 'free');
+                const priceIsZero = rawPrice === 0 || rawPrice === '0' || rawPrice === null || rawPrice === undefined;
+                const isFree = payField === 'free' || priceIsStringFree || priceIsZero || course.isFree === true;
+
+                // normalize price label
+                let priceLabel = 'مجاني';
+                if (!isFree) {
+                    if (typeof rawPrice === 'number' || (!isNaN(Number(rawPrice)) && rawPrice !== null)) {
+                        priceLabel = Number(rawPrice) + ' جنيه';
+                    } else if (rawPrice) {
+                        priceLabel = String(rawPrice);
+                    } else {
+                        priceLabel = 'قابل للشراء';
+                    }
+                }
+
+                const lessonsCount = (Array.isArray(course.units) ? course.units.length : (Array.isArray(course.lessons) ? course.lessons.length : 0));
+                const link = `course-page.html?id=${encodeURIComponent(course.id || course._id || course._id_str || '')}`;
 
                 const card = document.createElement('article');
-                card.className = 'course-card';
+                card.className = 'course-card' + (!isFree ? ' paid-course' : '') + (isFeatured ? ' featured-course' : '');
+
+                // Promo video removed from cards - shown only in course-page.html
+                let promoHTML = '';
 
                 card.innerHTML = `
                     <div class="course-card-header">
                         <div class="course-icon"><i class="${icon}"></i></div>
                         <div class="course-title-area">
-                            <h2 title="${title}">${title}</h2>
-                            <p class="course-instructor"><i class="fa-solid fa-user"></i><span>${instructor}</span></p>
+                            <h2 title="${escapeHtml(title)}">${escapeHtml(title)}</h2>
+                            <p class="course-instructor"><i class="fa-solid fa-user"></i><span>${escapeHtml(instructor)}</span></p>
                         </div>
                         ${isFeatured ? '<div class="course-featured-badge"><i class="fa-solid fa-star"></i><span>كورس مميز</span></div>' : ''}
                     </div>
-                    <p class="course-description">${description}</p>
+                    ${!isFree ? '<div class="course-paid-badge"><i class="fa-solid fa-crown"></i><span>مدفوع</span></div>' : ''}
+                    <p class="course-description">${escapeHtml(description)}</p>
+                    ${promoHTML}
                     <div class="course-meta-row">
                         <div class="course-price-pill ${isFree ? 'free' : ''}">
                             <i class="fa-solid ${isFree ? 'fa-gift' : 'fa-tag'}"></i>
-                            <span>${isFree ? 'مجاني' : priceValue + ' جنيه'}</span>
+                            <span>${escapeHtml(priceLabel)}</span>
                         </div>
-                        <span class="course-lessons-count">${(course.units && course.units.length) ? course.units.length + ' وحدة تعليمية' : ''}</span>
+                        <span class="course-lessons-count">${lessonsCount ? lessonsCount + ' وحدة تعليمية' : ''}</span>
                     </div>
                     <div class="course-cta">
                         <a href="${link}">
@@ -790,13 +1475,28 @@
         }
 
         function applyFilters() {
+
             const term = (searchInput.value || '').toLowerCase().trim();
             let data = [...allCourses];
 
             if (activeFilter === 'free') {
-                data = data.filter(c => c.isFree !== false);
+                data = data.filter(c => {
+                    const payField = (String(c.pay || '')).toLowerCase();
+                    const rawPrice = c.price;
+                    const priceIsStringFree = (typeof rawPrice === 'string' && rawPrice.toLowerCase() === 'free');
+                    const priceIsZero = rawPrice === 0 || rawPrice === '0' || rawPrice === null || rawPrice === undefined;
+                    const isFreeC = payField === 'free' || priceIsStringFree || priceIsZero || c.isFree === true;
+                    return !!isFreeC;
+                });
             } else if (activeFilter === 'paid') {
-                data = data.filter(c => c.isFree === false);
+                data = data.filter(c => {
+                    const payField = (String(c.pay || '')).toLowerCase();
+                    const rawPrice = c.price;
+                    const priceIsStringFree = (typeof rawPrice === 'string' && rawPrice.toLowerCase() === 'free');
+                    const priceIsZero = rawPrice === 0 || rawPrice === '0' || rawPrice === null || rawPrice === undefined;
+                    const isFreeC = payField === 'free' || priceIsStringFree || priceIsZero || c.isFree === true;
+                    return !isFreeC;
+                });
             } else if (activeFilter === 'featured') {
                 data = data.filter(c => c.featured);
             }

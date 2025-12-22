@@ -274,3 +274,147 @@
         justify-content: center;
     }
 }
+
+/* ============================================
+   Modern Paid Course Indicators
+   ============================================ */
+
+/* Paid Course Card Styling */
+.course-card.paid-course {
+    position: relative;
+    border: 2px solid transparent;
+    background: linear-gradient(135deg, var(--courses-card-bg) 0%, rgba(99, 102, 241, 0.05) 100%);
+    box-shadow: 
+        0 10px 40px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(99, 102, 241, 0.2) inset,
+        0 0 30px rgba(99, 102, 241, 0.1);
+    transform-style: preserve-3d;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.course-card.paid-course::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
+    border-radius: var(--courses-radius);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 0;
+}
+
+.course-card.paid-course:hover::before {
+    opacity: 1;
+}
+
+.course-card.paid-course:hover {
+    transform: translateY(-12px) translateZ(15px) scale(1.02);
+    border-color: rgba(99, 102, 241, 0.4);
+    box-shadow: 
+        0 20px 60px rgba(99, 102, 241, 0.3),
+        0 0 0 2px rgba(99, 102, 241, 0.2) inset,
+        0 0 50px rgba(99, 102, 241, 0.2);
+}
+
+/* Paid Course Badge */
+.course-card.paid-course::after {
+    content: 'مدفوع';
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    box-shadow: 
+        0 4px 12px rgba(99, 102, 241, 0.4),
+        0 0 0 2px rgba(255, 255, 255, 0.2) inset;
+    z-index: 10;
+    animation: paidBadgePulse 2s ease-in-out infinite;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+@keyframes paidBadgePulse {
+    0%, 100% {
+        box-shadow: 
+            0 4px 12px rgba(99, 102, 241, 0.4),
+            0 0 0 2px rgba(255, 255, 255, 0.2) inset;
+    }
+    50% {
+        box-shadow: 
+            0 6px 20px rgba(99, 102, 241, 0.6),
+            0 0 0 3px rgba(255, 255, 255, 0.3) inset;
+    }
+}
+
+/* Paid Course Price Pill */
+.course-price-pill:not(.free) {
+    background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1rem;
+    box-shadow: 
+        0 4px 16px rgba(99, 102, 241, 0.3),
+        0 0 0 2px rgba(255, 255, 255, 0.2) inset;
+    position: relative;
+    overflow: hidden;
+    transform-style: preserve-3d;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.course-price-pill:not(.free)::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transform: rotate(45deg);
+    transition: all 0.5s ease;
+}
+
+.course-price-pill:not(.free):hover::before {
+    left: 100%;
+    top: 100%;
+}
+
+.course-price-pill:not(.free):hover {
+    transform: translateY(-2px) translateZ(5px) scale(1.05);
+    box-shadow: 
+        0 6px 24px rgba(99, 102, 241, 0.4),
+        0 0 0 3px rgba(255, 255, 255, 0.3) inset;
+}
+
+.course-price-pill:not(.free) i {
+    margin-left: 0.5rem;
+    animation: priceIconFloat 2s ease-in-out infinite;
+}
+
+@keyframes priceIconFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-3px);
+    }
+}
+
+/* Free Course Styling */
+.course-price-pill.free {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1rem;
+    box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+}

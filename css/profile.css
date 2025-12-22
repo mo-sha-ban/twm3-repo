@@ -847,3 +847,55 @@ body.dark .progress-fill,
     background: var(--bg-secondary);
     border-color: var(--primary-color);
 }
+/* Course View Button Styling */
+.course-footer {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.view-course-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 24px;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white !important;
+    text-decoration: none;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    cursor: pointer;
+}
+
+.view-course-btn i {
+    font-size: 0.85rem;
+    transition: transform 0.4s ease;
+}
+
+.view-course-btn:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 10px 25px rgba(99, 102, 241, 0.4);
+    background: linear-gradient(135deg, var(--primary-dark) 0%, var(--secondary-color) 100%);
+    color: white !important;
+}
+
+.view-course-btn:hover i {
+    transform: translateX(-5px) rotate(15deg);
+}
+
+.view-course-btn:active {
+    transform: translateY(-1px) scale(0.98);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+}
+
+/* Dark mode tweaks for the button */
+[data-theme=" dark\] .view-course-btn {
+ box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+ border-color: rgba(255, 255, 255, 0.05);
+}

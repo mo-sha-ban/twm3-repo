@@ -17,6 +17,26 @@ const lessonSchema = new mongoose.Schema({
   duration: { type: Number, default: 0 }, // بالدقائق
   isFree: { type: Boolean, default: false },
   previewImage: String,
+  specialization: {
+    type: String,
+    enum: [
+      'cybersecurity',           // الأمان السيبراني
+      'networks',                // الشبكات
+      'hacking',                 // الهاكينج/الاختراق الأخلاقي
+      'linux',                   // لينكس
+      'bug-bounty',              // باج باونتي
+      'ethical-hacking',         // الهاكينج الأخلاقي
+      'malware-analysis',        // تحليل البرمجيات الخبيثة
+      'penetration-testing',     // اختبار الاختراق
+      'web-security',            // أمان الويب
+      'network-security',        // أمان الشبكات
+      'incident-response',       // الاستجابة للحوادث
+      'forensics',               // الطب الشرعي الرقمي
+      'reverse-engineering',     // الهندسة العكسية
+      'cryptography'             // التشفير
+    ],
+    default: 'cybersecurity'
+  },
   resources: [resourceSchema],
   createdAt: { type: Date, default: Date.now }
 });
@@ -66,6 +86,27 @@ const courseSchema = new mongoose.Schema({
       }]
     }],
   tags: [String],
+  specializations: [
+    {
+      type: String,
+      enum: [
+        'cybersecurity',           // الأمان السيبراني
+        'networks',                // الشبكات
+        'hacking',                 // الهاكينج/الاختراق الأخلاقي
+        'linux',                   // لينكس
+        'bug-bounty',              // باج باونتي
+        'ethical-hacking',         // الهاكينج الأخلاقي
+        'malware-analysis',        // تحليل البرمجيات الخبيثة
+        'penetration-testing',     // اختبار الاختراق
+        'web-security',            // أمان الويب
+        'network-security',        // أمان الشبكات
+        'incident-response',       // الاستجابة للحوادث
+        'forensics',               // الطب الشرعي الرقمي
+        'reverse-engineering',     // الهندسة العكسية
+        'cryptography'             // التشفير
+      ]
+    }
+  ],
   units: [unitSchema],
   prerequisites: [String],
   learningObjectives: [String],
@@ -83,41 +124,40 @@ const courseSchema = new mongoose.Schema({
   studentsEnrolled: { type: Number, default: 0 },
   isPublished: { type: Boolean, default: false },
   featured: { type: Boolean, default: false },
-  isFree: { type: Boolean, default: true },
-  reviews: [{
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    comment: String,
-    rating: { type: Number, min: 1, max: 5 },
-    createdAt: { type: Date, default: Date.now }
-  }],
+  isFree: { type: Boolean, default: false },
+  udemyLink: { type: String, default: '' },
+  promoVideoId: { type: String, default: null }, // ID of the selected promo video from mediaItems
+  promoVideo: { type: String, default: '' }, // Promotional video URL (YouTube or local video)
+  promoThumbnail: { type: String, default: '' }, // Thumbnail image for promo video
+  introVideo: { type: String, default: '' }, // Introductory video URL (fallback for promoVideo)
+  normalizedTitle: { type: String, default: null }, // Lowercase title for deduplication checks (optional)
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
 
-// normalizedTitle will be used for case-insensitive uniqueness checks per creator
-courseSchema.add({ normalizedTitle: { type: String, index: true } });
+// Add indexes
+courseSchema.index({ title: 'text', description: 'text' });
+courseSchema.index({ 'categories.mainCategory': 1 });
+courseSchema.index({ isPublished: 1 });
+courseSchema.index({ featured: 1 });
+courseSchema.index({ createdAt: -1 });
+courseSchema.index({ normalizedTitle: 1, createdBy: 1 }, { sparse: true }); // Sparse index for deduplication
 
-// ensure uniqueness: a user should not have two courses with the same normalized title
-courseSchema.index({ createdBy: 1, normalizedTitle: 1 }, { unique: true, sparse: true });
+// Virtual for total lessons count
+courseSchema.virtual('totalLessonsCount').get(function() {
+  return this.units.reduce((total, unit) => total + unit.lessons.length, 0);
+});
 
-// تحديث عدد الدروس والمدة الإجمالية قبل الحفظ
-courseSchema.pre('save', function (next) {
-  let totalLessons = 0;
-  let totalDuration = 0;
+// Virtual for total duration
+courseSchema.virtual('totalDurationCalc').get(function() {
+  return this.units.reduce((total, unit) => {
+    return total + unit.lessons.reduce((unitTotal, lesson) => unitTotal + (lesson.duration || 0), 0);
+  }, 0);
+});
 
-  if (this.units && this.units.length > 0) {
-    this.units.forEach(unit => {
-      totalLessons += unit.lessons.length;
-      unit.lessons.forEach(lesson => {
-        totalDuration += lesson.duration || 0;
-      });
-    });
-  }
-
-  this.totalLessons = totalLessons;
-  this.totalDuration = totalDuration;
-  this.updatedAt = new Date();
-
+// Middleware to update the updatedAt field
+courseSchema.pre('save', function(next) {
+  this.updatedAt = Date.now();
   next();
 });
 
