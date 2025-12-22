@@ -634,6 +634,10 @@
             console.log('handleProductSubmit: window.primaryImageFile=', window.primaryImageFile?.name || 'undefined');
 
             if (primaryImageFile) {
+                // Client-side size check (e.g., 20MB)
+                if (primaryImageFile.size > 20 * 1024 * 1024) {
+                    throw new Error(`حجم الصورة الأساسية كبير جداً (${(primaryImageFile.size / (1024 * 1024)).toFixed(2)} ميجا). الحد الأقصى هو 20 ميجا.`);
+                }
                 console.log('Appending primary image:', primaryImageFile.name);
                 formData.append('image', primaryImageFile);
             } else if (window.primaryImageRemoved) {
@@ -666,6 +670,11 @@
             for (let i = 0; i < mediaItems.length; i++) {
                 const item = mediaItems[i];
                 if (item.file && !item.url) {
+                    // Client-side size check (e.g., 20MB)
+                    if (item.file.size > 20 * 1024 * 1024) {
+                        console.error(`❌ File too large: ${item.file.name} (${(item.file.size / (1024 * 1024)).toFixed(2)} MB)`);
+                        continue; // Skip this file
+                    }
                     console.log(`handleProductSubmit: Uploading media [${i}] - type: ${item.type}, file: ${item.file.name}`);
                     const imgForm = new FormData();
                     imgForm.append('file', item.file);
@@ -675,7 +684,21 @@
                             headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                             body: imgForm
                         });
-                        const uploadData = await uploadRes.json();
+                        
+                        if (uploadRes.status === 413) {
+                            throw new Error('حجم الملف كبير جداً بالنسبة للسيرفر (Request Entity Too Large). قلل حجم الملف وحاول مجدداً.');
+                        }
+
+                        let uploadData;
+                        const contentType = uploadRes.headers.get("content-type");
+                        if (contentType && contentType.indexOf("application/json") !== -1) {
+                            uploadData = await uploadRes.json();
+                        } else {
+                            const textFallback = await uploadRes.text();
+                            console.error('Non-JSON response:', textFallback);
+                            throw new Error('استجابة غير متوقعة من السيرفر. قد يكون الملف كبيراً جداً.');
+                        }
+
                         console.log(`handleProductSubmit: Upload response [${i}]`, uploadData);
                         if (uploadData && uploadData.url) {
                             item.url = uploadData.url;
@@ -685,6 +708,8 @@
                         }
                     } catch (uploadErr) {
                         console.error(`❌ Upload failed [${i}]:`, uploadErr);
+                        // Optionally alert if you want to stop the whole process, or just continue
+                        alert(`فشل رفع الملف ${item.file.name}: ${uploadErr.message}`);
                     }
                 }
             }
