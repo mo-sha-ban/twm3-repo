@@ -303,6 +303,7 @@
           }
           
           // Check if product already in cart
+          const existingItemIndex = cartItems.findIndex(item => item.productId === productId);
 
           if (existingItemIndex !== -1) {
               // Product already in cart, update quantity
