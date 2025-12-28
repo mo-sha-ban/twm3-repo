@@ -1563,10 +1563,36 @@
             <input type="file" id="promoVideoFile" accept="video/*"
               style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; margin-bottom:8px;">
 
+            <!-- Promo Video Progress -->
+            <div id="promoVideoUploadProgress" style="display: none; margin-bottom: 15px;">
+              <div
+                style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.8rem; color: #555;">
+                <span id="promoVideoProgressText">جاري الرفع...</span>
+                <span id="promoVideoProgressPercent">0%</span>
+              </div>
+              <div style="width: 100%; background: #e0e0e0; border-radius: 4px; height: 6px; overflow: hidden;">
+                <div id="promoVideoProgressFill"
+                  style="width: 0%; background: #3b82f6; height: 100%; transition: width 0.3s ease;"></div>
+              </div>
+            </div>
+
             <label for="promoThumbnailFile" style="display: block; margin-bottom: 5px; font-weight: bold;">صورة مصغرة
               (Thumbnail):</label>
             <input type="file" id="promoThumbnailFile" accept="image/*"
               style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+
+            <!-- Promo Thumbnail Progress -->
+            <div id="promoThumbnailUploadProgress" style="display: none; margin-top: 10px; margin-bottom: 15px;">
+              <div
+                style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.8rem; color: #555;">
+                <span id="promoThumbnailProgressText">جاري الرفع...</span>
+                <span id="promoThumbnailProgressPercent">0%</span>
+              </div>
+              <div style="width: 100%; background: #e0e0e0; border-radius: 4px; height: 6px; overflow: hidden;">
+                <div id="promoThumbnailProgressFill"
+                  style="width: 0%; background: #3b82f6; height: 100%; transition: width 0.3s ease;"></div>
+              </div>
+            </div>
 
             <div style="margin-top:10px; display:flex; gap:8px;">
               <button type="button" class="btn btn-primary" onclick="updatePromoVideo(window.currentCourseId)">
@@ -1712,6 +1738,18 @@
                 </button>
               </div>
             </div>
+            <!-- Video Upload Progress -->
+            <div id="videoUploadProgress" style="display: none; margin-top: 15px;">
+              <div
+                style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; color: #555;">
+                <span id="videoProgressText">جاري الرفع...</span>
+                <span id="videoProgressPercent">0%</span>
+              </div>
+              <div style="width: 100%; background: #e0e0e0; border-radius: 4px; height: 8px; overflow: hidden;">
+                <div id="videoProgressFill"
+                  style="width: 0%; background: #3b82f6; height: 100%; transition: width 0.3s ease;"></div>
+              </div>
+            </div>
           </div>
           <div class="separator">
             <span>أو</span>
@@ -1762,6 +1800,18 @@
                 <button type="button" class="btn btn-danger btn-sm" onclick="removePdf()">
                   <i class="fas fa-trash"></i> حذف
                 </button>
+              </div>
+            </div>
+            <!-- PDF Upload Progress -->
+            <div id="pdfUploadProgress" style="display: none; margin-top: 15px;">
+              <div
+                style="display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; color: #555;">
+                <span id="pdfProgressText">جاري الرفع...</span>
+                <span id="pdfProgressPercent">0%</span>
+              </div>
+              <div style="width: 100%; background: #e0e0e0; border-radius: 4px; height: 8px; overflow: hidden;">
+                <div id="pdfProgressFill"
+                  style="width: 0%; background: #3b82f6; height: 100%; transition: width 0.3s ease;"></div>
               </div>
             </div>
           </div>

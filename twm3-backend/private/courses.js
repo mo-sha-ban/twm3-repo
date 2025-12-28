@@ -8,7 +8,7 @@
       // bind add-course button
       const addBtn = document.getElementById('add-course-button');
       if (addBtn) {
-        try { addBtn.onclick = null; } catch (e) {}
+        try { addBtn.onclick = null; } catch (e) { }
         addBtn.addEventListener('click', (e) => {
           e.preventDefault();
           Courses.openAddCourseModal();
@@ -56,7 +56,7 @@
       }
     },
 
-        // عرض الكورسات في الجدول
+    // عرض الكورسات في الجدول
     renderCourses(courses) {
       const tbody = document.getElementById('courses-table');
       if (!tbody) return;
@@ -76,7 +76,7 @@
             <td>
               <div class="action-buttons">
                   <button class="btn btn-primary" onclick="editCourse('${course._id}')" title="تعديل"><i class="fas fa-edit"></i></button>
-                  <button class="btn btn-secondary" onclick="manageCourseContent('${course._id}','${(course.title||'').replace(/'/g, "\\'")}' )" title="محتوى"><i class="fas fa-folder-open"></i></button>
+                  <button class="btn btn-secondary" onclick="manageCourseContent('${course._id}','${(course.title || '').replace(/'/g, "\\'")}' )" title="محتوى"><i class="fas fa-folder-open"></i></button>
                   <button class="btn btn-danger" onclick="deleteCourse('${course._id}')" title="حذف"><i class="fas fa-trash"></i></button>
               </div>
             </td>
@@ -99,7 +99,7 @@
     openAddCourseModal() {
       const modal = document.getElementById('courseModal');
       if (!modal) return;
-      
+
       // تحديث عنوان النافذة
       const titleEl = document.getElementById('courseModalTitle');
       if (titleEl) titleEl.textContent = 'إضافة كورس جديد';
@@ -134,15 +134,15 @@
 
     openEditCourse(courseId) {
       if (!courseId) return;
-      
+
       const initializeForm = () => {
         return new Promise((resolve) => {
           // Initialize form by opening add course modal
           Courses.openAddCourseModal();
-          
+
           // Set editingCourseId AFTER opening modal (to prevent it from being reset)
           window.editingCourseId = courseId;
-          
+
           // Update title for edit mode
           const titleEl = document.getElementById('courseModalTitle');
           if (titleEl) titleEl.textContent = 'تعديل الكورس';
@@ -207,7 +207,7 @@
           if (paidRadio) paidRadio.checked = !isFree;
           if (priceGroup) priceGroup.style.display = isFree ? 'none' : 'block';
           if (udemyLinkGroup) udemyLinkGroup.style.display = isFree ? 'none' : 'block';
-          
+
           const hidePriceEl = document.getElementById('courseHidePrice');
           if (hidePriceEl) hidePriceEl.checked = course.isPriceHidden || false;
 
@@ -307,19 +307,19 @@
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
           body: JSON.stringify(data)
         })
-        .then(async res => {
-          if (!res.ok) {
-            const txt = await res.text();
-            throw new Error(txt || 'خطأ من الخادم');
-          }
-          alert(window.editingCourseId ? 'تم تحديث الكورس' : 'تم إضافة الكورس');
-          Courses.closeCourseModal();
-          setTimeout(() => Courses.fetchCourses(), 150);
-        })
-        .catch(err => {
-          console.error('submit course error', err && err.stack ? err.stack : err);
-          alert('فشل في حفظ الكورس: ' + (err && err.message ? err.message : 'خطأ غير معروف'));
-        });
+          .then(async res => {
+            if (!res.ok) {
+              const txt = await res.text();
+              throw new Error(txt || 'خطأ من الخادم');
+            }
+            alert(window.editingCourseId ? 'تم تحديث الكورس' : 'تم إضافة الكورس');
+            Courses.closeCourseModal();
+            setTimeout(() => Courses.fetchCourses(), 150);
+          })
+          .catch(err => {
+            console.error('submit course error', err && err.stack ? err.stack : err);
+            alert('فشل في حفظ الكورس: ' + (err && err.message ? err.message : 'خطأ غير معروف'));
+          });
       } catch (err) {
         console.error('Submit error:', err);
         alert('خطأ في حفظ الكورس: ' + (err && err.message ? err.message : 'خطأ غير معروف'));
@@ -376,12 +376,19 @@
       if (!courseId) return alert('معرف الكورس مفقود');
       try {
         window.currentCourseId = courseId;
-        const res = await fetch(`/api/courses/${courseId}/content`, { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } });
-        if (!res.ok) {
-          const txt = await res.text();
-          throw new Error(txt || 'فشل في جلب محتوى الكورس');
-        }
-        const content = await res.json();
+        const token = localStorage.getItem('token');
+
+        // Fetch both course details and content
+        const [courseRes, contentRes] = await Promise.all([
+          fetch(`/api/courses/${courseId}`, { headers: { Authorization: `Bearer ${token}` } }),
+          fetch(`/api/courses/${courseId}/content`, { headers: { Authorization: `Bearer ${token}` } })
+        ]);
+
+        if (!courseRes.ok) throw new Error('فشل في جلب بيانات الكورس');
+        if (!contentRes.ok) throw new Error('فشل في جلب محتوى الكورس');
+
+        const course = await courseRes.json();
+        const content = await contentRes.json();
 
         // If dashboard has a renderer, use it to show the modules/lessons
         if (window.displayCourseContent && typeof window.displayCourseContent === 'function') {
@@ -389,7 +396,7 @@
             window.currentCourseTitle = courseTitle;
             const titleEl = document.getElementById('courseContentModalTitle');
             if (titleEl) titleEl.textContent = `محتوى الكورس: ${courseTitle}`;
-            window.displayCourseContent(content);
+            window.displayCourseContent(content, course);
           } catch (err) {
             console.warn('displayCourseContent failed', err);
           }
@@ -401,8 +408,8 @@
             (content.units || []).forEach((unit, i) => {
               const div = document.createElement('div');
               div.className = 'module-item';
-              div.innerHTML = `<h4>الوحدة ${i+1}: ${unit.title}</h4>` +
-                `<div>${(unit.lessons || []).map((l,j)=>`<div>الدرس ${j+1}: ${l.title}</div>`).join('')}</div>`;
+              div.innerHTML = `<h4>الوحدة ${i + 1}: ${unit.title}</h4>` +
+                `<div>${(unit.lessons || []).map((l, j) => `<div>الدرس ${j + 1}: ${l.title}</div>`).join('')}</div>`;
               container.appendChild(div);
             });
           }
@@ -429,7 +436,7 @@
   function escapeHtml(str) {
     if (!str) return '';
     return String(str).replace(/[&"'<>]/g, function (s) {
-      return ({'&':'&amp;','"':'&quot;',"'":'&#39;','<':'&lt;','>':'&gt;'})[s];
+      return ({ '&': '&amp;', '"': '&quot;', "'": '&#39;', '<': '&lt;', '>': '&gt;' })[s];
     });
   }
 

@@ -981,10 +981,162 @@ window.closeCourseContentModal = function () {
     }
 };
 
-window.updatePromoVideo = function (courseId) {
-    if (window.Courses && typeof window.Courses.updatePromoVideo === 'function') {
-        return window.Courses.updatePromoVideo(courseId);
+window.updatePromoVideo = async function (courseId) {
+    console.log('updatePromoVideo called with courseId:', courseId);
+    if (!courseId) courseId = window.currentCourseId;
+
+    const videoUrlInput = document.getElementById('promoVideoUrl');
+    const videoFileInput = document.getElementById('promoVideoFile');
+    const thumbnailFileInput = document.getElementById('promoThumbnailFile');
+    const typeSelect = document.getElementById('promoTypeSelect');
+    const isUploadMode = typeSelect ? typeSelect.value === 'upload' : (videoFileInput && videoFileInput.files.length > 0);
+
+    if (!videoUrlInput || !videoFileInput || !thumbnailFileInput) {
+        alert('عناصر النموذج غير متوفرة');
+        return;
     }
+
+    const videoUrl = videoUrlInput.value.trim();
+    const videoFile = videoFileInput.files[0];
+    const thumbnailFile = thumbnailFileInput.files[0];
+
+    if (isUploadMode && !videoFile && !thumbnailFile) {
+        alert('يرجى اختيار ملف فيديو أو صورة لرفعها');
+        return;
+    }
+    if (!isUploadMode && !videoUrl) {
+        alert('يرجى إدخال رابط الفيديو');
+        return;
+    }
+
+    try {
+        let uploadedVideoUrl = '';
+        let uploadedThumbnailUrl = '';
+
+        if (isUploadMode) {
+            if (videoFile) {
+                const videoResult = await uploadFileWithProgress(
+                    videoFile,
+                    '/api/uploads/promo-video',
+                    'promoVideoUploadProgress'
+                );
+                uploadedVideoUrl = videoResult.url;
+            }
+
+            if (thumbnailFile) {
+                const thumbResult = await uploadFileWithProgress(
+                    thumbnailFile,
+                    '/api/uploads/promo-thumbnail',
+                    'promoThumbnailUploadProgress'
+                );
+                uploadedThumbnailUrl = thumbResult.url;
+            }
+        }
+
+        const promoData = {};
+        if (isUploadMode) {
+            if (uploadedVideoUrl) promoData.promoVideo = uploadedVideoUrl;
+            if (uploadedThumbnailUrl) promoData.promoThumbnail = uploadedThumbnailUrl;
+        } else {
+            promoData.promoVideo = videoUrl;
+        }
+
+        const response = await fetch(`/api/courses/${courseId}/promo-video`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify(promoData)
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.message || 'فشل في تحديث الفيديو الترويجي');
+        }
+
+        alert('تم تحديث الفيديو الترويجي بنجاح!');
+
+        // Reset progress bars and inputs
+        if (typeof resetPromoProgress === 'function') resetPromoProgress();
+        if (videoFileInput) videoFileInput.value = '';
+        if (thumbnailFileInput) thumbnailFileInput.value = '';
+
+        // Update preview
+        if (typeof updatePromoVideoPreview === 'function') {
+            updatePromoVideoPreview(promoData.promoVideo || videoUrl);
+        }
+
+    } catch (error) {
+        console.error('Error updating promo video:', error);
+        alert(`خطأ: ${error.message}`);
+        if (typeof resetPromoProgress === 'function') resetPromoProgress();
+    }
+};
+
+window.removePromoVideo = async function (courseId) {
+    if (!courseId) courseId = window.currentCourseId;
+    if (!confirm('هل أنت متأكد من حذف الفيديو الترويجي؟')) return;
+
+    try {
+        const response = await fetch(`/api/courses/${courseId}/promo-video`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('token')}`
+            },
+            body: JSON.stringify({ promoVideo: '', promoThumbnail: '' })
+        });
+
+        if (!response.ok) throw new Error('فشل في حذف الفيديو الترويجي');
+
+        alert('تم حذف الفيديو الترويجي');
+        const promoUrlInput = document.getElementById('promoVideoUrl');
+        if (promoUrlInput) promoUrlInput.value = '';
+        if (typeof updatePromoVideoPreview === 'function') updatePromoVideoPreview('');
+
+    } catch (error) {
+        console.error('Error removing promo video:', error);
+        alert(`خطأ: ${error.message}`);
+    }
+};
+
+window.updatePromoVideoPreview = function (url) {
+    const frame = document.getElementById('promoVideoFrame');
+    const preview = document.getElementById('promoVideoPreview');
+
+    if (!url) {
+        if (preview) preview.style.display = 'none';
+        if (frame) frame.src = '';
+        return;
+    }
+
+    if (preview) preview.style.display = 'block';
+
+    let embedUrl = url;
+    if (url.includes('youtube.com') || url.includes('youtu.be')) {
+        let videoId = '';
+        if (url.includes('v=')) {
+            videoId = url.split('v=')[1].split('&')[0];
+        } else {
+            const parts = url.split('/');
+            videoId = parts[parts.length - 1];
+        }
+        embedUrl = `https://www.youtube.com/embed/${videoId}`;
+    }
+
+    if (frame) frame.src = embedUrl;
+};
+
+window.resetPromoProgress = function () {
+    ['promoVideo', 'promoThumbnail'].forEach(prefix => {
+        const container = document.getElementById(prefix + 'UploadProgress');
+        if (container) container.style.display = 'none';
+        const fill = document.getElementById(prefix + 'ProgressFill');
+        if (fill) fill.style.width = '0%';
+        const percent = document.getElementById(prefix + 'ProgressPercent');
+        if (percent) percent.textContent = '0%';
+    });
 };
 
 
@@ -1998,13 +2150,37 @@ window.showAddModuleForm = showAddModuleForm;
             const isFree = !!(document.getElementById('lessonIsFree')?.checked);
             if (!title) return alert('عنوان الدرس مطلوب');
 
+            // Handle File Uploads for Edit
+            let uploadedVideoUrl = '';
+            let uploadedPdfUrl = '';
+
+            try {
+                const videoFile = document.getElementById('videoFileInput')?.files[0];
+                if (type === 'video' && videoFile) {
+                    showLoadingOverlay('جاري رفع الفيديو...');
+                    const res = await uploadFileWithProgress(videoFile, '/api/uploads/lesson-video', 'videoUploadProgress');
+                    uploadedVideoUrl = res.url;
+                }
+
+                const pdfFile = document.getElementById('pdfFileInput')?.files[0];
+                if (type === 'pdf' && pdfFile) {
+                    showLoadingOverlay('جاري رفع الملف...');
+                    const res = await uploadFileWithProgress(pdfFile, '/api/uploads/lesson-pdf', 'pdfUploadProgress');
+                    uploadedPdfUrl = res.url;
+                }
+            } catch (uploadError) {
+                hideLoadingOverlay();
+                console.error('Upload failed during edit:', uploadError);
+                return alert('فشل رفع الملف: ' + uploadError.message);
+            }
+
             // Build payload (URL-first; file uploads ليست جزء من PUT الحالي)
             const payload = { title, description, duration, type, isFree };
             if (type === 'video') {
-                const videoUrl = (document.getElementById('lessonVideoUrl')?.value || '').trim();
+                const videoUrl = uploadedVideoUrl || (document.getElementById('lessonVideoUrl')?.value || '').trim();
                 payload.videoUrl = videoUrl;
             } else if (type === 'pdf') {
-                const fileUrl = (document.getElementById('lessonPdfUrl')?.value || '').trim();
+                const fileUrl = uploadedPdfUrl || (document.getElementById('lessonPdfUrl')?.value || '').trim();
                 payload.fileUrl = fileUrl;
             } else if (type === 'url') {
                 const externalUrl = (document.getElementById('lessonExternalUrl')?.value || '').trim();
@@ -2324,6 +2500,57 @@ let currentCourseTitle = null;
 let currentUnitId = null;
 let currentLessonId = null;
 
+// Helper for upload with progress
+function uploadFileWithProgress(file, endpoint, progressContainerId) {
+    return new Promise((resolve, reject) => {
+        const formData = new FormData();
+        let fieldName = 'file';
+        if (endpoint.includes('pdf')) fieldName = 'pdf';
+        else if (endpoint.includes('video')) fieldName = 'video';
+        else if (endpoint.includes('thumbnail') || endpoint.includes('image')) fieldName = 'image';
+
+        formData.append(fieldName, file);
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', endpoint, true);
+        xhr.setRequestHeader('Authorization', `Bearer ${localStorage.getItem('token')}`);
+
+        // Progress event
+        xhr.upload.onprogress = function (e) {
+            if (e.lengthComputable) {
+                const percentComplete = Math.round((e.loaded / e.total) * 100);
+                const progressContainer = document.getElementById(progressContainerId);
+                if (progressContainer) {
+                    progressContainer.style.display = 'block';
+                    const fill = progressContainer.querySelector('[id$="ProgressFill"]');
+                    const text = progressContainer.querySelector('[id$="ProgressPercent"]');
+                    if (fill) fill.style.width = percentComplete + '%';
+                    if (text) text.textContent = percentComplete + '%';
+                }
+            }
+        };
+
+        xhr.onload = function () {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    resolve(response);
+                } catch (e) {
+                    reject(new Error('Invalid JSON response'));
+                }
+            } else {
+                reject(new Error(`Upload failed with status ${xhr.status}`));
+            }
+        };
+
+        xhr.onerror = function () {
+            reject(new Error('Network error during upload'));
+        };
+
+        xhr.send(formData);
+    });
+}
+
 // دالة معالجة إضافة درس جديد
 async function handleAddLessonSubmit(e) {
     e.preventDefault();
@@ -2364,23 +2591,12 @@ async function handleAddLessonSubmit(e) {
                 if (videoUrl) {
                     lessonData.content = videoUrl;
                 } else if (videoFile) {
-                    const formData = new FormData();
-                    formData.append('video', videoFile);
-
-                    const uploadResponse = await fetch('/api/uploads/lesson-video', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`
-                        },
-                        body: formData
-                    });
-
-                    if (!uploadResponse.ok) {
-                        throw new Error('فشل في رفع ملف الفيديو');
+                    try {
+                        const uploadResult = await uploadFileWithProgress(videoFile, '/api/uploads/lesson-video', 'videoUploadProgress');
+                        lessonData.content = uploadResult.url;
+                    } catch (err) {
+                        throw new Error('فشل رفع الفيديو: ' + err.message);
                     }
-
-                    const uploadResult = await uploadResponse.json();
-                    lessonData.content = uploadResult.url;
                 } else {
                     throw new Error('يجب إضافة رابط فيديو أو رفع ملف');
                 }
@@ -2393,23 +2609,12 @@ async function handleAddLessonSubmit(e) {
                 if (pdfUrl) {
                     lessonData.content = pdfUrl;
                 } else if (pdfFile) {
-                    const formData = new FormData();
-                    formData.append('pdf', pdfFile);
-
-                    const uploadResponse = await fetch('/api/uploads/lesson-pdf', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${localStorage.getItem('token')}`
-                        },
-                        body: formData
-                    });
-
-                    if (!uploadResponse.ok) {
-                        throw new Error('فشل في رفع ملف PDF');
+                    try {
+                        const uploadResult = await uploadFileWithProgress(pdfFile, '/api/uploads/lesson-pdf', 'pdfUploadProgress');
+                        lessonData.content = uploadResult.url;
+                    } catch (err) {
+                        throw new Error('فشل رفع PDF: ' + err.message);
                     }
-
-                    const uploadResult = await uploadResponse.json();
-                    lessonData.content = uploadResult.url;
                 } else {
                     throw new Error('يجب إضافة رابط PDF أو رفع ملف');
                 }
@@ -2548,6 +2753,24 @@ function closeAddLessonModal() {
         const vUrl = document.getElementById('lessonVideoUrl'); if (vUrl) vUrl.value = '';
         const pUrl = document.getElementById('lessonPdfUrl'); if (pUrl) pUrl.value = '';
         const extUrl = document.getElementById('lessonExternalUrl'); if (extUrl) extUrl.value = '';
+
+        // Reset progress bars
+        const videoProg = document.getElementById('videoUploadProgress');
+        if (videoProg) {
+            videoProg.style.display = 'none';
+            const fill = videoProg.querySelector('#videoProgressFill');
+            if (fill) fill.style.width = '0%';
+            const text = videoProg.querySelector('#videoProgressPercent');
+            if (text) text.textContent = '0%';
+        }
+        const pdfProg = document.getElementById('pdfUploadProgress');
+        if (pdfProg) {
+            pdfProg.style.display = 'none';
+            const fill = pdfProg.querySelector('#pdfProgressFill');
+            if (fill) fill.style.width = '0%';
+            const text = pdfProg.querySelector('#pdfProgressPercent');
+            if (text) text.textContent = '0%';
+        }
 
         // reset content type and button text
         try { selectContentType('video'); } catch (e) { }

@@ -588,46 +588,6 @@ app.post('/api/uploads/lesson-asset', authToken, requireAuthToken, (req, res) =>
     });
 });
 
-// API: رفع فيديو للدرس
-app.post('/api/uploads/lesson-video', authToken, requireAuthToken, (req, res) => {
-    lessonUpload.single('video')(req, res, (err) => {
-        if (err) return res.status(400).json({ error: err.message || 'فشل رفع الفيديو' });
-        if (!req.file) return res.status(400).json({ error: 'يرجى اختيار ملف فيديو' });
-        const rel = '/uploads/' + req.file.filename;
-        return res.json({ url: rel, filename: req.file.filename });
-    });
-});
-
-// API: رفع PDF للدرس
-app.post('/api/uploads/lesson-pdf', authToken, requireAuthToken, (req, res) => {
-    lessonUpload.single('pdf')(req, res, (err) => {
-        if (err) return res.status(400).json({ error: err.message || 'فشل رفع PDF' });
-        if (!req.file) return res.status(400).json({ error: 'يرجى اختيار ملف PDF' });
-        const rel = '/uploads/' + req.file.filename;
-        return res.json({ url: rel, filename: req.file.filename });
-    });
-});
-
-// API: رفع الفيديو الترويجي للكورس
-app.post('/api/uploads/promo-video', authToken, requireAuthToken, (req, res) => {
-    lessonUpload.single('video')(req, res, (err) => {
-        if (err) return res.status(400).json({ error: err.message || 'فشل رفع الفيديو' });
-        if (!req.file) return res.status(400).json({ error: 'يرجى اختيار ملف فيديو' });
-        const rel = '/uploads/' + req.file.filename;
-        return res.json({ url: rel, filename: req.file.filename });
-    });
-});
-
-// API: رفع صورة الفيديو الترويجي (Thumbnail)
-app.post('/api/uploads/promo-thumbnail', authToken, requireAuthToken, (req, res) => {
-    lessonUpload.single('image')(req, res, (err) => {
-        if (err) return res.status(400).json({ error: err.message || 'فشل رفع الصورة' });
-        if (!req.file) return res.status(400).json({ error: 'يرجى اختيار ملف صورة' });
-        const rel = '/uploads/' + req.file.filename;
-        return res.json({ url: rel, filename: req.file.filename });
-    });
-});
-
 // إعداد رفع ملفات الدروس
 const lessonStorage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -639,53 +599,71 @@ const lessonStorage = multer.diskStorage({
     }
 });
 
-const lessonUpload = multer({
+const lessonMulterInstance = multer({
     storage: lessonStorage,
     fileFilter: (req, file, cb) => {
-        console.log('Processing lesson file:', file.originalname, 'MIME:', file.mimetype);
-
-        // normalize
         const mime = (file.mimetype || '').toLowerCase();
         const ext = (path.extname(file.originalname || '') || '').toLowerCase();
-
-        // For lessonFile: allow mp4 and mov (video/quicktime) by mime or extension
-        if (file.fieldname === 'lessonFile') {
-            // Allow video files (mp4, mov) and PDF files for lesson uploads
-            const allowedVideoMimes = ['video/mp4', 'video/quicktime'];
-            const allowedVideoExts = ['.mp4', '.mov'];
-            const allowedPdfMimes = ['application/pdf'];
-            const allowedPdfExts = ['.pdf'];
-
-            if (allowedVideoMimes.includes(mime) || allowedVideoExts.includes(ext) || allowedPdfMimes.includes(mime) || allowedPdfExts.includes(ext)) {
-                req._fileFilterPassed = true;
-                return cb(null, true);
-            }
-
-            // mark as rejected but don't throw (so we can return JSON from the route)
-            req._fileFilterPassed = false;
-            return cb(null, false);
-        }
-
-        // For other types (images, PDFs)
-        const allowedMimes = [
-            'image/png',
-            'image/jpeg',
-            'image/webp',
-            'application/pdf'
+        const allowed = [
+            'video/mp4', 'video/quicktime', 'video/webm',
+            'application/pdf',
+            'image/png', 'image/jpeg', 'image/webp'
         ];
+        const allowedExts = ['.mp4', '.mov', '.webm', '.pdf'];
 
-        if (allowedMimes.includes(mime)) {
+        if (allowed.includes(mime) || allowedExts.includes(ext) || mime.startsWith('video/')) {
             req._fileFilterPassed = true;
             return cb(null, true);
         }
-
         req._fileFilterPassed = false;
         return cb(null, false);
     },
     limits: { fileSize: 500 * 1024 * 1024 } // 500 MB
-}).fields([
-    { name: 'lessonFile', maxCount: 1 } // فيديو أو PDF
+});
+
+const lessonUpload = lessonMulterInstance.fields([
+    { name: 'lessonFile', maxCount: 1 }
 ]);
+
+// API: رفع فيديو للدرس
+app.post('/api/uploads/lesson-video', authToken, requireAuthToken, (req, res) => {
+    lessonMulterInstance.single('video')(req, res, (err) => {
+        if (err) return res.status(400).json({ error: err.message || 'فشل رفع الفيديو' });
+        if (!req.file) return res.status(400).json({ error: 'يرجى اختيار ملف فيديو' });
+        const rel = '/uploads/' + req.file.filename;
+        return res.json({ url: rel, filename: req.file.filename });
+    });
+});
+
+// API: رفع PDF للدرس
+app.post('/api/uploads/lesson-pdf', authToken, requireAuthToken, (req, res) => {
+    lessonMulterInstance.single('pdf')(req, res, (err) => {
+        if (err) return res.status(400).json({ error: err.message || 'فشل رفع PDF' });
+        if (!req.file) return res.status(400).json({ error: 'يرجى اختيار ملف PDF' });
+        const rel = '/uploads/' + req.file.filename;
+        return res.json({ url: rel, filename: req.file.filename });
+    });
+});
+
+// API: رفع الفيديو الترويجي للكورس
+app.post('/api/uploads/promo-video', authToken, requireAuthToken, (req, res) => {
+    lessonMulterInstance.single('video')(req, res, (err) => {
+        if (err) return res.status(400).json({ error: err.message || 'فشل رفع الفيديو' });
+        if (!req.file) return res.status(400).json({ error: 'يرجى اختيار ملف فيديو' });
+        const rel = '/uploads/' + req.file.filename;
+        return res.json({ url: rel, filename: req.file.filename });
+    });
+});
+
+// API: رفع صورة الفيديو الترويجي (Thumbnail)
+app.post('/api/uploads/promo-thumbnail', authToken, requireAuthToken, (req, res) => {
+    lessonMulterInstance.single('image')(req, res, (err) => {
+        if (err) return res.status(400).json({ error: err.message || 'فشل رفع الصورة' });
+        if (!req.file) return res.status(400).json({ error: 'يرجى اختيار ملف صورة' });
+        const rel = '/uploads/' + req.file.filename;
+        return res.json({ url: rel, filename: req.file.filename });
+    });
+});
 
 // ميدل وير جديد للتحقق من أن المستخدم أدمن بناءً على التوكن
 function requireAdminToken(req, res, next) {
