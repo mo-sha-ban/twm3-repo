@@ -36,11 +36,11 @@ class CoursesCarousel {
     try {
       await this.loadCourses();
 
-      
+
       if (this.courses.length > 0) {
         this.render();
         this.setupEventListeners();
-        
+
         // Start auto-scroll after a short delay
         setTimeout(() => {
           if (this.options.autoScroll) {
@@ -136,7 +136,15 @@ class CoursesCarousel {
     const title = course.title || 'كورس برمجة';
     const description = course.description || 'تعلم البرمجة من الصفر';
     const instructor = course.instructor || 'TWM3';
-    const price = course.price === 'free' || course.price === 0 ? 'مجاني' : `${course.price} جنيه`;
+    const isPriceHidden = course.isPriceHidden === true || course.isPriceHidden === 'true';
+    let priceText;
+
+    if (isPriceHidden) {
+      priceText = 'مدفوع';
+    } else {
+      priceText = course.price === 'free' || course.price === 0 ? 'مجاني' : `${course.price} جنيه`;
+    }
+
     const courseId = course._id || course.id || index;
 
     card.innerHTML = `
@@ -153,7 +161,7 @@ class CoursesCarousel {
           </span>
           <span class="course-price">
             <i class="fa-solid fa-tag"></i>
-            ${price}
+            ${priceText}
           </span>
         </div>
         <a href="course-page.html?id=${courseId}" class="course-link">
@@ -166,99 +174,99 @@ class CoursesCarousel {
     return card;
   }
 
-createControls() {
-  const controls = document.createElement('div');
-  controls.className = 'carousel-controls';
+  createControls() {
+    const controls = document.createElement('div');
+    controls.className = 'carousel-controls';
 
-  const dotsContainer = document.createElement('div');
-  dotsContainer.className = 'carousel-dots';
-  this.dotsContainer = dotsContainer;
+    const dotsContainer = document.createElement('div');
+    dotsContainer.className = 'carousel-dots';
+    this.dotsContainer = dotsContainer;
 
-  // تحديد عدد الكروت الظاهرة وعدد الخطوات
-  const visible = this.options.visibleCards || this.getVisibleCards();
-  const step = Math.max(1, this.options.scrollStep || 1);
-  const totalItems = this.courses.length || 0;
+    // تحديد عدد الكروت الظاهرة وعدد الخطوات
+    const visible = this.options.visibleCards || this.getVisibleCards();
+    const step = Math.max(1, this.options.scrollStep || 1);
+    const totalItems = this.courses.length || 0;
 
-  // عدد النقاط الديناميكي (كل نقطة = صفحة جديدة)
-  let totalDots = 1;
-  if (totalItems > visible) {
-    totalDots = Math.ceil((totalItems - visible) / step) + 1;
+    // عدد النقاط الديناميكي (كل نقطة = صفحة جديدة)
+    let totalDots = 1;
+    if (totalItems > visible) {
+      totalDots = Math.ceil((totalItems - visible) / step) + 1;
+    }
+
+    // حفظ عدد النقاط لاستخدامه لاحقًا
+    this.totalDots = totalDots;
+
+    // إنشاء النقاط
+    for (let i = 0; i < totalDots; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'carousel-dot';
+      if (i === 0) dot.classList.add('active');
+      dot.dataset.index = i;
+
+      dot.addEventListener('click', () => {
+        this.currentIndex = i * this.options.scrollStep;
+        this.updateCarousel();
+        this.stopAutoScroll();
+        if (this.options.autoScroll) this.startAutoScroll();
+      });
+
+      dotsContainer.appendChild(dot);
+    }
+
+    controls.appendChild(dotsContainer);
+    return controls;
   }
 
-  // حفظ عدد النقاط لاستخدامه لاحقًا
-  this.totalDots = totalDots;
 
-  // إنشاء النقاط
-  for (let i = 0; i < totalDots; i++) {
-    const dot = document.createElement('div');
-    dot.className = 'carousel-dot';
-    if (i === 0) dot.classList.add('active');
-    dot.dataset.index = i;
+  updateCarousel() {
+    if (!this.carouselContainer) return;
 
-    dot.addEventListener('click', () => {
-      this.currentIndex = i * this.options.scrollStep;
-      this.updateCarousel();
-      this.stopAutoScroll();
-      if (this.options.autoScroll) this.startAutoScroll();
+    const cards = Array.from(this.carouselContainer.children);
+    if (cards.length === 0) return;
+
+    const cardWidth = cards[0].offsetWidth;
+    const gap = 24; // المسافة بين الكروت
+    const offset = -(this.currentIndex * (cardWidth + gap));
+
+    // تحديث موضع الكاروسيل
+    this.carouselContainer.style.transform = `translateX(${offset}px)`;
+
+    // ✅ تحديث النقاط (dots)
+    if (this.dotsContainer) {
+      const dots = this.dotsContainer.children;
+      if (dots.length > 0) {
+        const activeDotIndex = Math.floor(this.currentIndex / this.options.scrollStep) % dots.length;
+        Array.from(dots).forEach((dot, index) => {
+          dot.classList.toggle('active', index === activeDotIndex);
+        });
+      }
+    }
+
+    // // ✅ تحديد الكروت الظاهرة وعمل highlight
+    // const visible = this.options.visibleCards || this.getVisibleCards();
+    // const start = this.currentIndex;
+    // const end = this.currentIndex + visible;
+
+    // cards.forEach((card, index) => {
+    //   if (index >= start && index < end) {
+    //     card.classList.add('active-course');
+    //   } else {
+    //     card.classList.remove('active-course');
+    //   }
+    // });
+
+    // ✅ تحديد الكورس النشط بناءً على النقطة الفعّالة
+    const activeDotIndex = Math.floor(this.currentIndex / this.options.scrollStep);
+    const activeCourseIndex = activeDotIndex * this.options.scrollStep;
+
+    cards.forEach((card, index) => {
+      card.classList.remove('active-course');
+      if (index === activeCourseIndex) {
+        card.classList.add('active-course');
+      }
     });
 
-    dotsContainer.appendChild(dot);
   }
-
-  controls.appendChild(dotsContainer);
-  return controls;
-}
-
-
-updateCarousel() {
-  if (!this.carouselContainer) return;
-
-  const cards = Array.from(this.carouselContainer.children);
-  if (cards.length === 0) return;
-
-  const cardWidth = cards[0].offsetWidth;
-  const gap = 24; // المسافة بين الكروت
-  const offset = -(this.currentIndex * (cardWidth + gap));
-
-  // تحديث موضع الكاروسيل
-  this.carouselContainer.style.transform = `translateX(${offset}px)`;
-
-  // ✅ تحديث النقاط (dots)
-  if (this.dotsContainer) {
-    const dots = this.dotsContainer.children;
-    if (dots.length > 0) {
-      const activeDotIndex = Math.floor(this.currentIndex / this.options.scrollStep) % dots.length;
-      Array.from(dots).forEach((dot, index) => {
-        dot.classList.toggle('active', index === activeDotIndex);
-      });
-    }
-  }
-
-  // // ✅ تحديد الكروت الظاهرة وعمل highlight
-  // const visible = this.options.visibleCards || this.getVisibleCards();
-  // const start = this.currentIndex;
-  // const end = this.currentIndex + visible;
-
-  // cards.forEach((card, index) => {
-  //   if (index >= start && index < end) {
-  //     card.classList.add('active-course');
-  //   } else {
-  //     card.classList.remove('active-course');
-  //   }
-  // });
-  
-  // ✅ تحديد الكورس النشط بناءً على النقطة الفعّالة
-  const activeDotIndex = Math.floor(this.currentIndex / this.options.scrollStep);
-  const activeCourseIndex = activeDotIndex * this.options.scrollStep;
-  
-  cards.forEach((card, index) => {
-    card.classList.remove('active-course');
-    if (index === activeCourseIndex) {
-      card.classList.add('active-course');
-    }
-  });
-  
-}
 
 
 
@@ -271,25 +279,25 @@ updateCarousel() {
     }
   }
 
-scrollNext() {
-  if (this.isAnimating) return;
+  scrollNext() {
+    if (this.isAnimating) return;
 
-  this.isAnimating = true;
-  this.currentIndex += this.options.scrollStep;
+    this.isAnimating = true;
+    this.currentIndex += this.options.scrollStep;
 
-  const maxIndex = this.courses.length - this.options.visibleCards;
-  
-  // لو وصلنا لآخر نقطة نرجع للأولى
-  if (this.currentIndex >= maxIndex) {
-    this.currentIndex = 0;
+    const maxIndex = this.courses.length - this.options.visibleCards;
+
+    // لو وصلنا لآخر نقطة نرجع للأولى
+    if (this.currentIndex >= maxIndex) {
+      this.currentIndex = 0;
+    }
+
+    this.updateCarousel();
+
+    setTimeout(() => {
+      this.isAnimating = false;
+    }, 600);
   }
-
-  this.updateCarousel();
-
-  setTimeout(() => {
-    this.isAnimating = false;
-  }, 600);
-}
 
 
   scrollPrev() {
@@ -378,7 +386,7 @@ document.addEventListener('DOMContentLoaded', () => {
     scrollInterval: 2000,
     scrollStep: 1
   });
-  
+
   // Make carousel accessible globally for debugging
   window.coursesCarousel = carousel;
 });

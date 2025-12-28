@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -12,84 +13,370 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         :root {
             /* Default Theme (Dark) */
-            --bg:#0b1220; --card:rgba(12,18,28,0.6); --glass-border:rgba(255,255,255,0.06); 
-            --primary:#3b82f6; --accent:#2563eb; --text:#e6eef8; --muted:#94a3b8;
-            --radius:16px; --container:1200px;
+            --bg: #0b1220;
+            --card: rgba(12, 18, 28, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.06);
+            --primary: #3b82f6;
+            --accent: #2563eb;
+            --text: #e6eef8;
+            --muted: #94a3b8;
+            --radius: 16px;
+            --container: 1200px;
         }
+
         /* Inverted Theme logic matching global style */
-        .dark-theme { --bg:#f6f8fb; --card:#ffffffaa; --glass-border:rgba(255,255,255,0.6); --text:#0f172a; --muted:#64748b }
-        [data-theme="dark"] { --bg:#0b1220; --card:rgba(12,18,28,0.6); --glass-border:rgba(255,255,255,0.06); --text:#e6eef8; --muted:#94a3b8 }
+        .dark-theme {
+            --bg: #f6f8fb;
+            --card: #ffffffaa;
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --text: #0f172a;
+            --muted: #64748b
+        }
 
-        html,body{font-family:'Cairo',sans-serif;background:var(--bg);margin:0;color:var(--text);transition: background 0.3s ease;}
-        
-        .page-wrap{margin:0px auto;padding:40px 18px}
-        .hero{display:flex;align-items:center;justify-content:center;gap:16px;margin:30px 0;text-align:center;flex-direction:column}
-        .hero h1{margin:0;font-size:1.8rem; font-weight:800}
-        .hero .sub{color:var(--muted);font-size:1rem; opacity:0.8}
-        .back{background:rgba(255,255,255,0.05); border:1px solid var(--glass-border); color:var(--text); padding:8px 16px; border-radius:10px; cursor:pointer; transition:0.3s}
-        .back:hover{background:var(--primary); color:#fff; border-color:var(--primary)}
+        [data-theme="dark"] {
+            --bg: #0b1220;
+            --card: rgba(12, 18, 28, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.06);
+            --text: #e6eef8;
+            --muted: #94a3b8
+        }
 
-        .cart-grid{display:grid;grid-template-columns:1fr;max-width:850px;margin:0 auto;gap:24px}
-        .glass{background:var(--card);border-radius:var(--radius);padding:24px;box-shadow:0 8px 32px rgba(0,0,0,0.1);border:1px solid var(--glass-border);backdrop-filter:blur(16px); position:relative; overflow:hidden;}
-        
-        .item{ margin:10px; display:flex;gap:16px;align-items:center;padding:16px;border-radius:12px;background:rgba(255,255,255,0.02); transition:0.3s}
-        .item:hover{background:rgba(255,255,255,0.05)}
-        .item img{width:110px;height:75px;object-fit:cover;border-radius:10px}
-        .info{flex:1}
-        .info .title{font-weight:700; font-size:1.1rem}
-        .info .meta{color:var(--muted);font-size:0.9rem}
+        html,
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: var(--bg);
+            margin: 0;
+            color: var(--text);
+            transition: background 0.3s ease;
+        }
 
-        .controls{display:flex;gap:16px;align-items:center}
-        .price{font-weight:800;color:var(--primary);font-size:1.1rem}
-        .qty{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,0.1);padding:5px 12px;border-radius:20px}
-        .qty button{background:transparent;border:none;color:var(--text); cursor:pointer; font-size:1.2rem}
-        .remove{background:transparent;border:none;color:#ef4444;cursor:pointer; font-weight:700}
+        .page-wrap {
+            margin: 0px auto;
+            padding: 40px 18px
+        }
 
-        .summary h3{margin:0 0 15px 0; font-weight:800}
-        .row{display:flex;justify-content:space-between;align-items:center; margin-bottom:10px}
-        .total{font-size:1.5rem;font-weight:800;color:var(--primary)}
-        .checkout{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;padding:16px;border-radius:14px;border:none;font-weight:800;cursor:pointer;width:100%;transition:all .3s ease; font-size:1.1rem}
-        .checkout:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 12px 24px rgba(37,99,235,0.4)}
-        .checkout:disabled{opacity:0.5;cursor:not-allowed}
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            margin: 30px 0;
+            text-align: center;
+            flex-direction: column
+        }
 
-        .empty{display:flex;flex-direction:column;align-items:center;padding:40px 20px;text-align:center;color:var(--muted)}
-        .empty i{font-size:4rem; margin-bottom:20px; opacity:0.3}
+        .hero h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 800
+        }
+
+        .hero .sub {
+            color: var(--muted);
+            font-size: 1rem;
+            opacity: 0.8
+        }
+
+        .back {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            color: var(--text);
+            padding: 8px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s
+        }
+
+        .back:hover {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary)
+        }
+
+        .cart-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            max-width: 850px;
+            margin: 0 auto;
+            gap: 24px
+        }
+
+        .glass {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(16px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .item {
+            margin: 10px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            padding: 16px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            transition: 0.3s
+        }
+
+        .item:hover {
+            background: rgba(255, 255, 255, 0.05)
+        }
+
+        .item img {
+            width: 110px;
+            height: 75px;
+            object-fit: cover;
+            border-radius: 10px
+        }
+
+        .info {
+            flex: 1
+        }
+
+        .info .title {
+            font-weight: 700;
+            font-size: 1.1rem
+        }
+
+        .info .meta {
+            color: var(--muted);
+            font-size: 0.9rem
+        }
+
+        .controls {
+            display: flex;
+            gap: 16px;
+            align-items: center
+        }
+
+        .price {
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 1.1rem
+        }
+
+        .qty {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(0, 0, 0, 0.1);
+            padding: 5px 12px;
+            border-radius: 20px
+        }
+
+        .qty button {
+            background: transparent;
+            border: none;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 1.2rem
+        }
+
+        .remove {
+            background: transparent;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-weight: 700
+        }
+
+        .summary h3 {
+            margin: 0 0 15px 0;
+            font-weight: 800
+        }
+
+        .row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px
+        }
+
+        .total {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--primary)
+        }
+
+        .checkout {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: #fff;
+            padding: 16px;
+            border-radius: 14px;
+            border: none;
+            font-weight: 800;
+            cursor: pointer;
+            width: 100%;
+            transition: all .3s ease;
+            font-size: 1.1rem
+        }
+
+        .checkout:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(37, 99, 235, 0.4)
+        }
+
+        .checkout:disabled {
+            opacity: 0.5;
+            cursor: not-allowed
+        }
+
+        .empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            text-align: center;
+            color: var(--muted)
+        }
+
+        .empty i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.3
+        }
 
         /* Modal Styles */
-        .checkout-modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(2,6,23,0.8);opacity:0;pointer-events:none;transition:opacity .3s ease;z-index:200}
-        .checkout-modal.show{opacity:1;pointer-events:auto}
-        .checkout-modal-panel{width:min(600px,94%); border-radius:20px; padding:30px; background:var(--bg); border:1px solid var(--glass-border); box-shadow:0 30px 60px rgba(0,0,0,0.3); backdrop-filter:blur(20px)}
-        .modal-close{position:absolute; top:15px; right:15px; background:none; border:none; color:var(--text); font-size:1.5rem; cursor:pointer; opacity:0.6}
-        
-        .payment-methods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 20px 0; }
-        .payment-option { cursor: pointer; }
-        .payment-option input { display:none }
-        .payment-card {
-            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
-            padding: 15px; border-radius: 16px; border: 1px solid var(--glass-border);
-            background: rgba(255,255,255,0.03); transition: 0.3s; text-align: center; color: var(--muted);
-        }
-        .payment-option input:checked + .payment-card {
-            background: rgba(59, 130, 246, 0.1); border-color: var(--primary); color: var(--primary);
-            box-shadow: 0 8px 16px rgba(59,130,246,0.2); transform: translateY(-5px);
-        }
-        
-        /* Disabled payment methods */
-        .payment-option.disabled { cursor: not-allowed; opacity: 0.5; filter: grayscale(1); }
-        .payment-option.disabled .payment-card { pointer-events: none; }
-        .field label { display:block; margin-bottom:5px; font-weight:600; font-size:0.9rem }
-        .field input, .field textarea {
-            width:100%; padding:10px; border-radius:8px; border:1px solid var(--glass-border);
-            background:rgba(0,0,0,0.2); color:white; margin-bottom:12px; outline:none;
+        .checkout-modal {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(2, 6, 23, 0.8);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .3s ease;
+            z-index: 200
         }
 
-        #paymentProcessing, #paymentSuccess { text-align:center; padding:30px 0; display:none }
-        .spinner { font-size: 2.5rem; color:var(--primary); animation: spin 1s linear infinite; margin-bottom:15px }
-        @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+        .checkout-modal.show {
+            opacity: 1;
+            pointer-events: auto
+        }
+
+        .checkout-modal-panel {
+            width: min(600px, 94%);
+            border-radius: 20px;
+            padding: 30px;
+            background: var(--bg);
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px)
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            color: var(--text);
+            font-size: 1.5rem;
+            cursor: pointer;
+            opacity: 0.6
+        }
+
+        .payment-methods {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+
+        .payment-option {
+            cursor: pointer;
+        }
+
+        .payment-option input {
+            display: none
+        }
+
+        .payment-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 15px;
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            background: rgba(255, 255, 255, 0.03);
+            transition: 0.3s;
+            text-align: center;
+            color: var(--muted);
+        }
+
+        .payment-option input:checked+.payment-card {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: var(--primary);
+            color: var(--primary);
+            box-shadow: 0 8px 16px rgba(59, 130, 246, 0.2);
+            transform: translateY(-5px);
+        }
+
+        /* Disabled payment methods */
+        .payment-option.disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+            filter: grayscale(1);
+        }
+
+        .payment-option.disabled .payment-card {
+            pointer-events: none;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            font-size: 0.9rem
+        }
+
+        .field input,
+        .field textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.2);
+            color: white;
+            margin-bottom: 12px;
+            outline: none;
+        }
+
+        #paymentProcessing,
+        #paymentSuccess {
+            text-align: center;
+            padding: 30px 0;
+            display: none
+        }
+
+        .spinner {
+            font-size: 2.5rem;
+            color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px
+        }
+
+        @keyframes spin {
+            from {
+                transform: rotate(0deg)
+            }
+
+            to {
+                transform: rotate(360deg)
+            }
+        }
 
         /* Responsive Styles for Cart Items */
         @media (max-width: 600px) {
@@ -98,16 +385,19 @@
                 text-align: center;
                 gap: 12px;
             }
+
             .item img {
                 width: 100%;
                 height: 160px;
                 max-width: 200px;
             }
+
             .controls {
                 flex-direction: column;
                 width: 100%;
                 gap: 12px;
             }
+
             .qty {
                 justify-content: center;
                 width: fit-content;
@@ -120,12 +410,15 @@
                 max-height: 90vh;
                 overflow-y: auto;
             }
-            #checkoutForm > div[style*="grid-template-columns"] {
+
+            #checkoutForm>div[style*="grid-template-columns"] {
                 grid-template-columns: 1fr !important;
             }
+
             .payment-methods {
                 grid-template-columns: repeat(1, 1fr);
             }
+
             .payment-card {
                 padding: 10px;
                 font-size: 1.5rem;
@@ -133,6 +426,7 @@
         }
     </style>
 </head>
+
 <body>
 
     <div dir="rtl" class="header">
@@ -175,7 +469,8 @@
                 <div class="row"><span>المجموع الفرعي</span><span id="subtotal">0.00 ج.م</span></div>
                 <div class="row"><span>الضريبة</span><span id="tax">0.00 ج.م</span></div>
                 <hr style="border:0; border-top:1px solid var(--glass-border); margin:10px 0">
-                <div class="row"><strong style="font-size:1.3rem">الإجمالي</strong><span class="total" id="total">0.00 ج.م</span></div>
+                <div class="row"><strong style="font-size:1.3rem">الإجمالي</strong><span class="total" id="total">0.00
+                        ج.م</span></div>
                 <button id="checkoutBtn" class="checkout">إتمام الشراء</button>
             </aside>
         </div>
@@ -186,7 +481,8 @@
             <button class="modal-close" onclick="closeCheckoutModal()">✕</button>
             <div id="checkoutContent">
                 <h2 style="margin:0 0 15px 0">تنسيق الطلب</h2>
-                <div id="orderPreview" style="background:rgba(0,0,0,0.1); padding:12px; border-radius:10px; margin-bottom:15px; max-height:fit-content; overflow-y:auto; font-size:0.85rem">
+                <div id="orderPreview"
+                    style="background:rgba(0,0,0,0.1); padding:12px; border-radius:10px; margin-bottom:15px; max-height:fit-content; overflow-y:auto; font-size:0.85rem">
                     <ul id="checkoutItemsList" style="margin:0; padding-right:20px"></ul>
                 </div>
 
@@ -196,7 +492,7 @@
                         <div class="field"><label>البريد</label><input id="chkEmail" type="email" required></div>
                         <div class="field"><label>الهاتف</label><input id="chkPhone" required></div>
                     </div>
-                    
+
                     <label style="font-weight:700; margin-bottom:8px; display:block">طريقة الدفع</label>
                     <div class="payment-methods" id="paymentMethodsContainer">
                         <label class="payment-option disabled" title="قيد التطوير">
@@ -218,8 +514,14 @@
                 </form>
             </div>
 
-            <div id="paymentProcessing"><div class="spinner"><i class="fas fa-circle-notch"></i></div><h3>جاري المعالجة...</h3></div>
-            <div id="paymentSuccess"><div style="font-size:3rem; color:#10b981; margin-bottom:10px">✓</div><h3>تم الطلب بنجاح!</h3></div>
+            <div id="paymentProcessing">
+                <div class="spinner"><i class="fas fa-circle-notch"></i></div>
+                <h3>جاري المعالجة...</h3>
+            </div>
+            <div id="paymentSuccess">
+                <div style="font-size:3rem; color:#10b981; margin-bottom:10px">✓</div>
+                <h3>تم الطلب بنجاح!</h3>
+            </div>
         </div>
     </div>
 
@@ -232,11 +534,11 @@
         const totalEl = document.getElementById('total');
         const checkoutBtn = document.getElementById('checkoutBtn');
 
-        function formatPrice(v){ return Number(v).toFixed(2) + ' ج.م'; }
+        function formatPrice(v) { return Number(v).toFixed(2) + ' ج.م'; }
 
-        async function loadCart(){
+        async function loadCart() {
             const raw = JSON.parse(localStorage.getItem('cart') || '[]');
-            if(!raw.length) {
+            if (!raw.length) {
                 cartUl.innerHTML = '<div class="empty"><h3>السلة فارغة</h3></div>';
                 updateSummary(0);
                 return;
@@ -280,11 +582,11 @@
             renderCart(enriched);
         }
 
-        function renderCart(cart){
+        function renderCart(cart) {
             cartUl.innerHTML = '';
             let subtotal = 0;
             cart.forEach((it, idx) => {
-                subtotal += (it.price||0) * (it.qty||1);
+                subtotal += (it.price || 0) * (it.qty || 1);
                 const div = document.createElement('div');
                 div.className = 'item';
                 div.innerHTML = `
@@ -308,7 +610,7 @@
             updateSummary(subtotal);
         }
 
-        function updateSummary(total){
+        function updateSummary(total) {
             subtotalEl.textContent = formatPrice(total);
             totalEl.textContent = formatPrice(total);
             checkoutBtn.disabled = total === 0;
@@ -316,17 +618,17 @@
 
         window.changeQty = (idx, delta) => {
             const c = JSON.parse(localStorage.getItem('cart') || '[]');
-            if(c[idx]) { 
+            if (c[idx]) {
                 const currentQty = c[idx].qty || c[idx].quantity || 1;
                 c[idx].qty = Math.max(1, currentQty + delta);
                 c[idx].quantity = c[idx].qty;
-                localStorage.setItem('cart', JSON.stringify(c)); 
-                loadCart(); 
+                localStorage.setItem('cart', JSON.stringify(c));
+                loadCart();
             }
         }
         window.removeItem = (idx) => {
             const c = JSON.parse(localStorage.getItem('cart') || '[]');
-            c.splice(idx,1); localStorage.setItem('cart', JSON.stringify(c)); loadCart();
+            c.splice(idx, 1); localStorage.setItem('cart', JSON.stringify(c)); loadCart();
         }
 
         const modal = document.getElementById('checkoutModal');
@@ -349,7 +651,7 @@
             }
         });
 
-        async function processPayment(){
+        async function processPayment() {
             const method = document.querySelector('input[name="payment"]:checked').value;
             const name = document.getElementById('chkName').value;
             const cart = JSON.parse(localStorage.getItem('cart') || '[]');
@@ -357,18 +659,38 @@
             document.getElementById('checkoutContent').style.display = 'none';
             document.getElementById('paymentProcessing').style.display = 'block';
 
-            if(method === 'telegram') {
-                const text = `طلب جديد من: ${name}%0A📦 المنتجات: ${cart.map(i => (i.title || i.name) + '(' + (i.qty || i.quantity || 1) + 'x)').join(', ')}`;
+            if (method === 'telegram') {
+                const headerText = cart.length > 1 ? 'عايز اشتري المنتجات دي:' : 'عايز اشتري المنتج دا:';
+                let text = `${headerText}%0A%0A`;
+
+                cart.forEach(item => {
+                    const itemTitle = item.title || item.name || 'منتج';
+                    const itemQty = item.qty || item.quantity || 1;
+                    const itemPrice = item.price ? Number(item.price).toFixed(2) + ' ج.م' : 'غير محدد';
+
+                    text += `📦 ${itemTitle}%0A`;
+                    text += `🔢 عدد القطع: ${itemQty}%0A`;
+                    text += `💰 السعر: ${itemPrice}%0A`;
+                    text += `%0A`; // Spacing between items
+                });
+
+                // Calculate total
+                const total = cart.reduce((sum, item) => sum + ((item.price || 0) * (item.qty || item.quantity || 1)), 0);
+
+                text += `💵 الإجمالي: ${total.toFixed(2)} ج.م%0A`;
+                text += `👤 اسم المشتري: ${name}`;
+
                 window.open(`https://t.me/mo_hussien_20?text=${text}`, '_blank');
             }
 
             await new Promise(r => setTimeout(r, 2000));
             document.getElementById('paymentProcessing').style.display = 'none';
             document.getElementById('paymentSuccess').style.display = 'block';
-            setTimeout(() => { localStorage.removeItem('cart'); window.location.href='index.html'; }, 2000);
+            setTimeout(() => { localStorage.removeItem('cart'); window.location.href = 'index.html'; }, 2000);
         }
 
         loadCart();
     </script>
 </body>
+
 </html>

@@ -61,7 +61,7 @@ window.onload = function () {
               <i class="${course.icon || 'fas fa-book'}"></i>
               <h2>${course.title}</h2>
               <p>${course.description || 'لا يوجد وصف متاح'}</p>
-              <p>السعر: ${course.price || 0} جنيه</p>
+              <p>السعر: ${course.isFree ? 'مجاني' : (course.isPriceHidden ? 'مدفوع' : (course.price || 0) + ' جنيه')}</p>
               <p>المدرب: ${course.instructor || 'غير محدد'}</p>
               <p>المدة: ${course.duration || 0} ساعة</p>
               <a href="paid-course-page.html?id=${course._id}" class="course-link">اذهب للكورس</a>
@@ -111,10 +111,10 @@ document
           localStorage.setItem("user", JSON.stringify(data.user));
           localStorage.setItem("login-email", email);
           localStorage.setItem("login-password", password);
-          
+
           document.getElementById("loginForm").style.display = "none";
           document.getElementById("logoutButton").style.display = "block";
-          
+
           // إعادة تحميل الصفحة لعرض الكورسات
           window.location.reload();
         } else {
@@ -135,12 +135,12 @@ document.getElementById("logoutButton").addEventListener("click", function () {
   localStorage.removeItem("login-password");
   localStorage.removeItem("token");
   localStorage.removeItem("user");
-  
+
   document.getElementById("logoutButton").style.display = "none";
   document.getElementById("loginForm").style.display = "block";
   document.getElementById("login-email").value = "";
   document.getElementById("login-password").value = "";
-  
+
   // إعادة تحميل الصفحة
   window.location.reload();
 });

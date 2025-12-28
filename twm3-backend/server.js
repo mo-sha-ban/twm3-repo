@@ -249,31 +249,31 @@ async function sendVerificationEmail(email, token) {
 // Middleware
 app.use(helmet({
     crossOriginResourcePolicy: { policy: 'cross-origin' },
-            contentSecurityPolicy: {
-                useDefaults: true,
-                directives: {
-                    defaultSrc: ["'self'"],
-                    scriptSrc: [
-                        "'self'",
-                        "'unsafe-inline'",
-                        "blob:",
-                        "data:",
-                        "'unsafe-eval'",
-                        "https://cdn.plyr.io",
-                        "https://cdnjs.cloudflare.com",
-                        "https://cdn.jsdelivr.net",
-                        "https://pagead2.googlesyndication.com",
-                        "https://www.googletagservices.com",
-                        "https://www.googletagmanager.com",
-                        "https://cdn.jsdelivr.net/npm/@emailjs/browser",
-                        "https://use.fontawesome.com",
-                        "https://www.youtube.com",
-                        "https://cdn.quilljs.com",
-                        "https://www.google-analytics.com",
-                        "https://analytics.google.com",
-                        "https://infird.com",
-                        "https://cdn.socket.io"
-                    ],
+    contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: [
+                "'self'",
+                "'unsafe-inline'",
+                "blob:",
+                "data:",
+                "'unsafe-eval'",
+                "https://cdn.plyr.io",
+                "https://cdnjs.cloudflare.com",
+                "https://cdn.jsdelivr.net",
+                "https://pagead2.googlesyndication.com",
+                "https://www.googletagservices.com",
+                "https://www.googletagmanager.com",
+                "https://cdn.jsdelivr.net/npm/@emailjs/browser",
+                "https://use.fontawesome.com",
+                "https://www.youtube.com",
+                "https://cdn.quilljs.com",
+                "https://www.google-analytics.com",
+                "https://analytics.google.com",
+                "https://infird.com",
+                "https://cdn.socket.io"
+            ],
             styleSrc: [
                 "'self'",
                 "'unsafe-inline'",
@@ -427,17 +427,17 @@ app.get('/pdf', (req, res) => {
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', 'inline; filename=myfile.pdf');
     res.sendFile(filePath);
-  });
+});
 
 
 const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'public/uploads/');
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
+    destination: function (req, file, cb) {
+        cb(null, 'public/uploads/');
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
 });
 const upload = multer({
     storage,
@@ -488,76 +488,76 @@ const upload = multer({
 
 // إعداد رفع صور البروفايل (صور فقط)
 const avatarStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const dest = path.join(__dirname, 'public/uploads/avatars');
-    try { fs.mkdirSync(dest, { recursive: true }); } catch(_) {}
-    cb(null, dest);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
+    destination: function (req, file, cb) {
+        const dest = path.join(__dirname, 'public/uploads/avatars');
+        try { fs.mkdirSync(dest, { recursive: true }); } catch (_) { }
+        cb(null, dest);
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
 });
 const avatarUpload = multer({
-  storage: avatarStorage,
-  limits: { fileSize: 2 * 1024 * 1024 },
-  fileFilter: (req, file, cb) => {
-    const allowed = ['image/png', 'image/jpeg', 'image/webp'];
-    if (allowed.includes(file.mimetype)) return cb(null, true);
-    cb(new Error('صيغة الصورة غير مسموح بها!'), false);
-  }
+    storage: avatarStorage,
+    limits: { fileSize: 2 * 1024 * 1024 },
+    fileFilter: (req, file, cb) => {
+        const allowed = ['image/png', 'image/jpeg', 'image/webp'];
+        if (allowed.includes(file.mimetype)) return cb(null, true);
+        cb(new Error('صيغة الصورة غير مسموح بها!'), false);
+    }
 });
 
 // إعداد رفع ملفات وصف الدروس (صور + PDF)
 const lessonAssetStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    const dest = path.join(__dirname, 'public/uploads/lesson-assets');
-    try { fs.mkdirSync(dest, { recursive: true }); } catch(_) {}
-    cb(null, dest);
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
+    destination: function (req, file, cb) {
+        const dest = path.join(__dirname, 'public/uploads/lesson-assets');
+        try { fs.mkdirSync(dest, { recursive: true }); } catch (_) { }
+        cb(null, dest);
+    },
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
 });
 const lessonAssetUpload = multer({
-  storage: lessonAssetStorage,
-  limits: { fileSize: 500 * 1024 * 1024 }, // Increased to 500MB for videos
-  fileFilter: (req, file, cb) => {
-    // Accept images, videos, and PDFs
-    const allowed = [
-      // Images
-      'image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/avif',
-      // Videos
-      'video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo', 'video/x-ms-wmv', 'video/ogg',
-      'video/x-matroska', 'video/x-flv', 'video/mpeg', 'video/3gpp', 'video/mp2t',
-      'application/x-mpegURL', // HLS
-      // Documents
-      'application/pdf'
-    ];
-    if (allowed.includes(file.mimetype)) return cb(null, true);
-    // Also accept if it has a video/* type but MIME might not be registered
-    if (file.mimetype && file.mimetype.startsWith('video/')) return cb(null, true);
-    cb(new Error(`صيغة الملف غير مسموح بها (${file.mimetype}). يدعم الصور والفيديوهات و PDF فقط.`), false);
-  }
+    storage: lessonAssetStorage,
+    limits: { fileSize: 500 * 1024 * 1024 }, // Increased to 500MB for videos
+    fileFilter: (req, file, cb) => {
+        // Accept images, videos, and PDFs
+        const allowed = [
+            // Images
+            'image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/avif',
+            // Videos
+            'video/mp4', 'video/webm', 'video/quicktime', 'video/x-msvideo', 'video/x-ms-wmv', 'video/ogg',
+            'video/x-matroska', 'video/x-flv', 'video/mpeg', 'video/3gpp', 'video/mp2t',
+            'application/x-mpegURL', // HLS
+            // Documents
+            'application/pdf'
+        ];
+        if (allowed.includes(file.mimetype)) return cb(null, true);
+        // Also accept if it has a video/* type but MIME might not be registered
+        if (file.mimetype && file.mimetype.startsWith('video/')) return cb(null, true);
+        cb(new Error(`صيغة الملف غير مسموح بها (${file.mimetype}). يدعم الصور والفيديوهات و PDF فقط.`), false);
+    }
 });
 
 // 🟢 مسار عرض PDF مباشرة
 app.get('/pdf/:filename', (req, res) => {
-  const filePath = path.join(__dirname, 'public/uploads', req.params.filename);
+    const filePath = path.join(__dirname, 'public/uploads', req.params.filename);
 
-  if (!fs.existsSync(filePath)) {
-    return res.status(404).send('❌ الملف غير موجود');
-  }
+    if (!fs.existsSync(filePath)) {
+        return res.status(404).send('❌ الملف غير موجود');
+    }
 
-  // 🟢 هيدرز عرض Inline (بدل التحميل)
-  res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader(
-    'Content-Disposition',
-    'inline; filename="' + req.params.filename + '"'
-  );
+    // 🟢 هيدرز عرض Inline (بدل التحميل)
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader(
+        'Content-Disposition',
+        'inline; filename="' + req.params.filename + '"'
+    );
 
-  res.sendFile(filePath);
+    res.sendFile(filePath);
 });
 
 // API: رفع ملف مرفق (صور + فيديو + PDF) عبر حقل form-data باسم 'file'
@@ -565,24 +565,24 @@ app.post('/api/uploads/lesson-asset', authToken, requireAuthToken, (req, res) =>
     lessonAssetUpload.single('file')(req, res, async (err) => {
         if (err) return res.status(400).json({ error: err.message || 'فشل رفع الملف' });
         if (!req.file) return res.status(400).json({ error: 'يرجى اختيار ملف' });
-        
+
         let rel = '/uploads/lesson-assets/' + req.file.filename;
         let type = 'file';
         const mimetype = (req.file.mimetype || '').toLowerCase();
         if (mimetype.startsWith('image/')) type = 'image';
         else if (mimetype.startsWith('video/')) type = 'video';
         else if (mimetype === 'application/pdf') type = 'pdf';
-        
+
         // For MOV files, note that frontend should convert to MP4 URL
         if (req.file.originalname.toLowerCase().endsWith('.mov')) {
             console.log('🎬 MOV file uploaded:', req.file.filename);
             console.log('📹 Client will attempt to use .mp4 version as fallback');
         }
-        
-        return res.json({ 
-            success: true, 
-            url: rel, 
-            type, 
+
+        return res.json({
+            success: true,
+            url: rel,
+            type,
             filename: req.file.originalname
         });
     });
@@ -814,168 +814,168 @@ app.use('/api/progress', progressRoutes);
 
 // --- Product Reviews & Comments Endpoints (BEFORE productRoutes to take priority) ---
 app.get('/api/products/:id/reviews', async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id).select('reviews');
-    if (!product) return res.status(404).json({ error: 'Product not found' });
-    res.json(product.reviews || []);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch reviews' });
-  }
+    try {
+        const product = await Product.findById(req.params.id).select('reviews');
+        if (!product) return res.status(404).json({ error: 'Product not found' });
+        res.json(product.reviews || []);
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to fetch reviews' });
+    }
 });
 
 app.get('/api/products/:id/comments', async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id).select('comments');
-    if (!product) return res.status(404).json({ error: 'Product not found' });
-    res.json(product.comments || []);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch comments' });
-  }
+    try {
+        const product = await Product.findById(req.params.id).select('comments');
+        if (!product) return res.status(404).json({ error: 'Product not found' });
+        res.json(product.comments || []);
+    } catch (err) {
+        res.status(500).json({ error: 'Failed to fetch comments' });
+    }
 });
 
 // POST review for a product
 app.post('/api/products/:id/reviews', async (req, res) => {
-  try {
-    const { user, rating, comment, text, title } = req.body;
-    const finalRating = rating || parseInt(req.body.rating);
-    const finalComment = comment || text || title;
-    
-    // Handle user as object or string
-    let finalUser = user;
-    if (typeof user === 'string') {
-      finalUser = user;
-    } else if (user && typeof user === 'object') {
-      finalUser = user; // Keep as object with name, email, avatarUrl
-    } else {
-      finalUser = (req.user && req.user.name) || 'Anonymous';
+    try {
+        const { user, rating, comment, text, title } = req.body;
+        const finalRating = rating || parseInt(req.body.rating);
+        const finalComment = comment || text || title;
+
+        // Handle user as object or string
+        let finalUser = user;
+        if (typeof user === 'string') {
+            finalUser = user;
+        } else if (user && typeof user === 'object') {
+            finalUser = user; // Keep as object with name, email, avatarUrl
+        } else {
+            finalUser = (req.user && req.user.name) || 'Anonymous';
+        }
+
+        console.log('POST /api/products/:id/reviews', { rating: finalRating, comment: finalComment, user: finalUser });
+
+        if (!finalRating || !finalComment) {
+            return res.status(400).json({ error: 'rating and comment/text are required', received: { rating: finalRating, comment: finalComment } });
+        }
+
+        const product = await Product.findById(req.params.id);
+        if (!product) return res.status(404).json({ error: 'Product not found' });
+
+        const newReview = { user: finalUser, rating: Number(finalRating), comment: finalComment, createdAt: new Date(), likes: [] };
+        if (!product.reviews) product.reviews = [];
+        product.reviews.push(newReview);
+        await product.save();
+
+        res.status(201).json(newReview);
+    } catch (err) {
+        console.error('Error adding review:', err);
+        res.status(500).json({ error: 'Failed to add review', details: err.message });
     }
-    
-    console.log('POST /api/products/:id/reviews', { rating: finalRating, comment: finalComment, user: finalUser });
-    
-    if (!finalRating || !finalComment) {
-      return res.status(400).json({ error: 'rating and comment/text are required', received: { rating: finalRating, comment: finalComment } });
-    }
-    
-    const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ error: 'Product not found' });
-    
-    const newReview = { user: finalUser, rating: Number(finalRating), comment: finalComment, createdAt: new Date(), likes: [] };
-    if (!product.reviews) product.reviews = [];
-    product.reviews.push(newReview);
-    await product.save();
-    
-    res.status(201).json(newReview);
-  } catch (err) {
-    console.error('Error adding review:', err);
-    res.status(500).json({ error: 'Failed to add review', details: err.message });
-  }
 });
 
 // POST comment for a product
 app.post('/api/products/:id/comments', async (req, res) => {
-  try {
-    const { user, text, comment } = req.body;
-    const finalText = text || comment;
-    
-    // Handle user as object or string
-    let finalUser = user;
-    if (typeof user === 'string') {
-      finalUser = user;
-    } else if (user && typeof user === 'object') {
-      finalUser = user; // Keep as object with name, email, avatarUrl
-    } else {
-      finalUser = (req.user && req.user.name) || 'Anonymous';
+    try {
+        const { user, text, comment } = req.body;
+        const finalText = text || comment;
+
+        // Handle user as object or string
+        let finalUser = user;
+        if (typeof user === 'string') {
+            finalUser = user;
+        } else if (user && typeof user === 'object') {
+            finalUser = user; // Keep as object with name, email, avatarUrl
+        } else {
+            finalUser = (req.user && req.user.name) || 'Anonymous';
+        }
+
+        console.log('POST /api/products/:id/comments', { text: finalText, user: finalUser });
+
+        if (!finalText) {
+            return res.status(400).json({ error: 'text is required', received: { text: finalText } });
+        }
+
+        const product = await Product.findById(req.params.id);
+        if (!product) return res.status(404).json({ error: 'Product not found' });
+
+        const newComment = { user: finalUser, text: finalText, createdAt: new Date(), likes: [] };
+        if (!product.comments) product.comments = [];
+        product.comments.push(newComment);
+        await product.save();
+
+        res.status(201).json(newComment);
+    } catch (err) {
+        console.error('Error adding comment:', err);
+        res.status(500).json({ error: 'Failed to add comment', details: err.message });
     }
-    
-    console.log('POST /api/products/:id/comments', { text: finalText, user: finalUser });
-    
-    if (!finalText) {
-      return res.status(400).json({ error: 'text is required', received: { text: finalText } });
-    }
-    
-    const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ error: 'Product not found' });
-    
-    const newComment = { user: finalUser, text: finalText, createdAt: new Date(), likes: [] };
-    if (!product.comments) product.comments = [];
-    product.comments.push(newComment);
-    await product.save();
-    
-    res.status(201).json(newComment);
-  } catch (err) {
-    console.error('Error adding comment:', err);
-    res.status(500).json({ error: 'Failed to add comment', details: err.message });
-  }
 });
 
 app.use('/api/products', productRoutes);
 
 // Like/Unlike review (toggle)
 app.post('/api/products/:productId/reviews/:reviewId/like', authToken, async (req, res) => {
-  try {
-    const { productId, reviewId } = req.params;
-    const userId = req.user && req.user._id;
-    if (!userId) return res.status(401).json({ error: 'Not authenticated' });
+    try {
+        const { productId, reviewId } = req.params;
+        const userId = req.user && req.user._id;
+        if (!userId) return res.status(401).json({ error: 'Not authenticated' });
 
-    // Find product with this review
-    const product = await Product.findById(productId);
-    if (!product) return res.status(404).json({ error: 'Product not found' });
+        // Find product with this review
+        const product = await Product.findById(productId);
+        if (!product) return res.status(404).json({ error: 'Product not found' });
 
-    const review = product.reviews.id(reviewId);
-    if (!review) return res.status(404).json({ error: 'Review not found' });
+        const review = product.reviews.id(reviewId);
+        if (!review) return res.status(404).json({ error: 'Review not found' });
 
-    // Toggle like
-    if (!review.likes) review.likes = [];
-    const likeIndex = review.likes.findIndex(id => String(id) === String(userId));
-    
-    if (likeIndex >= 0) {
-      // Unlike
-      review.likes.splice(likeIndex, 1);
-    } else {
-      // Like
-      review.likes.push(userId);
+        // Toggle like
+        if (!review.likes) review.likes = [];
+        const likeIndex = review.likes.findIndex(id => String(id) === String(userId));
+
+        if (likeIndex >= 0) {
+            // Unlike
+            review.likes.splice(likeIndex, 1);
+        } else {
+            // Like
+            review.likes.push(userId);
+        }
+
+        await product.save();
+        res.json({ liked: likeIndex < 0, likes: review.likes.length });
+    } catch (err) {
+        console.error('Error liking review:', err);
+        res.status(500).json({ error: 'Failed to like review' });
     }
-    
-    await product.save();
-    res.json({ liked: likeIndex < 0, likes: review.likes.length });
-  } catch (err) {
-    console.error('Error liking review:', err);
-    res.status(500).json({ error: 'Failed to like review' });
-  }
 });
 
 // Like/Unlike comment (toggle)
 app.post('/api/products/:productId/comments/:commentId/like', authToken, async (req, res) => {
-  try {
-    const { productId, commentId } = req.params;
-    const userId = req.user && req.user._id;
-    if (!userId) return res.status(401).json({ error: 'Not authenticated' });
+    try {
+        const { productId, commentId } = req.params;
+        const userId = req.user && req.user._id;
+        if (!userId) return res.status(401).json({ error: 'Not authenticated' });
 
-    // Find product with this comment
-    const product = await Product.findById(productId);
-    if (!product) return res.status(404).json({ error: 'Product not found' });
+        // Find product with this comment
+        const product = await Product.findById(productId);
+        if (!product) return res.status(404).json({ error: 'Product not found' });
 
-    const comment = product.comments.id(commentId);
-    if (!comment) return res.status(404).json({ error: 'Comment not found' });
+        const comment = product.comments.id(commentId);
+        if (!comment) return res.status(404).json({ error: 'Comment not found' });
 
-    // Toggle like
-    if (!comment.likes) comment.likes = [];
-    const likeIndex = comment.likes.findIndex(id => String(id) === String(userId));
-    
-    if (likeIndex >= 0) {
-      // Unlike
-      comment.likes.splice(likeIndex, 1);
-    } else {
-      // Like
-      comment.likes.push(userId);
+        // Toggle like
+        if (!comment.likes) comment.likes = [];
+        const likeIndex = comment.likes.findIndex(id => String(id) === String(userId));
+
+        if (likeIndex >= 0) {
+            // Unlike
+            comment.likes.splice(likeIndex, 1);
+        } else {
+            // Like
+            comment.likes.push(userId);
+        }
+
+        await product.save();
+        res.json({ liked: likeIndex < 0, likes: comment.likes.length });
+    } catch (err) {
+        console.error('Error liking comment:', err);
+        res.status(500).json({ error: 'Failed to like comment' });
     }
-    
-    await product.save();
-    res.json({ liked: likeIndex < 0, likes: comment.likes.length });
-  } catch (err) {
-    console.error('Error liking comment:', err);
-    res.status(500).json({ error: 'Failed to like comment' });
-  }
 });
 
 app.use('/api', dataDeletionRoutes);
@@ -1015,7 +1015,7 @@ app.get('/api/user', async (req, res) => {
                 if (!userDoc && decoded && decoded.email) {
                     userDoc = await User.findOne({ email: decoded.email }).lean();
                 }
-            } catch(_) { /* ignore */ }
+            } catch (_) { /* ignore */ }
         }
         // fallback by email query param
         if (!userDoc && req.query && req.query.email) {
@@ -1163,7 +1163,7 @@ app.post('/api/users/me/avatar', async (req, res) => {
         const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
         let decoded;
         try { decoded = jwt.verify(token, process.env.JWT_SECRET || 'jwtsecret'); }
-        catch(_) { return res.status(403).json({ error: 'توكن غير صالح أو منتهي الصلاحية' }); }
+        catch (_) { return res.status(403).json({ error: 'توكن غير صالح أو منتهي الصلاحية' }); }
         avatarUpload.single('avatar')(req, res, async (err) => {
             if (err) return res.status(400).json({ error: err.message || 'فشل رفع الصورة' });
             if (!req.file) return res.status(400).json({ error: 'يجب رفع صورة' });
@@ -1495,7 +1495,7 @@ app.use((err, req, res, next) => {
 app.put('/api/courses/:id', authToken, requireAuthToken, async (req, res) => {
     try {
         const courseId = req.params.id;
-        const { title, description, instructor, duration, price, category, tags, icon, categories, featured, isFree, udemyLink, promoVideo, promoVideoId, promoThumbnail, introVideo } = req.body;
+        const { title, description, instructor, duration, price, category, tags, icon, categories, featured, isFree, udemyLink, isPriceHidden, promoVideo, promoVideoId, promoThumbnail, introVideo } = req.body;
 
         // Defensive: if client incorrectly sends a POST while intending to update
         // a course, allow update-by-id when an id is provided in the body to
@@ -1525,6 +1525,7 @@ app.put('/api/courses/:id', authToken, requireAuthToken, async (req, res) => {
                     toUpdate.icon = icon !== undefined ? icon : toUpdate.icon;
                     if (categories !== undefined) toUpdate.categories = Array.isArray(categories) ? categories : toUpdate.categories;
                     if (udemyLink !== undefined) toUpdate.udemyLink = udemyLink;
+                    if (isPriceHidden !== undefined) toUpdate.isPriceHidden = isPriceHidden;
                     if (promoVideoId !== undefined) toUpdate.promoVideoId = promoVideoId;
                     if (promoVideo !== undefined) toUpdate.promoVideo = promoVideo;
                     if (promoThumbnail !== undefined) toUpdate.promoThumbnail = promoThumbnail;
@@ -1542,7 +1543,7 @@ app.put('/api/courses/:id', authToken, requireAuthToken, async (req, res) => {
 
         // Build update data - include all fields that are provided (even if empty)
         const updateData = {};
-        
+
         // Update fields only if they are explicitly provided in the request
         if (title !== undefined) updateData.title = title;
         if (description !== undefined) updateData.description = description;
@@ -1557,11 +1558,12 @@ app.put('/api/courses/:id', authToken, requireAuthToken, async (req, res) => {
         if (featured !== undefined) updateData.featured = featured;
         if (isFree !== undefined) updateData.isFree = isFree;
         if (udemyLink !== undefined) updateData.udemyLink = udemyLink;
+        if (isPriceHidden !== undefined) updateData.isPriceHidden = isPriceHidden;
         if (promoVideoId !== undefined) updateData.promoVideoId = promoVideoId;
         if (promoVideo !== undefined) updateData.promoVideo = promoVideo;
         if (promoThumbnail !== undefined) updateData.promoThumbnail = promoThumbnail;
         if (introVideo !== undefined) updateData.introVideo = introVideo;
-        
+
         // Always update the updatedAt timestamp
         updateData.updatedAt = new Date();
 
@@ -1615,6 +1617,9 @@ app.patch('/api/courses/:id', authToken, requireAuthToken, async (req, res) => {
         }
         if (updates.udemyLink !== undefined) {
             course.udemyLink = updates.udemyLink;
+        }
+        if (updates.isPriceHidden !== undefined) {
+            course.isPriceHidden = updates.isPriceHidden;
         }
         if (updates.promoVideo !== undefined) {
             course.promoVideo = updates.promoVideo;
@@ -1671,41 +1676,41 @@ app.post('/api/admin/users', authToken, requireAdminToken, async (req, res) => {
     try {
         console.log('========== POST /api/admin/users ==========');
         console.log('Request body:', req.body);
-        
+
         const { name, username, email, password, phone, isAdmin, role } = req.body;
-        
+
         console.log('Extracted fields:', { name, username, email, phone, isAdmin, role });
-        
+
         // التحقق من الحقول المطلوبة
         if (!name || !username || !email || !password) {
             console.log('Missing required fields');
             return res.status(400).json({ error: 'جميع الحقول مطلوبة' });
         }
-        
+
         console.log('All required fields present, checking for duplicates...');
-        
+
         // التحقق من تكرار البريد الإلكتروني
         const existingUser = await User.findOne({ email });
         if (existingUser) {
             console.log('Email already exists:', email);
             return res.status(400).json({ error: 'البريد الإلكتروني مسجل مسبقاً' });
         }
-        
+
         // التحقق من تكرار اسم المستخدم
         const existingUsername = await User.findOne({ username });
         if (existingUsername) {
             console.log('Username already exists:', username);
             return res.status(400).json({ error: 'اسم المستخدم مسجل مسبقاً' });
         }
-        
+
         console.log('No duplicates found, hashing password...');
-        
+
         // تشفير كلمة المرور
         const bcryptjs = require('bcryptjs');
         const hashedPassword = await bcryptjs.hash(password, 10);
-        
+
         console.log('Password hashed, creating user...');
-        
+
         // إنشاء مستخدم جديد
         const newUser = new User({
             name,
@@ -1715,13 +1720,13 @@ app.post('/api/admin/users', authToken, requireAdminToken, async (req, res) => {
             phone: phone || '',
             isAdmin: isAdmin === true || isAdmin === 'true' || role === 'admin'
         });
-        
+
         console.log('User object created, saving to database...');
-        
+
         await newUser.save();
-        
+
         console.log('User created successfully:', newUser._id);
-        
+
         res.status(201).json({
             success: true,
             message: 'تمت إضافة المستخدم بنجاح',
@@ -1739,8 +1744,8 @@ app.post('/api/admin/users', authToken, requireAdminToken, async (req, res) => {
         console.error('Error name:', err.name);
         console.error('Stack:', err.stack);
         console.error('Full error:', err);
-        
-        res.status(500).json({ 
+
+        res.status(500).json({
             error: 'فشل في إضافة المستخدم',
             details: err.message,
             errorName: err.name
@@ -1753,12 +1758,12 @@ app.put('/api/admin/users/:userId', authToken, requireAdminToken, async (req, re
     try {
         const { userId } = req.params;
         const { name, username, email, phone, isAdmin, isVerified } = req.body;
-        
+
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ error: 'المستخدم غير موجود' });
         }
-        
+
         // تحديث البيانات
         user.name = name || user.name;
         user.username = username || user.username;
@@ -1767,9 +1772,9 @@ app.put('/api/admin/users/:userId', authToken, requireAdminToken, async (req, re
         user.isAdmin = isAdmin !== undefined ? isAdmin : user.isAdmin;
         // allow admins to set verification flag
         if (isVerified !== undefined) user.isVerified = !!isVerified;
-        
+
         await user.save();
-        
+
         res.json({
             _id: user._id,
             name: user.name,
@@ -1789,12 +1794,12 @@ app.put('/api/admin/users/:userId', authToken, requireAdminToken, async (req, re
 app.delete('/api/admin/users/:userId', authToken, requireAdminToken, async (req, res) => {
     try {
         const { userId } = req.params;
-        
+
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ error: 'المستخدم غير موجود' });
         }
-        
+
         await User.findByIdAndDelete(userId);
         res.json({ message: 'تم حذف المستخدم بنجاح' });
     } catch (err) {
@@ -1809,7 +1814,7 @@ app.get('/api/admin/blogs', authToken, requireAdminToken, async (req, res) => {
         const blogs = await Blog.find().populate('author', 'name username');
         res.json(blogs);
     } catch (err) {
-    res.status(500).json({ error: 'فشل في جلب المنشورات' });
+        res.status(500).json({ error: 'فشل في جلب المنشورات' });
     }
 });
 
@@ -1817,11 +1822,11 @@ app.get('/api/admin/blogs', authToken, requireAdminToken, async (req, res) => {
 app.post('/api/admin/blogs', authToken, requireAdminToken, async (req, res) => {
     try {
         const { title, content, author, category, tags } = req.body;
-        
+
         if (!title || !content) {
             return res.status(400).json({ error: 'العنوان والمحتوى مطلوبان' });
         }
-        
+
         const newBlog = new Blog({
             title,
             content,
@@ -1829,12 +1834,12 @@ app.post('/api/admin/blogs', authToken, requireAdminToken, async (req, res) => {
             category: category || 'عام',
             tags: tags || []
         });
-        
+
         await newBlog.save();
         res.status(201).json(newBlog);
     } catch (err) {
-    console.error('خطأ في إضافة المنشور:', err);
-    res.status(500).json({ error: 'فشل في إضافة المنشور' });
+        console.error('خطأ في إضافة المنشور:', err);
+        res.status(500).json({ error: 'فشل في إضافة المنشور' });
     }
 });
 
@@ -1843,22 +1848,22 @@ app.put('/api/admin/blogs/:blogId', authToken, requireAdminToken, async (req, re
     try {
         const { blogId } = req.params;
         const { title, content, category, tags } = req.body;
-        
+
         const blog = await Blog.findById(blogId);
         if (!blog) {
             return res.status(404).json({ error: 'المنشور غير موجود' });
         }
-        
+
         blog.title = title || blog.title;
         blog.content = content || blog.content;
         blog.category = category || blog.category;
         blog.tags = tags || blog.tags;
-        
+
         await blog.save();
         res.json(blog);
     } catch (err) {
-    console.error('خطأ في تحديث المنشور:', err);
-    res.status(500).json({ error: 'فشل في تحديث المنشور' });
+        console.error('خطأ في تحديث المنشور:', err);
+        res.status(500).json({ error: 'فشل في تحديث المنشور' });
     }
 });
 
@@ -1866,17 +1871,17 @@ app.put('/api/admin/blogs/:blogId', authToken, requireAdminToken, async (req, re
 app.delete('/api/admin/blogs/:blogId', authToken, requireAdminToken, async (req, res) => {
     try {
         const { blogId } = req.params;
-        
+
         const blog = await Blog.findById(blogId);
         if (!blog) {
             return res.status(404).json({ error: 'المنشور غير موجود' });
         }
-        
+
         await Blog.findByIdAndDelete(blogId);
-    res.json({ message: 'تم حذف المنشور بنجاح' });
+        res.json({ message: 'تم حذف المنشور بنجاح' });
     } catch (err) {
-    console.error('خطأ في حذف المنشور:', err);
-    res.status(500).json({ error: 'فشل في حذف المنشور' });
+        console.error('خطأ في حذف المنشور:', err);
+        res.status(500).json({ error: 'فشل في حذف المنشور' });
     }
 });
 
@@ -1895,12 +1900,12 @@ app.put('/api/admin/courses/:courseId', authToken, requireAdminToken, async (req
     try {
         const { courseId } = req.params;
         const { title, description, instructor, duration, price, category, tags } = req.body;
-        
+
         const course = await Course.findById(courseId);
         if (!course) {
             return res.status(404).json({ error: 'الكورس غير موجود' });
         }
-        
+
         course.title = title || course.title;
         course.description = description || course.description;
         course.instructor = instructor || course.instructor;
@@ -1908,7 +1913,7 @@ app.put('/api/admin/courses/:courseId', authToken, requireAdminToken, async (req
         course.price = price !== undefined ? price : course.price;
         course.category = category || course.category;
         course.tags = tags || course.tags;
-        
+
         await course.save();
         res.json(course);
     } catch (err) {
@@ -1921,12 +1926,12 @@ app.put('/api/admin/courses/:courseId', authToken, requireAdminToken, async (req
 app.delete('/api/admin/courses/:courseId', authToken, requireAdminToken, async (req, res) => {
     try {
         const { courseId } = req.params;
-        
+
         const course = await Course.findById(courseId);
         if (!course) {
             return res.status(404).json({ error: 'الكورس غير موجود' });
         }
-        
+
         await Course.findByIdAndDelete(courseId);
         res.json({ message: 'تم حذف الكورس بنجاح' });
     } catch (err) {
@@ -1940,10 +1945,10 @@ app.post('/api/courses', authToken, requireAuthToken, async (req, res) => {
     // Lightweight request logging for debugging duplicate submissions
     try {
         console.log('[/api/courses] Incoming POST — referer:', req.headers.referer || 'NONE', 'user:', (req.user && (req.user._id || req.user.id)) || 'anon');
-        try { console.log('[/api/courses] body preview:', JSON.stringify(req.body).slice(0,200)); } catch(_){}
-    } catch(_) {}
+        try { console.log('[/api/courses] body preview:', JSON.stringify(req.body).slice(0, 200)); } catch (_) { }
+    } catch (_) { }
     try {
-        const { title, description, instructor, duration, price, category, tags, icon, categories, featured, isFree, udemyLink, promoVideoId } = req.body;
+        const { title, description, instructor, duration, price, category, tags, icon, categories, featured, isFree, udemyLink, isPriceHidden, promoVideoId } = req.body;
 
         // Basic duplicate prevention:
         // 1) If the same creator already has a course with the same title (case-insensitive),
@@ -1994,7 +1999,7 @@ app.post('/api/courses', authToken, requireAuthToken, async (req, res) => {
             normalizedTitleLower = `${normalizedTitleLower}-${Date.now()}`;
         }
 
-            const insertDoc = {
+        const insertDoc = {
             title,
             description,
             instructor,
@@ -2007,12 +2012,13 @@ app.post('/api/courses', authToken, requireAuthToken, async (req, res) => {
             featured: featured || false,
             isFree: isFree !== undefined ? isFree : true,
             udemyLink: udemyLink || '',
+            isPriceHidden: isPriceHidden || false,
             promoVideoId: promoVideoId || null,
             promoVideo: '',
             promoThumbnail: '',
             introVideo: '',
             createdBy: creator,
-             	normalizedTitle: normalizedTitleLower,
+            normalizedTitle: normalizedTitleLower,
             createdAt: new Date(),
             updatedAt: new Date()
         };
@@ -2058,7 +2064,7 @@ app.post('/api/courses/:courseId/units', authToken, requireAuthToken, async (req
     try {
         const { title, description } = req.body;
         const course = await Course.findById(req.params.courseId);
-        
+
         if (!course) {
             return res.status(404).json({ error: 'الكورس غير موجود' });
         }
@@ -2072,7 +2078,7 @@ app.post('/api/courses/:courseId/units', authToken, requireAuthToken, async (req
 
         course.units.push(newUnit);
         await course.save();
-        
+
         res.status(201).json(newUnit);
     } catch (err) {
         console.error('خطأ في إضافة الوحدة:', err);
@@ -2084,102 +2090,102 @@ app.post('/api/courses/:courseId/units', authToken, requireAuthToken, async (req
 
 
 app.post(
-'/api/courses/:courseId/units/:unitId/lessons',
-async (req, res) => {
-    // Handle multer file upload with proper error handling
-    await new Promise((resolve, reject) => {
-        lessonUpload(req, res, (err) => {
-            if (err) {
-                console.error('File upload error:', {
-                    message: err.message,
-                    code: err.code,
-                    field: err.field
-                });
-                
-                if (err.code === 'INVALID_FILE_TYPE') {
+    '/api/courses/:courseId/units/:unitId/lessons',
+    async (req, res) => {
+        // Handle multer file upload with proper error handling
+        await new Promise((resolve, reject) => {
+            lessonUpload(req, res, (err) => {
+                if (err) {
+                    console.error('File upload error:', {
+                        message: err.message,
+                        code: err.code,
+                        field: err.field
+                    });
+
+                    if (err.code === 'INVALID_FILE_TYPE') {
+                        return res.status(400).json({
+                            error: err.message,
+                            allowedTypes: ['video/mp4 (.mp4)', 'video/quicktime (.mov)']
+                        });
+                    }
+
                     return res.status(400).json({
-                        error: err.message,
-                        allowedTypes: ['video/mp4 (.mp4)', 'video/quicktime (.mov)']
+                        error: 'حدث خطأ أثناء رفع الملف: ' + err.message
                     });
                 }
-                
-                return res.status(400).json({
-                    error: 'حدث خطأ أثناء رفع الملف: ' + err.message
-                });
-            }
-            resolve();
+                resolve();
+            });
         });
-    });
 
-    try {
-        console.log('📂 الملفات المرفوعة:', req.files);
-        console.log('📝 البيانات:', req.body);
+        try {
+            console.log('📂 الملفات المرفوعة:', req.files);
+            console.log('📝 البيانات:', req.body);
 
-    // If multer's fileFilter marked the file as not allowed, return a JSON error
-    if (req._fileFilterPassed === false) {
-        console.warn('ملف مرفوض بواسطة فلتر الصيغ. originalname=', req.files && req.files.lessonFile && req.files.lessonFile[0] && req.files.lessonFile[0].originalname);
-        return res.status(400).json({ error: 'صيغة الملف غير مسموح بها أو الملف غير مدعوم. يرجى رفع ملف بصيغة mp4 أو mov أو pdf.' });
+            // If multer's fileFilter marked the file as not allowed, return a JSON error
+            if (req._fileFilterPassed === false) {
+                console.warn('ملف مرفوض بواسطة فلتر الصيغ. originalname=', req.files && req.files.lessonFile && req.files.lessonFile[0] && req.files.lessonFile[0].originalname);
+                return res.status(400).json({ error: 'صيغة الملف غير مسموح بها أو الملف غير مدعوم. يرجى رفع ملف بصيغة mp4 أو mov أو pdf.' });
+            }
+
+            const { title, description, duration, type, videoUrl, fileUrl, externalUrl, content, isFree } = req.body;
+
+            const course = await Course.findById(req.params.courseId);
+            if (!course) return res.status(404).json({ error: 'الكورس غير موجود' });
+
+            const unit = course.units.id(req.params.unitId);
+            if (!unit) return res.status(404).json({ error: 'الوحدة غير موجودة' });
+
+            const files = req.files || {};
+            const lessonFiles = Array.isArray(files.lessonFile) ? files.lessonFile : [];
+            const videoFile = lessonFiles[0] || null;
+            const pdfFile = videoFile; // لأنك تستخدم نفس الاسم في الـ form
+
+            const newLesson = {
+                title,
+                description,
+                duration: Number(duration) || 0,
+                type: type || 'video',
+                isFree: isFree === 'true' || isFree === true
+            };
+
+            if (newLesson.type === 'video') {
+                if (videoFile && videoFile.mimetype.startsWith('video/')) {
+                    newLesson.videoUrl = `/uploads/${videoFile.filename}`;
+                } else if (videoUrl) {
+                    newLesson.videoUrl = videoUrl;
+                } else {
+                    return res.status(400).json({ error: 'يجب رفع ملف فيديو أو إدخال رابط فيديو' });
+                }
+            } else if (newLesson.type === 'pdf') {
+                if (pdfFile && pdfFile.mimetype === 'application/pdf') {
+                    newLesson.fileUrl = `/uploads/${pdfFile.filename}`;
+                } else if (fileUrl) {
+                    newLesson.fileUrl = fileUrl;
+                } else {
+                    return res.status(400).json({ error: 'يجب رفع ملف PDF أو إدخال رابط PDF' });
+                }
+            } else if (newLesson.type === 'url') {
+                if (!externalUrl) {
+                    return res.status(400).json({ error: 'يرجى إدخال الرابط الخارجي' });
+                }
+                newLesson.externalUrl = externalUrl;
+            } else if (newLesson.type === 'text') {
+                newLesson.content = content || '';
+            }
+
+
+            unit.lessons.push(newLesson);
+            await course.save();
+
+            const savedUnit = course.units.id(req.params.unitId);
+            const savedLesson = savedUnit.lessons[savedUnit.lessons.length - 1];
+
+            res.status(201).json(savedLesson);
+        } catch (err) {
+            console.error('خطأ في إضافة الدرس:', err);
+            res.status(500).json({ error: 'حدث خطأ أثناء إضافة الدرس' });
+        }
     }
-
-    const { title, description, duration, type, videoUrl, fileUrl, externalUrl, content, isFree } = req.body;
-
-    const course = await Course.findById(req.params.courseId);
-    if (!course) return res.status(404).json({ error: 'الكورس غير موجود' });
-
-    const unit = course.units.id(req.params.unitId);
-    if (!unit) return res.status(404).json({ error: 'الوحدة غير موجودة' });
-
-    const files = req.files || {};
-    const lessonFiles = Array.isArray(files.lessonFile) ? files.lessonFile : [];
-    const videoFile = lessonFiles[0] || null;
-const pdfFile = videoFile; // لأنك تستخدم نفس الاسم في الـ form
-
-const newLesson = {
-    title,
-    description,
-    duration: Number(duration) || 0,
-    type: type || 'video',
-    isFree: isFree === 'true' || isFree === true
-};
-
-if (newLesson.type === 'video') {
-    if (videoFile && videoFile.mimetype.startsWith('video/')) {
-        newLesson.videoUrl = `/uploads/${videoFile.filename}`;
-    } else if (videoUrl) {
-        newLesson.videoUrl = videoUrl;
-    } else {
-        return res.status(400).json({ error: 'يجب رفع ملف فيديو أو إدخال رابط فيديو' });
-    }
-} else if (newLesson.type === 'pdf') {
-    if (pdfFile && pdfFile.mimetype === 'application/pdf') {
-        newLesson.fileUrl = `/uploads/${pdfFile.filename}`;
-    } else if (fileUrl) {
-        newLesson.fileUrl = fileUrl;
-    } else {
-        return res.status(400).json({ error: 'يجب رفع ملف PDF أو إدخال رابط PDF' });
-    }
-} else if (newLesson.type === 'url') {
-    if (!externalUrl) {
-        return res.status(400).json({ error: 'يرجى إدخال الرابط الخارجي' });
-    }
-    newLesson.externalUrl = externalUrl;
-} else if (newLesson.type === 'text') {
-    newLesson.content = content || '';
-}
-
-
-    unit.lessons.push(newLesson);
-    await course.save();
-
-    const savedUnit = course.units.id(req.params.unitId);
-    const savedLesson = savedUnit.lessons[savedUnit.lessons.length - 1];
-
-    res.status(201).json(savedLesson);
-} catch (err) {
-    console.error('خطأ في إضافة الدرس:', err);
-    res.status(500).json({ error: 'حدث خطأ أثناء إضافة الدرس' });
-}
-}
 );
 
 
@@ -2188,14 +2194,14 @@ app.put('/api/courses/:courseId/content', authToken, requireAuthToken, async (re
     try {
         const { units } = req.body;
         const course = await Course.findById(req.params.courseId);
-        
+
         if (!course) {
             return res.status(404).json({ error: 'الكورس غير موجود' });
         }
 
         course.units = units;
         await course.save();
-        
+
         res.json(course);
     } catch (err) {
         console.error('خطأ في تحديث محتوى الكورس:', err);
@@ -2286,7 +2292,7 @@ app.put('/api/courses/:courseId/promo-video', authToken, requireAuthToken, async
 app.delete('/api/courses/:courseId/units/:unitId', authToken, requireAuthToken, async (req, res) => {
     try {
         const course = await Course.findById(req.params.courseId);
-        
+
         if (!course) {
             return res.status(404).json({ error: 'الكورس غير موجود' });
         }
@@ -2298,7 +2304,7 @@ app.delete('/api/courses/:courseId/units/:unitId', authToken, requireAuthToken, 
 
         course.units.splice(unitIndex, 1);
         await course.save();
-        
+
         res.json({ message: 'تم حذف الوحدة بنجاح' });
     } catch (err) {
         console.error('خطأ في حذف الوحدة:', err);
@@ -2310,7 +2316,7 @@ app.delete('/api/courses/:courseId/units/:unitId', authToken, requireAuthToken, 
 app.get('/api/courses/:courseId/units/:unitId/lessons/:lessonId', async (req, res) => {
     try {
         const course = await Course.findById(req.params.courseId);
-        
+
         if (!course) {
             return res.status(404).json({ error: 'الكورس غير موجود' });
         }
@@ -2338,7 +2344,7 @@ app.put('/api/courses/:courseId/units/:unitId/lessons/:lessonId', authToken, req
         const { title, videoUrl, description, duration, type, fileUrl, externalUrl, content, isFree } = req.body;
         console.log('PUT update lesson payload:', { title, videoUrl, description, duration, type, fileUrl, externalUrl, content, isFree });
         const course = await Course.findById(req.params.courseId);
-        
+
         if (!course) {
             return res.status(404).json({ error: 'الكورس غير موجود' });
         }
@@ -2359,7 +2365,7 @@ app.put('/api/courses/:courseId/units/:unitId/lessons/:lessonId', authToken, req
         lesson.duration = duration || lesson.duration;
         lesson.type = type || lesson.type;
         lesson.isFree = isFree !== undefined ? isFree : lesson.isFree;
-        
+
         // Update media fields if provided - do not rely solely on the 'type' value
         if (typeof videoUrl !== 'undefined') {
             lesson.videoUrl = videoUrl;
@@ -2389,7 +2395,7 @@ app.put('/api/courses/:courseId/units/:unitId/lessons/:lessonId', authToken, req
 
         await course.save();
         console.log('Saved lesson:', lesson);
-        
+
         res.json(lesson);
     } catch (err) {
         console.error('خطأ في تحديث الدرس:', err);
@@ -2401,7 +2407,7 @@ app.put('/api/courses/:courseId/units/:unitId/lessons/:lessonId', authToken, req
 app.delete('/api/courses/:courseId/units/:unitId/lessons/:lessonId', authToken, requireAuthToken, async (req, res) => {
     try {
         const course = await Course.findById(req.params.courseId);
-        
+
         if (!course) {
             return res.status(404).json({ error: 'الكورس غير موجود' });
         }
@@ -2418,7 +2424,7 @@ app.delete('/api/courses/:courseId/units/:unitId/lessons/:lessonId', authToken, 
 
         unit.lessons.splice(lessonIndex, 1);
         await course.save();
-        
+
         res.json({ message: 'تم حذف الدرس بنجاح' });
     } catch (err) {
         console.error('خطأ في حذف الدرس:', err);
@@ -2581,7 +2587,7 @@ app.get('/api/admin/missing-product-images', authToken, requireAdminToken, async
 app.use((err, req, res, next) => {
     console.error('Error:', err.message);
     console.error('Stack:', err.stack);
-    
+
     // Always return JSON, never HTML
     res.status(err.status || 500).json({
         error: err.message || 'Internal Server Error',
@@ -2591,9 +2597,9 @@ app.use((err, req, res, next) => {
 
 // Catch-all handler for any unhandled routes to return JSON instead of HTML
 app.use((req, res) => {
-    res.status(404).json({ 
+    res.status(404).json({
         error: 'Route not found',
-        status: 404 
+        status: 404
     });
 });
 
@@ -2630,7 +2636,7 @@ io.use((socket, next) => {
 });
 
 io.on('connection', (socket) => {
-    try { console.log('Socket connected:', socket.id, 'userId=', socket.userId); } catch(e) { console.log('Socket connected:', socket.id); }
+    try { console.log('Socket connected:', socket.id, 'userId=', socket.userId); } catch (e) { console.log('Socket connected:', socket.id); }
 
     // Auto-join the user's room if authenticated
     try { if (socket.userId) socket.join(socket.userId); } catch (e) { console.error('Auto-join room failed', e); }
@@ -2668,7 +2674,7 @@ app.get('/', (req, res) => {
 // 2. نظام تنقل ذكي لجميع الصفحات (بما فيها الكورسات)
 app.get('/:page', (req, res) => {
     const pageName = req.params.page.replace('.html', ''); // تنظيف الاسم
-    
+
     // قائمة بالأماكن المحتملة للملف
     const paths = [
         path.join(rootDirectory, `${pageName}.html`),
@@ -2692,9 +2698,9 @@ app.get('/:page', (req, res) => {
 mongoose.connect(process.env.MONGO_URI)
     .then(async () => {
         console.log("MongoDB connected");
-        
 
-        
+
+
         const port = parseInt(process.env.PORT || PORT || 5000, 10);
         const maxRetries = 5;
         let attempt = 0;

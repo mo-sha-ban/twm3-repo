@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://www.youtube.com https://www.youtube-nocookie.com https://cdn.plyr.io https://cdnjs.cloudflare.com https://www.google.com https://apis.google.com https://ssl.gstatic.com https://www.gstatic.com https://*.youtube.com https://*.gstatic.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; connect-src 'self' https: http:;">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://www.youtube.com https://www.youtube-nocookie.com https://cdn.plyr.io https://cdnjs.cloudflare.com https://www.google.com https://apis.google.com https://ssl.gstatic.com https://www.gstatic.com https://*.youtube.com https://*.gstatic.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; connect-src 'self' https: http:;">
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/courses-carousel.css">
@@ -212,8 +214,8 @@
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             transition: border-color var(--courses-transition-fast),
-                        box-shadow var(--courses-transition-fast),
-                        background var(--courses-transition-fast);
+                box-shadow var(--courses-transition-fast),
+                background var(--courses-transition-fast);
         }
 
         body.dark .courses-search input,
@@ -262,8 +264,8 @@
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             transition: background var(--courses-transition-fast),
-                        border-color var(--courses-transition-fast),
-                        transform var(--courses-transition-fast);
+                border-color var(--courses-transition-fast),
+                transform var(--courses-transition-fast);
         }
 
         body.dark .filter-chip,
@@ -510,8 +512,8 @@
             text-decoration: none;
             cursor: pointer;
             transition: transform var(--courses-transition-fast),
-                        box-shadow var(--courses-transition-fast),
-                        background var(--courses-transition-fast);
+                box-shadow var(--courses-transition-fast),
+                background var(--courses-transition-fast);
             box-shadow: 0 12px 30px rgba(37, 99, 235, 0.55);
         }
 
@@ -524,7 +526,7 @@
            Paid Course - Premium 3D Liquid Glass Design
            ============================================ */
         .course-card.paid-course {
-            background: 
+            background:
                 linear-gradient(135deg, rgba(255, 215, 0, 0.08) 0%, rgba(212, 175, 55, 0.12) 100%),
                 rgba(255, 255, 255, 0.75);
             border: 2px solid rgba(255, 215, 0, 0.35);
@@ -542,7 +544,7 @@
 
         body.dark .course-card.paid-course,
         :root.dark-theme .course-card.paid-course {
-            background: 
+            background:
                 linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(212, 175, 55, 0.2) 100%),
                 rgba(15, 23, 42, 0.85);
             border: 2px solid rgba(255, 215, 0, 0.45);
@@ -556,7 +558,7 @@
             left: -60%;
             width: 220%;
             height: 220%;
-            background: 
+            background:
                 radial-gradient(circle at 30% 30%, rgba(255, 215, 0, 0.4) 0%, transparent 50%),
                 radial-gradient(circle at 70% 70%, rgba(250, 218, 94, 0.3) 0%, transparent 50%);
             animation: liquidFloat 8s ease-in-out infinite;
@@ -566,15 +568,19 @@
         }
 
         @keyframes liquidFloat {
-            0%, 100% { 
+
+            0%,
+            100% {
                 transform: translate(-50%, -50%) rotate(0deg) scale(1);
                 opacity: 0.5;
             }
-            33% { 
+
+            33% {
                 transform: translate(-45%, -55%) rotate(120deg) scale(1.1);
                 opacity: 0.7;
             }
-            66% { 
+
+            66% {
                 transform: translate(-55%, -45%) rotate(240deg) scale(0.95);
                 opacity: 0.6;
             }
@@ -585,7 +591,7 @@
             content: '';
             position: absolute;
             inset: 0;
-            background: 
+            background:
                 linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
                 linear-gradient(225deg, rgba(255, 215, 0, 0.1) 0%, transparent 50%);
             z-index: 0;
@@ -593,7 +599,7 @@
             border-radius: inherit;
         }
 
-        .course-card.paid-course > * {
+        .course-card.paid-course>* {
             position: relative;
             z-index: 1;
         }
@@ -639,7 +645,7 @@
         .paid-course-features {
             margin: 12px 0;
             padding: 14px;
-            background: 
+            background:
                 linear-gradient(135deg, rgba(255, 215, 0, 0.08) 0%, rgba(239, 223, 187, 0.12) 100%),
                 rgba(255, 255, 255, 0.5);
             border-radius: 12px;
@@ -650,7 +656,7 @@
 
         body.dark .paid-course-features,
         :root.dark-theme .paid-course-features {
-            background: 
+            background:
                 linear-gradient(135deg, rgba(255, 215, 0, 0.12) 0%, rgba(212, 175, 55, 0.15) 100%),
                 rgba(15, 23, 42, 0.6);
         }
@@ -718,7 +724,7 @@
             position: relative;
             border-radius: 12px;
             overflow: hidden;
-            background: 
+            background:
                 linear-gradient(135deg, rgba(255, 215, 0, 0.1) 0%, rgba(212, 175, 55, 0.15) 100%),
                 rgba(0, 0, 0, 0.05);
             border: 1px solid rgba(255, 215, 0, 0.3);
@@ -734,7 +740,7 @@
 
         body.dark .paid-course-promo,
         :root.dark-theme .paid-course-promo {
-            background: 
+            background:
                 linear-gradient(135deg, rgba(255, 215, 0, 0.06) 0%, rgba(212, 175, 55, 0.08) 100%),
                 rgba(30, 41, 59, 0.4);
             border: 1px solid rgba(255, 215, 0, 0.25);
@@ -749,7 +755,8 @@
         .paid-course-promo-thumbnail {
             position: relative;
             width: 100%;
-            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            padding-top: 56.25%;
+            /* 16:9 Aspect Ratio */
             background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(212, 175, 55, 0.3));
             overflow: hidden;
         }
@@ -800,13 +807,13 @@
             transform: translate(-50%, -50%);
             width: 60px;
             height: 60px;
-            background: 
+            background:
                 linear-gradient(135deg, rgba(255, 215, 0, 0.95), rgba(212, 175, 55, 0.95));
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 
+            box-shadow:
                 0 8px 24px rgba(212, 175, 55, 0.5),
                 0 0 0 8px rgba(255, 215, 0, 0.2);
             transition: all 0.3s ease;
@@ -816,23 +823,23 @@
 
         .paid-course-promo:hover .paid-course-promo-play {
             transform: translate(-50%, -50%) scale(1.1);
-            box-shadow: 
+            box-shadow:
                 0 12px 32px rgba(212, 175, 55, 0.6),
                 0 0 0 12px rgba(255, 215, 0, 0.3);
         }
 
         body.dark .paid-course-promo-play,
         :root.dark-theme .paid-course-promo-play {
-            background: 
+            background:
                 linear-gradient(135deg, rgba(255, 215, 0, 0.85), rgba(212, 175, 55, 0.85));
-            box-shadow: 
+            box-shadow:
                 0 8px 24px rgba(212, 175, 55, 0.35),
                 0 0 0 8px rgba(255, 215, 0, 0.15);
         }
 
         body.dark .paid-course-promo:hover .paid-course-promo-play,
         :root.dark-theme .paid-course-promo:hover .paid-course-promo-play {
-            box-shadow: 
+            box-shadow:
                 0 12px 32px rgba(212, 175, 55, 0.4),
                 0 0 0 12px rgba(255, 215, 0, 0.2);
         }
@@ -962,14 +969,18 @@
         }
 
         @keyframes liquidFloatFeatured {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: translate(-50%, -50%) rotate(0deg) scale(1);
                 opacity: 0.5;
             }
+
             33% {
                 transform: translate(-45%, -55%) rotate(120deg) scale(1.1);
                 opacity: 0.7;
             }
+
             66% {
                 transform: translate(-55%, -45%) rotate(240deg) scale(0.95);
                 opacity: 0.6;
@@ -989,7 +1000,7 @@
             border-radius: inherit;
         }
 
-        .course-card.featured-course > * {
+        .course-card.featured-course>* {
             position: relative;
             z-index: 1;
         }
@@ -1103,10 +1114,13 @@
         }
 
         @keyframes badgePulse {
-            0%, 100% {
+
+            0%,
+            100% {
                 transform: scale(1);
                 filter: brightness(1);
             }
+
             50% {
                 transform: scale(1.05);
                 filter: brightness(1.1);
@@ -1127,6 +1141,7 @@
                 opacity: 0;
                 transform: scale(0.8) rotate(-10deg);
             }
+
             100% {
                 opacity: 1;
                 transform: scale(1) rotate(0deg);
@@ -1134,13 +1149,16 @@
         }
 
         @keyframes pricePulse {
-            0%, 100% {
-                box-shadow: 
+
+            0%,
+            100% {
+                box-shadow:
                     0 4px 16px rgba(99, 102, 241, 0.4),
                     0 0 0 1px rgba(255, 255, 255, 0.2) inset;
             }
+
             50% {
-                box-shadow: 
+                box-shadow:
                     0 6px 24px rgba(99, 102, 241, 0.6),
                     0 0 0 2px rgba(255, 255, 255, 0.3) inset;
             }
@@ -1164,7 +1182,9 @@
         }
 
         @keyframes courses-spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .courses-error {
@@ -1206,6 +1226,7 @@
         }
     </style>
 </head>
+
 <body>
     <!-- -------------------------------------------Start Header-------------------------------- -->
     <div dir="rtl" class="header">
@@ -1218,7 +1239,8 @@
                     <li><a href="index.html">الرئيسيه</a></li>
                     <li><a href="courses.html">الكورسات </a></li>
                     <li><a href="portfolio.html">مشاريعنا </a></li>
-                    <li class="nav-dropdown"><a href="roadmap.html">مسارات التعلم <i class="fa-solid fa-angle-down"></i></a>
+                    <li class="nav-dropdown"><a href="roadmap.html">مسارات التعلم <i
+                                class="fa-solid fa-angle-down"></i></a>
                         <ul class="nav-dropdown-items">
                             <li><a href="frontendroadmap.html">Front End </a></li>
                             <li><a href="backendroadmap.html">Back End</a></li>
@@ -1236,7 +1258,8 @@
                     <i class="fa-solid fa-sun sun"></i>
                 </div>
                 <a href="store.html" aria-label="المتجر" title="المتجر"><i class="fa-solid fa-store store"></i></a>
-                <a href="login.html" aria-label="تسجيل الدخول" title="تسجيل الدخول"><i class="fa-solid fa-user user"></i></a>
+                <a href="login.html" aria-label="تسجيل الدخول" title="تسجيل الدخول"><i
+                        class="fa-solid fa-user user"></i></a>
             </div>
         </div>
     </div>
@@ -1263,7 +1286,8 @@
                 </div>
                 <div class="courses-toolbar">
                     <div class="courses-search">
-                        <input type="search" id="coursesSearch" placeholder="ابحث باسم الكورس أو المدرب..." aria-label="بحث عن كورس" />
+                        <input type="search" id="coursesSearch" placeholder="ابحث باسم الكورس أو المدرب..."
+                            aria-label="بحث عن كورس" />
                         <i class="fa-solid fa-magnifying-glass"></i>
                     </div>
                     <div class="courses-filters">
@@ -1333,7 +1357,8 @@
                         <a href="https://youtube.com/@twm3" target="_blank" class="social-link" title="YouTube">
                             <img src="img/Youtube-1.png" alt="YouTube" />
                         </a>
-                        <a href="https://instagram.com/mo_hussien_20" target="_blank" class="social-link" title="Instagram">
+                        <a href="https://instagram.com/mo_hussien_20" target="_blank" class="social-link"
+                            title="Instagram">
                             <img src="img/Instagram-1.png" alt="Instagram" />
                         </a>
                         <a href="https://t.me/teamworkm3" target="_blank" class="social-link" title="Telegram">
@@ -1344,7 +1369,8 @@
             </div>
 
             <div class="footer-copyright">
-                <p>&copy; <span id="yearData"></span> جميع الحقوق محفوظة لفريق <span class="brand-highlight">TWM3</span> <i class="fas fa-heart heart"></i></p>
+                <p>&copy; <span id="yearData"></span> جميع الحقوق محفوظة لفريق <span class="brand-highlight">TWM3</span>
+                    <i class="fas fa-heart heart"></i></p>
             </div>
 
             <div class="footer-bg-effects">
@@ -1372,76 +1398,78 @@
     <script src="app.js"></script>
     <script src="js/ui-toast.js"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', async () => {
-        const grid = document.getElementById('coursesGrid');
-        const stateEl = document.getElementById('coursesState');
-        const searchInput = document.getElementById('coursesSearch');
-        const filterChips = document.querySelectorAll('.filter-chip');
-        const totalCoursesLabel = document.getElementById('totalCoursesLabel');
-        const featuredCoursesLabel = document.getElementById('featuredCoursesLabel');
-        const visibleCoursesLabel = document.getElementById('visibleCoursesLabel');
+        document.addEventListener('DOMContentLoaded', async () => {
+            const grid = document.getElementById('coursesGrid');
+            const stateEl = document.getElementById('coursesState');
+            const searchInput = document.getElementById('coursesSearch');
+            const filterChips = document.querySelectorAll('.filter-chip');
+            const totalCoursesLabel = document.getElementById('totalCoursesLabel');
+            const featuredCoursesLabel = document.getElementById('featuredCoursesLabel');
+            const visibleCoursesLabel = document.getElementById('visibleCoursesLabel');
 
-        let allCourses = [];
-        let filteredCourses = [];
-        let activeFilter = 'all';
+            let allCourses = [];
+            let filteredCourses = [];
+            let activeFilter = 'all';
 
-        function escapeHtml(str) {
-            if (str === null || str === undefined) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
-        }
-
-        function renderCourses(courses) {
-            grid.innerHTML = '';
-            if (!courses.length) {
-                const empty = document.createElement('div');
-                empty.className = 'courses-state';
-                empty.innerHTML = '<p>لا توجد كورسات مطابقة لبحثك حالياً.</p>';
-                grid.appendChild(empty);
-                visibleCoursesLabel.textContent = '0 كورس ظاهر حالياً';
-                return;
+            function escapeHtml(str) {
+                if (str === null || str === undefined) return '';
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
             }
 
-            courses.forEach(course => {
-                const icon = course.icon || 'fa-solid fa-book';
-                const title = course.title || 'بدون عنوان';
-                const description = course.description || '';
-                const instructor = course.instructor || (course.author || 'غير محدد');
-                const isFeatured = course.featured || false;
-
-                // determine free vs paid
-                const payField = (String(course.pay || '')).toLowerCase();
-                const rawPrice = course.price;
-                const priceIsStringFree = (typeof rawPrice === 'string' && rawPrice.toLowerCase() === 'free');
-                const priceIsZero = rawPrice === 0 || rawPrice === '0' || rawPrice === null || rawPrice === undefined;
-                const isFree = payField === 'free' || priceIsStringFree || priceIsZero || course.isFree === true;
-
-                // normalize price label
-                let priceLabel = 'مجاني';
-                if (!isFree) {
-                    if (typeof rawPrice === 'number' || (!isNaN(Number(rawPrice)) && rawPrice !== null)) {
-                        priceLabel = Number(rawPrice) + ' جنيه';
-                    } else if (rawPrice) {
-                        priceLabel = String(rawPrice);
-                    } else {
-                        priceLabel = 'قابل للشراء';
-                    }
+            function renderCourses(courses) {
+                grid.innerHTML = '';
+                if (!courses.length) {
+                    const empty = document.createElement('div');
+                    empty.className = 'courses-state';
+                    empty.innerHTML = '<p>لا توجد كورسات مطابقة لبحثك حالياً.</p>';
+                    grid.appendChild(empty);
+                    visibleCoursesLabel.textContent = '0 كورس ظاهر حالياً';
+                    return;
                 }
 
-                const lessonsCount = (Array.isArray(course.units) ? course.units.length : (Array.isArray(course.lessons) ? course.lessons.length : 0));
-                const link = `course-page.html?id=${encodeURIComponent(course.id || course._id || course._id_str || '')}`;
+                courses.forEach(course => {
+                    const icon = course.icon || 'fa-solid fa-book';
+                    const title = course.title || 'بدون عنوان';
+                    const description = course.description || '';
+                    const instructor = course.instructor || (course.author || 'غير محدد');
+                    const isFeatured = course.featured || false;
 
-                const card = document.createElement('article');
-                card.className = 'course-card' + (!isFree ? ' paid-course' : '') + (isFeatured ? ' featured-course' : '');
+                    // determine free vs paid
+                    const payField = (String(course.pay || '')).toLowerCase();
+                    const rawPrice = course.price;
+                    const priceIsStringFree = (typeof rawPrice === 'string' && rawPrice.toLowerCase() === 'free');
+                    const priceIsZero = rawPrice === 0 || rawPrice === '0' || rawPrice === null || rawPrice === undefined;
+                    const isFree = payField === 'free' || priceIsStringFree || priceIsZero || course.isFree === true;
 
-                // Promo video removed from cards - shown only in course-page.html
-                let promoHTML = '';
+                    // normalize price label
+                    let priceLabel = 'مجاني';
+                    if (!isFree) {
+                        if (course.isPriceHidden) {
+                            priceLabel = 'مدفوع';
+                        } else if (typeof rawPrice === 'number' || (!isNaN(Number(rawPrice)) && rawPrice !== null)) {
+                            priceLabel = Number(rawPrice) + ' جنيه';
+                        } else if (rawPrice) {
+                            priceLabel = String(rawPrice);
+                        } else {
+                            priceLabel = 'قابل للشراء';
+                        }
+                    }
 
-                card.innerHTML = `
+                    const lessonsCount = (Array.isArray(course.units) ? course.units.length : (Array.isArray(course.lessons) ? course.lessons.length : 0));
+                    const link = `course-page.html?id=${encodeURIComponent(course.id || course._id || course._id_str || '')}`;
+
+                    const card = document.createElement('article');
+                    card.className = 'course-card' + (!isFree ? ' paid-course' : '') + (isFeatured ? ' featured-course' : '');
+
+                    // Promo video removed from cards - shown only in course-page.html
+                    let promoHTML = '';
+
+                    card.innerHTML = `
                     <div class="course-card-header">
                         <div class="course-icon"><i class="${icon}"></i></div>
                         <div class="course-title-area">
@@ -1468,121 +1496,122 @@
                     </div>
                 `;
 
-                grid.appendChild(card);
-            });
-
-            visibleCoursesLabel.textContent = `${courses.length} كورس ظاهر حالياً`;
-        }
-
-        function applyFilters() {
-
-            const term = (searchInput.value || '').toLowerCase().trim();
-            let data = [...allCourses];
-
-            if (activeFilter === 'free') {
-                data = data.filter(c => {
-                    const payField = (String(c.pay || '')).toLowerCase();
-                    const rawPrice = c.price;
-                    const priceIsStringFree = (typeof rawPrice === 'string' && rawPrice.toLowerCase() === 'free');
-                    const priceIsZero = rawPrice === 0 || rawPrice === '0' || rawPrice === null || rawPrice === undefined;
-                    const isFreeC = payField === 'free' || priceIsStringFree || priceIsZero || c.isFree === true;
-                    return !!isFreeC;
+                    grid.appendChild(card);
                 });
-            } else if (activeFilter === 'paid') {
-                data = data.filter(c => {
-                    const payField = (String(c.pay || '')).toLowerCase();
-                    const rawPrice = c.price;
-                    const priceIsStringFree = (typeof rawPrice === 'string' && rawPrice.toLowerCase() === 'free');
-                    const priceIsZero = rawPrice === 0 || rawPrice === '0' || rawPrice === null || rawPrice === undefined;
-                    const isFreeC = payField === 'free' || priceIsStringFree || priceIsZero || c.isFree === true;
-                    return !isFreeC;
-                });
-            } else if (activeFilter === 'featured') {
-                data = data.filter(c => c.featured);
+
+                visibleCoursesLabel.textContent = `${courses.length} كورس ظاهر حالياً`;
             }
 
-            if (term) {
-                data = data.filter(c => {
-                    const title = (c.title || '').toLowerCase();
-                    const instructor = (c.instructor || '').toLowerCase();
-                    return title.includes(term) || instructor.includes(term);
-                });
+            function applyFilters() {
+
+                const term = (searchInput.value || '').toLowerCase().trim();
+                let data = [...allCourses];
+
+                if (activeFilter === 'free') {
+                    data = data.filter(c => {
+                        const payField = (String(c.pay || '')).toLowerCase();
+                        const rawPrice = c.price;
+                        const priceIsStringFree = (typeof rawPrice === 'string' && rawPrice.toLowerCase() === 'free');
+                        const priceIsZero = rawPrice === 0 || rawPrice === '0' || rawPrice === null || rawPrice === undefined;
+                        const isFreeC = payField === 'free' || priceIsStringFree || priceIsZero || c.isFree === true;
+                        return !!isFreeC;
+                    });
+                } else if (activeFilter === 'paid') {
+                    data = data.filter(c => {
+                        const payField = (String(c.pay || '')).toLowerCase();
+                        const rawPrice = c.price;
+                        const priceIsStringFree = (typeof rawPrice === 'string' && rawPrice.toLowerCase() === 'free');
+                        const priceIsZero = rawPrice === 0 || rawPrice === '0' || rawPrice === null || rawPrice === undefined;
+                        const isFreeC = payField === 'free' || priceIsStringFree || priceIsZero || c.isFree === true;
+                        return !isFreeC;
+                    });
+                } else if (activeFilter === 'featured') {
+                    data = data.filter(c => c.featured);
+                }
+
+                if (term) {
+                    data = data.filter(c => {
+                        const title = (c.title || '').toLowerCase();
+                        const instructor = (c.instructor || '').toLowerCase();
+                        return title.includes(term) || instructor.includes(term);
+                    });
+                }
+
+                filteredCourses = data;
+                renderCourses(filteredCourses);
             }
 
-            filteredCourses = data;
-            renderCourses(filteredCourses);
-        }
+            try {
+                if (stateEl) {
+                    stateEl.innerHTML = '<div class="courses-spinner" aria-hidden="true"></div><p>جاري تحميل الكورسات...</p>';
+                }
 
-        try {
-            if (stateEl) {
-                stateEl.innerHTML = '<div class="courses-spinner" aria-hidden="true"></div><p>جاري تحميل الكورسات...</p>';
-            }
+                const res = await fetch('/api/courses');
+                let data = await res.json();
+                if (!res.ok) throw new Error((data && (data.error || data.message)) || 'فشل في تحميل الكورسات');
 
-            const res = await fetch('/api/courses');
-            let data = await res.json();
-            if (!res.ok) throw new Error((data && (data.error || data.message)) || 'فشل في تحميل الكورسات');
+                const courses = Array.isArray(data) ? data : (data.courses || []);
+                allCourses = courses;
 
-            const courses = Array.isArray(data) ? data : (data.courses || []);
-            allCourses = courses;
+                const total = courses.length;
+                const featuredCount = courses.filter(c => c.featured).length;
 
-            const total = courses.length;
-            const featuredCount = courses.filter(c => c.featured).length;
+                totalCoursesLabel.textContent = total ? `${total} كورس` : 'لا توجد كورسات حالياً';
+                featuredCoursesLabel.textContent = featuredCount ? `${featuredCount} كورس مميز` : 'لا توجد كورسات مميزة';
 
-            totalCoursesLabel.textContent = total ? `${total} كورس` : 'لا توجد كورسات حالياً';
-            featuredCoursesLabel.textContent = featuredCount ? `${featuredCount} كورس مميز` : 'لا توجد كورسات مميزة';
+                stateEl && (stateEl.remove());
 
-            stateEl && (stateEl.remove());
+                applyFilters();
 
-            applyFilters();
-
-            // Show success toast
-            if (window.showToast && total > 0) {
-                window.showToast(`تم تحميل ${total} كورس بنجاح`, {
-                    type: 'success',
-                    timeout: 3000,
-                    title: 'تم التحميل',
-                    icon: 'fas fa-check-circle'
-                });
-            }
-        } catch (err) {
-            console.error('خطأ تحميل الكورسات:', err);
-            if (grid) {
-                grid.innerHTML = `
+                // Show success toast
+                if (window.showToast && total > 0) {
+                    window.showToast(`تم تحميل ${total} كورس بنجاح`, {
+                        type: 'success',
+                        timeout: 3000,
+                        title: 'تم التحميل',
+                        icon: 'fas fa-check-circle'
+                    });
+                }
+            } catch (err) {
+                console.error('خطأ تحميل الكورسات:', err);
+                if (grid) {
+                    grid.innerHTML = `
                     <div class="courses-state courses-error">
                         <p>حدث خطأ أثناء تحميل الكورسات: ${err.message}</p>
                     </div>
                 `;
-            }
-            visibleCoursesLabel.textContent = 'تعذر تحميل الكورسات';
+                }
+                visibleCoursesLabel.textContent = 'تعذر تحميل الكورسات';
 
-            // Show error toast
-            if (window.showToast) {
-                window.showToast(err.message || 'فشل في تحميل الكورسات', {
-                    type: 'error',
-                    timeout: 5000,
-                    title: 'خطأ في التحميل',
-                    icon: 'fas fa-exclamation-circle'
+                // Show error toast
+                if (window.showToast) {
+                    window.showToast(err.message || 'فشل في تحميل الكورسات', {
+                        type: 'error',
+                        timeout: 5000,
+                        title: 'خطأ في التحميل',
+                        icon: 'fas fa-exclamation-circle'
+                    });
+                }
+            }
+
+            // أحداث البحث
+            if (searchInput) {
+                searchInput.addEventListener('input', () => {
+                    applyFilters();
                 });
             }
-        }
 
-        // أحداث البحث
-        if (searchInput) {
-            searchInput.addEventListener('input', () => {
-                applyFilters();
-            });
-        }
-
-        // أحداث الفلتر
-        filterChips.forEach(chip => {
-            chip.addEventListener('click', () => {
-                filterChips.forEach(c => c.classList.remove('active'));
-                chip.classList.add('active');
-                activeFilter = chip.getAttribute('data-filter');
-                applyFilters();
+            // أحداث الفلتر
+            filterChips.forEach(chip => {
+                chip.addEventListener('click', () => {
+                    filterChips.forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    activeFilter = chip.getAttribute('data-filter');
+                    applyFilters();
+                });
             });
         });
-    });
     </script>
 </body>
+
 </html>

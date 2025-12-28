@@ -72,7 +72,7 @@
             <td>${escapeHtml((course.description || '').substring(0, 80))}</td>
             <td>${escapeHtml(course.instructor || '')}</td>
             <td>${course.duration || 0} ساعة</td>
-            <td>${course.isFree ? 'مجاني' : (course.price || 0) + ' جنيه'}</td>
+            <td>${course.isFree ? 'مجاني' : (course.isPriceHidden ? 'مدفوع' : (course.price || 0) + ' جنيه')}</td>
             <td>
               <div class="action-buttons">
                   <button class="btn btn-primary" onclick="editCourse('${course._id}')" title="تعديل"><i class="fas fa-edit"></i></button>
@@ -116,6 +116,8 @@
         if (freeRadio) freeRadio.checked = true;
         if (paidRadio) paidRadio.checked = false;
         if (priceGroup) priceGroup.style.display = 'none';
+        const hidePriceEl = document.getElementById('courseHidePrice');
+        if (hidePriceEl) hidePriceEl.checked = false;
       }
       // لا نعيد تعيين editingCourseId هنا إذا كان موجوداً (لأننا في وضع التعديل)
       if (!window.editingCourseId) {
@@ -205,6 +207,10 @@
           if (paidRadio) paidRadio.checked = !isFree;
           if (priceGroup) priceGroup.style.display = isFree ? 'none' : 'block';
           if (udemyLinkGroup) udemyLinkGroup.style.display = isFree ? 'none' : 'block';
+          
+          const hidePriceEl = document.getElementById('courseHidePrice');
+          if (hidePriceEl) hidePriceEl.checked = course.isPriceHidden || false;
+
           if (!isFree) {
             elements.price.value = course.price || '';
           }
@@ -270,6 +276,7 @@
 
         const freeRadio = document.getElementById('pricingFree');
         const paidRadio = document.getElementById('pricingPaid');
+        const hidePriceEl = document.getElementById('courseHidePrice');
         const featuredEl = document.getElementById('courseFeatured');
 
         // Determine pricing based on radio buttons
@@ -285,6 +292,7 @@
           categories: [],
           icon: (iconEl && iconEl.value || '').trim(),
           isFree: isFree,
+          isPriceHidden: hidePriceEl ? hidePriceEl.checked : false,
           featured: featuredEl ? featuredEl.checked : false,
           udemyLink: (udemyLinkEl && udemyLinkEl.value || '').trim()
           // promoVideo and promoThumbnail removed - managed in course content modal

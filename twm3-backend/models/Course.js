@@ -61,30 +61,30 @@ const courseSchema = new mongoose.Schema({
     link: String,
     file: String
   }],
-    categories: [{
-      mainCategory: {
-        type: String,
-        enum: ['programming', 'ethical-hacking', 'cybersecurity', 'web-development', 'mobile-development', 'video-editing', 'other'],
-        required: true
-      },
-      subCategories: [{
-        type: String,
-        enum: [
-          // Programming subcategories
-          'python', 'javascript', 'java', 'cpp', 'csharp', 'php',
-          // Web Development subcategories
-          'frontend', 'backend', 'fullstack', 'react', 'angular', 'vue',
-          // Mobile Development subcategories
-          'android', 'ios', 'flutter', 'react-native',
-          // Cybersecurity subcategories
-          'network-security', 'web-security', 'malware-analysis', 'incident-response',
-          // Ethical Hacking subcategories
-          'penetration-testing', 'vulnerability-assessment', 'social-engineering',
-          // Video Editing subcategories
-          'premiere-pro', 'after-effects', 'davinci-resolve'
-        ]
-      }]
-    }],
+  categories: [{
+    mainCategory: {
+      type: String,
+      enum: ['programming', 'ethical-hacking', 'cybersecurity', 'web-development', 'mobile-development', 'video-editing', 'other'],
+      required: true
+    },
+    subCategories: [{
+      type: String,
+      enum: [
+        // Programming subcategories
+        'python', 'javascript', 'java', 'cpp', 'csharp', 'php',
+        // Web Development subcategories
+        'frontend', 'backend', 'fullstack', 'react', 'angular', 'vue',
+        // Mobile Development subcategories
+        'android', 'ios', 'flutter', 'react-native',
+        // Cybersecurity subcategories
+        'network-security', 'web-security', 'malware-analysis', 'incident-response',
+        // Ethical Hacking subcategories
+        'penetration-testing', 'vulnerability-assessment', 'social-engineering',
+        // Video Editing subcategories
+        'premiere-pro', 'after-effects', 'davinci-resolve'
+      ]
+    }]
+  }],
   tags: [String],
   specializations: [
     {
@@ -126,6 +126,7 @@ const courseSchema = new mongoose.Schema({
   featured: { type: Boolean, default: false },
   isFree: { type: Boolean, default: false },
   udemyLink: { type: String, default: '' },
+  isPriceHidden: { type: Boolean, default: false },
   promoVideoId: { type: String, default: null }, // ID of the selected promo video from mediaItems
   promoVideo: { type: String, default: '' }, // Promotional video URL (YouTube or local video)
   promoThumbnail: { type: String, default: '' }, // Thumbnail image for promo video
@@ -144,19 +145,19 @@ courseSchema.index({ createdAt: -1 });
 courseSchema.index({ normalizedTitle: 1, createdBy: 1 }, { sparse: true }); // Sparse index for deduplication
 
 // Virtual for total lessons count
-courseSchema.virtual('totalLessonsCount').get(function() {
+courseSchema.virtual('totalLessonsCount').get(function () {
   return this.units.reduce((total, unit) => total + unit.lessons.length, 0);
 });
 
 // Virtual for total duration
-courseSchema.virtual('totalDurationCalc').get(function() {
+courseSchema.virtual('totalDurationCalc').get(function () {
   return this.units.reduce((total, unit) => {
     return total + unit.lessons.reduce((unitTotal, lesson) => unitTotal + (lesson.duration || 0), 0);
   }, 0);
 });
 
 // Middleware to update the updatedAt field
-courseSchema.pre('save', function(next) {
+courseSchema.pre('save', function (next) {
   this.updatedAt = Date.now();
   next();
 });

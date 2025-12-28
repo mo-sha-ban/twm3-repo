@@ -16,8 +16,8 @@ function setupModalEvents() {
     // Minimal fallback implementation: close buttons, backdrop click, Esc key
     try {
         document.querySelectorAll('.modal .modal-close').forEach(btn => {
-            try { btn.removeEventListener('click', btn.__modal_close__); } catch(e) {}
-            const handler = function() {
+            try { btn.removeEventListener('click', btn.__modal_close__); } catch (e) { }
+            const handler = function () {
                 const modal = this.closest('.modal');
                 if (modal) {
                     modal.style.display = 'none';
@@ -30,8 +30,8 @@ function setupModalEvents() {
         });
 
         document.querySelectorAll('.modal').forEach(modal => {
-            try { modal.removeEventListener('click', modal.__modal_backdrop__); } catch(e) {}
-            const handler = function(e) {
+            try { modal.removeEventListener('click', modal.__modal_backdrop__); } catch (e) { }
+            const handler = function (e) {
                 if (e.target === this) {
                     this.style.display = 'none';
                     this.classList.remove('show');
@@ -42,11 +42,11 @@ function setupModalEvents() {
             modal.__modal_backdrop__ = handler;
         });
 
-        try { document.removeEventListener('keydown', document.__modal_esc__); } catch(e) {}
-        const escHandler = function(e) {
+        try { document.removeEventListener('keydown', document.__modal_esc__); } catch (e) { }
+        const escHandler = function (e) {
             if (e.key === 'Escape') {
                 document.querySelectorAll('.modal.show').forEach(m => {
-                    try { m.style.display = 'none'; m.classList.remove('show'); } catch(e) {}
+                    try { m.style.display = 'none'; m.classList.remove('show'); } catch (e) { }
                 });
                 document.body.style.overflow = 'auto';
             }
@@ -59,88 +59,88 @@ function setupModalEvents() {
 }
 
 // Ensure legacy callers can access the function
-try { if (typeof window !== 'undefined') window.setupModalEvents = setupModalEvents; } catch(e) { /* ignore */ }
+try { if (typeof window !== 'undefined') window.setupModalEvents = setupModalEvents; } catch (e) { /* ignore */ }
 
 // Utility function to escape HTML entities (prevent XSS)
 function escapeHtml(str) {
     if (!str) return '';
     return String(str).replace(/[&"'<>]/g, function (s) {
-      return ({'&':'&amp;','"':'&quot;',"'":'&#39;','<':'&lt;','>':'&gt;'})[s];
+        return ({ '&': '&amp;', '"': '&quot;', "'": '&#39;', '<': '&lt;', '>': '&gt;' })[s];
     });
 }
 
 function initializeCoursesModule() {
     console.log('Initializing Courses module with global modal functions...');
-    
+
     if (window.Courses && typeof window.Courses.init === 'function') {
         console.log('Courses module found, calling init...');
-            return window.Courses.init();
-        
+        return window.Courses.init();
+
         // ربط الدوال العامة مع الدوال العالمية
-        window.openAddCourseModal = function() {
+        window.openAddCourseModal = function () {
             console.log('Delegating to Courses.openAddCourseModal with global modal');
-                if (window.Courses.openAddCourseModal) { 
+            if (window.Courses.openAddCourseModal) {
                 window.Courses.openAddCourseModal();
             } else {
                 // Fallback مباشر
                 openModal('courseModal');
             }
         };
-        
-        window.editCourse = function(courseId) {
+
+        window.editCourse = function (courseId) {
             console.log('Delegating to Courses.openEditCourse for:', courseId);
-                if (window.Courses.openEditCourse) { 
+            if (window.Courses.openEditCourse) {
                 window.Courses.openEditCourse(courseId);
             }
         };
-        
-        window.manageCourseContent = function(courseId, courseTitle) {
+
+        window.manageCourseContent = function (courseId, courseTitle) {
             console.log('Delegating to Courses.manageCourseContent for:', courseId);
-                if (window.Courses.manageCourseContent) { 
+            if (window.Courses.manageCourseContent) {
                 window.Courses.manageCourseContent(courseId, courseTitle);
             } else {
                 // Fallback مباشر
                 openModal('courseContentModal');
             }
         };
-        
-        window.closeCourseModal = function() {
+
+        window.closeCourseModal = function () {
             console.log('Delegating to Courses.closeCourseModal');
-                if (window.Courses.closeCourseModal) { 
+            if (window.Courses.closeCourseModal) {
                 window.Courses.closeCourseModal();
             } else {
                 closeModal('courseModal');
             }
         };
-        
-        window.handleAddCourseSubmit = function(e) {
+
+        window.handleAddCourseSubmit = function (e) {
             console.log('Delegating to Courses.handleAddCourseSubmit');
-                if (window.Courses.handleAddCourseSubmit) { 
+            if (window.Courses.handleAddCourseSubmit) {
                 window.Courses.handleAddCourseSubmit(e);
             }
         };
-        
+
         console.log('Courses module initialization complete');
         return true;
-    } else { 
+    } else {
         console.error('Courses module not available');
-        
+
         // Fallback كامل
-        window.openAddCourseModal = function() {
+        window.openAddCourseModal = function () {
             console.log('Using fallback openAddCourseModal');
             openModal('courseModal');
         };
-        
-        window.manageCourseContent = function() {
+
+        window.manageCourseContent = function () {
             console.log('Using fallback manageCourseContent');
             openModal('courseContentModal');
         };
-        
-        window.closeCourseModal = function() {
+
+        window.closeCourseModal = function () {
             console.log('Using fallback closeCourseModal');
             closeModal('courseModal');
         };
-        
+
         return false;
     }
 }
@@ -149,14 +149,14 @@ function initializeCoursesModule() {
 if (!window.Courses) {
     window.Courses = {
         // دالة فتح نموذج إضافة كورس
-        openAddCourseModal: function() {
+        openAddCourseModal: function () {
             console.log('Opening add course modal...');
             const modal = document.getElementById('courseModal');
             if (!modal) {
                 console.error('Course modal not found');
                 return;
             }
-            
+
             document.getElementById('courseModalTitle').textContent = 'إضافة كورس جديد';
             const form = document.getElementById('addCourseForm');
             if (form) {
@@ -180,15 +180,15 @@ if (!window.Courses) {
                 // Remove any existing listeners and add new one
                 form.onsubmit = this.handleAddCourseSubmit.bind(this);
             }
-            
+
             window.editingCourseId = null;
             window.mediaItems = [];
             window.currentPromoVideoId = null;
-            
+
             modal.style.display = 'flex';
             modal.classList.add('show');
             document.body.style.overflow = 'hidden';
-            
+
             // Render empty media grid for new course
             if (typeof window.renderMediaGrid === 'function') {
                 setTimeout(() => {
@@ -198,7 +198,7 @@ if (!window.Courses) {
         },
 
         // دالة معالجة إضافة كورس
-        handleAddCourseSubmit: async function(e) {
+        handleAddCourseSubmit: async function (e) {
             e && e.preventDefault && e.preventDefault();
             // prevent double-submit
             if (window._courseSubmitting) {
@@ -208,7 +208,7 @@ if (!window.Courses) {
             window._courseSubmitting = true;
 
             // disable submit button(s)
-            try { 
+            try {
                 const form = document.getElementById('addCourseForm');
                 if (form) {
                     const submitBtn = form.querySelector('button[type="submit"], input[type="submit"]');
@@ -227,25 +227,25 @@ if (!window.Courses) {
                 const resolvedInstructor = (document.getElementById('courseInstructor') && document.getElementById('courseInstructor').value.trim()) || (form && (form.querySelector('[name="instructor"]') && form.querySelector('[name="instructor"]').value.trim())) || '';
                 const resolvedDuration = (document.getElementById('courseDuration') && parseInt(document.getElementById('courseDuration').value)) || (form && (form.querySelector('[name="duration"]') && parseInt(form.querySelector('[name="duration"]').value))) || 1;
                 const resolvedPrice = (document.getElementById('coursePrice') && parseFloat(document.getElementById('coursePrice').value)) || (form && (form.querySelector('[name="price"]') && parseFloat(form.querySelector('[name="price"]').value))) || 0;
-                const resolvedCategories = (function(){
+                const resolvedCategories = (function () {
                     // Try new checkbox method first
                     const checkboxNodes = document.querySelectorAll('input[name="courseCategories"]:checked');
                     if (checkboxNodes && checkboxNodes.length) {
                         // Return array of strings (الأمان السيبراني، تطوير الويب، إلخ)
                         return Array.from(checkboxNodes).map(checkbox => checkbox.value);
                     }
-                    
+
                     // Fallback to old category-input method if available
                     const nodes = document.querySelectorAll('.category-input:checked');
                     if (nodes && nodes.length) return Array.from(nodes).map(i => ({ mainCategory: i.value }));
-                    
+
                     if (form) {
                         const checked = form.querySelectorAll('.category-input:checked');
                         if (checked && checked.length) return Array.from(checked).map(i => ({ mainCategory: i.value }));
                     }
                     return [];
                 })();
-                const resolvedTags = (function(){
+                const resolvedTags = (function () {
                     const el = document.getElementById('courseTags') || (form && form.querySelector('[name="tags"]'));
                     return el ? (el.value || '').split(',').map(tag => tag.trim()).filter(tag => tag) : [];
                 })();
@@ -254,7 +254,7 @@ if (!window.Courses) {
                 // attempt to determine editing id from multiple sources (global, hidden input, data attr)
                 const editingIdFromForm = (form && (form.querySelector('[name="id"]') && form.querySelector('[name="id"]').value)) || (form && form.dataset && form.dataset.courseId) || null;
                 const editingId = window.editingCourseId || editingIdFromForm || null;
-                
+
                 // Debug logging
                 console.log('handleAddCourseSubmit: editingId determination:', {
                     'window.editingCourseId': window.editingCourseId,
@@ -301,13 +301,13 @@ if (!window.Courses) {
                 });
 
                 if (!response.ok) {
-                    const errorData = await response.json().catch(()=>({}));
+                    const errorData = await response.json().catch(() => ({}));
                     throw new Error(errorData.message || errorData.error || 'فشل في حفظ الكورس');
                 }
 
                 const result = await response.json();
                 console.log('Course saved successfully:', result);
-                
+
                 const successMsg = editingId ? 'تم تحديث الكورس بنجاح!' : 'تم إضافة الكورس بنجاح!';
                 alert(successMsg);
                 this.closeCourseModal();
@@ -335,7 +335,7 @@ if (!window.Courses) {
         },
 
         // دالة إغلاق مودال الكورس
-        closeCourseModal: function() {
+        closeCourseModal: function () {
             const modal = document.getElementById('courseModal');
             if (modal) {
                 modal.style.display = 'none';
@@ -344,14 +344,14 @@ if (!window.Courses) {
                 window.editingCourseId = null;
                 window.currentPromoVideoId = null;
                 window.mediaItems = [];
-                
+
                 const form = document.getElementById('addCourseForm');
                 if (form) form.reset();
             }
         },
 
         // دالة فتح تعديل كورس
-        openEditCourse: function(courseId) {
+        openEditCourse: function (courseId) {
             console.log('Opening edit course for:', courseId);
             if (!courseId) {
                 alert('معرف الكورس غير صالح');
@@ -363,98 +363,98 @@ if (!window.Courses) {
                     'Authorization': `Bearer ${localStorage.getItem('token')}`
                 }
             })
-            .then(response => {
-                if (!response.ok) throw new Error('فشل في جلب بيانات الكورس');
-                return response.json();
-            })
-            .then(course => {
-                const modal = document.getElementById('courseModal');
-                if (!modal) return;
+                .then(response => {
+                    if (!response.ok) throw new Error('فشل في جلب بيانات الكورس');
+                    return response.json();
+                })
+                .then(course => {
+                    const modal = document.getElementById('courseModal');
+                    if (!modal) return;
 
-                document.getElementById('courseModalTitle').textContent = 'تعديل الكورس';
-                document.getElementById('courseTitle').value = course.title || '';
-                document.getElementById('courseDescription').value = course.description || '';
-                document.getElementById('courseInstructor').value = course.instructor || '';
-                document.getElementById('courseDuration').value = course.duration || 1;
-                document.getElementById('coursePrice').value = course.price || 0;
-                
-                // Set Udemy link if available
-                try {
-                    const udemyLinkInput = document.getElementById('courseUdemyLink');
-                    if (udemyLinkInput) {
-                        udemyLinkInput.value = course.udemyLink || '';
-                    }
-                } catch (e) { console.warn('Failed to load Udemy link:', e); }
-                
-                // Set pricing type based on isFree field
-                try {
-                    const pricingFree = document.getElementById('pricingFree');
-                    const pricingPaid = document.getElementById('pricingPaid');
-                    const isFree = course.isFree !== false; // Default to true if not specified
-                    
-                    if (pricingFree) pricingFree.checked = isFree;
-                    if (pricingPaid) pricingPaid.checked = !isFree;
-                    
-                    // Trigger the toggle to show/hide pricing fields
-                    if (typeof window.togglePricingFields === 'function') {
-                        window.togglePricingFields();
-                    }
-                } catch (e) { console.warn('Failed to set pricing type:', e); }
-                
-                
-                (function(){ const el = document.getElementById('courseTags'); if (el) el.value = (course.tags || []).join(', '); })();
-                document.getElementById('courseIcon').value = course.icon || '';
+                    document.getElementById('courseModalTitle').textContent = 'تعديل الكورس';
+                    document.getElementById('courseTitle').value = course.title || '';
+                    document.getElementById('courseDescription').value = course.description || '';
+                    document.getElementById('courseInstructor').value = course.instructor || '';
+                    document.getElementById('courseDuration').value = course.duration || 1;
+                    document.getElementById('coursePrice').value = course.price || 0;
 
-                window.editingCourseId = courseId;
-                
-                // Set promo video ID if available
-                if (course.promoVideoId) {
-                    window.currentPromoVideoId = String(course.promoVideoId);
-                } else {
-                    window.currentPromoVideoId = null;
-                }
-
-                // Ensure a hidden input with the course id exists in the form
-                try {
-                    const formEl = document.getElementById('addCourseForm');
-                    if (formEl) {
-                        let hid = formEl.querySelector('input[name="id"]');
-                        if (!hid) {
-                            hid = document.createElement('input');
-                            hid.type = 'hidden';
-                            hid.name = 'id';
-                            hid.id = 'courseId';
-                            formEl.appendChild(hid);
+                    // Set Udemy link if available
+                    try {
+                        const udemyLinkInput = document.getElementById('courseUdemyLink');
+                        if (udemyLinkInput) {
+                            udemyLinkInput.value = course.udemyLink || '';
                         }
-                        hid.value = courseId;
-                        formEl.dataset.courseId = courseId;
-                    }
-                } catch (e) { console.warn('Failed to inject hidden course id into form', e); }
-                
-                // Reset media items and set promo video if exists
-                if (typeof window.renderMediaGrid === 'function') {
-                    window.mediaItems = []; // Clear media items (fresh load for new course editing)
-                    window.currentPromoVideoId = course.promoVideoId ? String(course.promoVideoId) : null;
-                    setTimeout(() => {
-                        if (typeof window.renderMediaGrid === 'function') {
-                            window.renderMediaGrid();
+                    } catch (e) { console.warn('Failed to load Udemy link:', e); }
+
+                    // Set pricing type based on isFree field
+                    try {
+                        const pricingFree = document.getElementById('pricingFree');
+                        const pricingPaid = document.getElementById('pricingPaid');
+                        const isFree = course.isFree !== false; // Default to true if not specified
+
+                        if (pricingFree) pricingFree.checked = isFree;
+                        if (pricingPaid) pricingPaid.checked = !isFree;
+
+                        // Trigger the toggle to show/hide pricing fields
+                        if (typeof window.togglePricingFields === 'function') {
+                            window.togglePricingFields();
                         }
-                    }, 100);
-                }
+                    } catch (e) { console.warn('Failed to set pricing type:', e); }
 
-                modal.style.display = 'flex';
-                modal.classList.add('show');
-                document.body.style.overflow = 'hidden';
 
-            })
-            .catch(error => {
-                console.error('Error loading course:', error);
-                alert(`خطأ: ${error.message}`);
-            });
+                    (function () { const el = document.getElementById('courseTags'); if (el) el.value = (course.tags || []).join(', '); })();
+                    document.getElementById('courseIcon').value = course.icon || '';
+
+                    window.editingCourseId = courseId;
+
+                    // Set promo video ID if available
+                    if (course.promoVideoId) {
+                        window.currentPromoVideoId = String(course.promoVideoId);
+                    } else {
+                        window.currentPromoVideoId = null;
+                    }
+
+                    // Ensure a hidden input with the course id exists in the form
+                    try {
+                        const formEl = document.getElementById('addCourseForm');
+                        if (formEl) {
+                            let hid = formEl.querySelector('input[name="id"]');
+                            if (!hid) {
+                                hid = document.createElement('input');
+                                hid.type = 'hidden';
+                                hid.name = 'id';
+                                hid.id = 'courseId';
+                                formEl.appendChild(hid);
+                            }
+                            hid.value = courseId;
+                            formEl.dataset.courseId = courseId;
+                        }
+                    } catch (e) { console.warn('Failed to inject hidden course id into form', e); }
+
+                    // Reset media items and set promo video if exists
+                    if (typeof window.renderMediaGrid === 'function') {
+                        window.mediaItems = []; // Clear media items (fresh load for new course editing)
+                        window.currentPromoVideoId = course.promoVideoId ? String(course.promoVideoId) : null;
+                        setTimeout(() => {
+                            if (typeof window.renderMediaGrid === 'function') {
+                                window.renderMediaGrid();
+                            }
+                        }, 100);
+                    }
+
+                    modal.style.display = 'flex';
+                    modal.classList.add('show');
+                    document.body.style.overflow = 'hidden';
+
+                })
+                .catch(error => {
+                    console.error('Error loading course:', error);
+                    alert(`خطأ: ${error.message}`);
+                });
         },
 
         // دالة إدارة محتوى الكورس
-        manageCourseContent: function(courseId, courseTitle) {
+        manageCourseContent: function (courseId, courseTitle) {
             console.log('Managing course content:', courseId, courseTitle);
             if (!courseId || !courseTitle) {
                 alert('بيانات الكورس غير مكتملة');
@@ -485,25 +485,25 @@ if (!window.Courses) {
                     }
                 })
             ])
-            .then(([courseResponse, contentResponse]) => {
-                if (!courseResponse.ok) throw new Error('فشل في جلب بيانات الكورس');
-                if (!contentResponse.ok) throw new Error('فشل في جلب محتوى الكورس');
-                return Promise.all([courseResponse.json(), contentResponse.json()]);
-            })
-            .then(([course, courseContent]) => {
-                this.displayCourseContent(courseContent, course);
-                modal.style.display = 'flex';
-                modal.classList.add('show');
-                document.body.style.overflow = 'hidden';
-            })
-            .catch(error => {
-                console.error('Error loading course content:', error);
-                alert(`خطأ: ${error.message}`);
-            });
+                .then(([courseResponse, contentResponse]) => {
+                    if (!courseResponse.ok) throw new Error('فشل في جلب بيانات الكورس');
+                    if (!contentResponse.ok) throw new Error('فشل في جلب محتوى الكورس');
+                    return Promise.all([courseResponse.json(), contentResponse.json()]);
+                })
+                .then(([course, courseContent]) => {
+                    this.displayCourseContent(courseContent, course);
+                    modal.style.display = 'flex';
+                    modal.classList.add('show');
+                    document.body.style.overflow = 'hidden';
+                })
+                .catch(error => {
+                    console.error('Error loading course content:', error);
+                    alert(`خطأ: ${error.message}`);
+                });
         },
 
         // دالة عرض محتوى الكورس
-        displayCourseContent: function(courseContent, course) {
+        displayCourseContent: function (courseContent, course) {
             const container = document.getElementById('modulesContainer');
             if (!container) {
                 console.error('modulesContainer not found');
@@ -562,7 +562,7 @@ if (!window.Courses) {
                         </div>
                         <div class="lessons-list" style="margin-top: 15px;">
                             ${unit.lessons && unit.lessons.length > 0 ?
-                                unit.lessons.map((lesson, lessonIndex) => `
+                        unit.lessons.map((lesson, lessonIndex) => `
                                     <div class="lesson-item" style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee;">
                                         <span>الدرس ${lessonIndex + 1}: ${lesson.title}</span>
                                         <div class="lesson-actions">
@@ -577,8 +577,8 @@ if (!window.Courses) {
                                         </div>
                                     </div>
                                 `).join('')
-                                : '<p style="text-align: center; color: #999; margin: 10px 0;">لا توجد دروس في هذه الوحدة</p>'
-                            }
+                        : '<p style="text-align: center; color: #999; margin: 10px 0;">لا توجد دروس في هذه الوحدة</p>'
+                    }
                         </div>
                     </div>
                 `).join('');
@@ -588,7 +588,7 @@ if (!window.Courses) {
         },
 
         // دالة تحديث الفيديو الترويجي للكورس
-        updatePromoVideo: async function(courseId) {
+        updatePromoVideo: async function (courseId) {
             console.log('updatePromoVideo called with courseId:', courseId);
             const videoUrlInput = document.getElementById('promoVideoUrl');
             const videoFileInput = document.getElementById('promoVideoFile');
@@ -655,7 +655,7 @@ if (!window.Courses) {
         },
 
         // دالة إغلاق مودال المحتوى
-        closeCourseContentModal: function() {
+        closeCourseContentModal: function () {
             const modal = document.getElementById('courseContentModal');
             if (modal) {
                 modal.style.display = 'none';
@@ -667,7 +667,7 @@ if (!window.Courses) {
         },
 
         // جلب الكورسات من الخادم وعرضها
-        fetchCourses: async function() {
+        fetchCourses: async function () {
             try {
                 const token = localStorage.getItem('token');
                 if (!token) {
@@ -692,15 +692,15 @@ if (!window.Courses) {
         },
 
         // عرض الكورسات في الجدول
-    renderCourses(courses) {
-      const tbody = document.getElementById('courses-table');
-      if (!tbody) return;
-      if (!Array.isArray(courses) || courses.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7">لا توجد كورسات</td></tr>';
-        return;
-      }
-      tbody.innerHTML = courses.map((course, idx) => {
-        return `
+        renderCourses(courses) {
+            const tbody = document.getElementById('courses-table');
+            if (!tbody) return;
+            if (!Array.isArray(courses) || courses.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7">لا توجد كورسات</td></tr>';
+                return;
+            }
+            tbody.innerHTML = courses.map((course, idx) => {
+                return `
           <tr>
             <td>${idx + 1}</td>
             <td>${escapeHtml(course.title || '')}</td>
@@ -711,17 +711,17 @@ if (!window.Courses) {
             <td>
               <div class="action-buttons">
                   <button class="btn btn-primary" onclick="editCourse('${course._id}')" title="تعديل"><i class="fas fa-edit"></i></button>
-                  <button class="btn btn-secondary" onclick="manageCourseContent('${course._id}','${(course.title||'').replace(/'/g, "\\'")}' )" title="محتوى"><i class="fas fa-folder-open"></i></button>
+                  <button class="btn btn-secondary" onclick="manageCourseContent('${course._id}','${(course.title || '').replace(/'/g, "\\'")}' )" title="محتوى"><i class="fas fa-folder-open"></i></button>
                   <button class="btn btn-danger" onclick="deleteCourse('${course._id}')" title="حذف"><i class="fas fa-trash"></i></button>
               </div>
             </td>
           </tr>
         `;
-      }).join('');
-    },
+            }).join('');
+        },
 
         // تهيئة الوحدة
-        init: function() {
+        init: function () {
             console.log('Courses module initialized');
         }
     };
@@ -764,8 +764,8 @@ function openAddModal() {
     if (form && typeof form.reset === 'function') form.reset();
     window.editingUserId = null;
     if (form) {
-        try { form.removeEventListener('submit', handleUpdateUserSubmit); } catch(e) {}
-        try { form.removeEventListener('submit', addUser); } catch(e) {}
+        try { form.removeEventListener('submit', handleUpdateUserSubmit); } catch (e) { }
+        try { form.removeEventListener('submit', addUser); } catch (e) { }
         form.addEventListener('submit', addUser);
     }
 }
@@ -778,8 +778,8 @@ function closeModal() {
     window.editingUserId = null;
     const form = document.getElementById('addUserForm');
     if (form) {
-        try { form.removeEventListener('submit', handleUpdateUserSubmit); } catch(e) {}
-        try { form.removeEventListener('submit', addUser); } catch(e) {}
+        try { form.removeEventListener('submit', handleUpdateUserSubmit); } catch (e) { }
+        try { form.removeEventListener('submit', addUser); } catch (e) { }
     }
 }
 
@@ -922,7 +922,7 @@ window.validatePdfUrl = validatePdfUrl;
 window.validateExternalUrl = validateExternalUrl;
 
 // Override delegators to use direct functions
-window.openAddCourseModal = function() {
+window.openAddCourseModal = function () {
     console.log('Direct openAddCourseModal called');
     if (window.Courses && typeof window.Courses.openAddCourseModal === 'function') {
         return window.Courses.openAddCourseModal();
@@ -957,31 +957,31 @@ window.openAddCourseModal = function() {
     }
 };
 
-window.editCourse = function(courseId) {
+window.editCourse = function (courseId) {
     if (window.Courses && typeof window.Courses.openEditCourse === 'function') {
         return window.Courses.openEditCourse(courseId);
     }
 };
 
-window.manageCourseContent = function(courseId, courseTitle) {
+window.manageCourseContent = function (courseId, courseTitle) {
     if (window.Courses && typeof window.Courses.manageCourseContent === 'function') {
         return window.Courses.manageCourseContent(courseId, courseTitle);
     }
 };
 
-window.closeCourseModal = function() {
+window.closeCourseModal = function () {
     if (window.Courses && typeof window.Courses.closeCourseModal === 'function') {
         return window.Courses.closeCourseModal();
     }
 };
 
-window.closeCourseContentModal = function() {
+window.closeCourseContentModal = function () {
     if (window.Courses && typeof window.Courses.closeCourseContentModal === 'function') {
         return window.Courses.closeCourseContentModal();
     }
 };
 
-window.updatePromoVideo = function(courseId) {
+window.updatePromoVideo = function (courseId) {
     if (window.Courses && typeof window.Courses.updatePromoVideo === 'function') {
         return window.Courses.updatePromoVideo(courseId);
     }
@@ -991,39 +991,39 @@ window.updatePromoVideo = function(courseId) {
 // تعريف دالة إعداد القائمة الجانبية
 function setupSidebarMenu() {
     console.log('Setting up sidebar menu listeners...');
-    
+
     const menuItems = document.querySelectorAll('.menu-item');
     console.log('Found menu items:', menuItems.length);
-    
+
     menuItems.forEach((item, index) => {
         const sectionId = item.getAttribute('href').replace('#', '');
         console.log(`Menu item ${index}:`, sectionId);
-        
+
         // إزالة أي event listeners موجودة مسبقاً
         const newItem = item.cloneNode(true);
         item.parentNode.replaceChild(newItem, item);
-        
+
         // إضافة event listener جديدة
-        newItem.addEventListener('click', function(e) {
+        newItem.addEventListener('click', function (e) {
             e.preventDefault();
             e.stopPropagation();
-            
+
             const clickedSectionId = this.getAttribute('href').replace('#', '');
             console.log('Menu item clicked:', clickedSectionId);
-            
+
             switchSection(clickedSectionId);
         });
     });
-    
+
     console.log('Sidebar menu setup complete');
 }
 
 
 
 // تهيئة الصفحة النهائية
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     console.log('=== DASHBOARD INITIALIZATION STARTED ===');
-    
+
     if (window.__dashInit) return;
     window.__dashInit = true;
 
@@ -1044,7 +1044,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const addCourseBtn = document.getElementById('add-course-button');
     if (addCourseBtn) {
         console.log('Found add course button');
-        addCourseBtn.addEventListener('click', function(e) {
+        addCourseBtn.addEventListener('click', function (e) {
             e.preventDefault();
             console.log('Add course button clicked');
 
@@ -1091,7 +1091,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const addCourseForm = document.getElementById('addCourseForm');
     if (addCourseForm) {
         // Replace any existing onsubmit handler so only one handler runs.
-        addCourseForm.onsubmit = function(e) {
+        addCourseForm.onsubmit = function (e) {
             e = e || window.event;
             if (e && typeof e.preventDefault === 'function') e.preventDefault();
             console.log('Course form submitted (delegated via onsubmit)');
@@ -1123,16 +1123,16 @@ document.addEventListener('DOMContentLoaded', function() {
     switchSection('users');
 
     // 8. Set up user action handlers with event delegation
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         const editBtn = e.target.closest('.btn-edit-user');
         const deleteBtn = e.target.closest('.btn-delete-user');
-        
+
         if (editBtn) {
             e.preventDefault();
             const userId = editBtn.dataset.userid;
             if (userId) editUser(userId);
         }
-        
+
         if (deleteBtn) {
             e.preventDefault();
             const userId = deleteBtn.dataset.userid;
@@ -1163,28 +1163,28 @@ async function addCourse(courseData) {
 
 // دالة إغلاق المودال
 // Modal close functions - making them available globally
-window.closeCourseModal = function() {
+window.closeCourseModal = function () {
     const modal = document.getElementById('courseModal');
     if (!modal) return;
-    
+
     modal.style.display = 'none';
     document.body.style.overflow = 'auto';
-    
+
     const form = document.getElementById('addCourseForm');
     if (form) {
         form.reset();
     }
-    
+
     window.editingCourseId = null;
 };
 
-window.closeCourseContentModal = function() {
+window.closeCourseContentModal = function () {
     const modal = document.getElementById('courseContentModal');
     if (!modal) return;
-    
+
     modal.style.display = 'none';
     document.body.style.overflow = 'auto';
-    
+
     window.currentCourseId = null;
     window.currentCourseTitle = null;
 };
@@ -1194,7 +1194,7 @@ window.closeCourseContentModal = function() {
 // دالة إضافة مستخدم معدلة
 async function addUser(e) {
     e.preventDefault();
-    
+
     // منع الإرسال المتكرر
     const submitBtn = e.target.querySelector('button[type="submit"]');
     if (submitBtn) {
@@ -1351,10 +1351,10 @@ async function editUser(userId) {
     }
 
     // Set the editingUserId in the global scope
-window.editingUserId = userId;
-const form = document.getElementById('addUserForm');
-form.removeEventListener('submit', addUser);
-form.addEventListener('submit', handleUpdateUserSubmit);
+    window.editingUserId = userId;
+    const form = document.getElementById('addUserForm');
+    form.removeEventListener('submit', addUser);
+    form.addEventListener('submit', handleUpdateUserSubmit);
 }
 
 async function handleUpdateUserSubmit(event) {
@@ -1373,10 +1373,10 @@ async function handleUpdateUserSubmit(event) {
     };
 
     const updatedUserData = {
-        name: (getVal(['userName','name','editUserName']) || '').trim(),
-        username: (getVal(['userUsername','username','editUserUsername']) || '').trim(),
-        email: (getVal(['userEmail','email','editUserEmail']) || '').trim(),
-        phone: (getVal(['userPhone','phone','editUserPhone']) || '').trim(),
+        name: (getVal(['userName', 'name', 'editUserName']) || '').trim(),
+        username: (getVal(['userUsername', 'username', 'editUserUsername']) || '').trim(),
+        email: (getVal(['userEmail', 'email', 'editUserEmail']) || '').trim(),
+        phone: (getVal(['userPhone', 'phone', 'editUserPhone']) || '').trim(),
     };
 
     // Determine isAdmin from checkbox or role select
@@ -1386,12 +1386,12 @@ async function handleUpdateUserSubmit(event) {
         isAdminVal = !!isAdminEl.checked;
     }
     if (isAdminVal === null) {
-        const roleVal = getVal(['userRole','role','editUserRole']);
+        const roleVal = getVal(['userRole', 'role', 'editUserRole']);
         if (roleVal) isAdminVal = roleVal === 'admin' || roleVal === 'true' || roleVal === '1';
     }
     if (isAdminVal !== null) updatedUserData.isAdmin = !!isAdminVal;
 
-    const password = (getVal(['userPassword','password']) || '').trim();
+    const password = (getVal(['userPassword', 'password']) || '').trim();
     if (password) {
         updatedUserData.password = password;
     }
@@ -1440,69 +1440,69 @@ async function fetchCourses() {
 
 // دالة عرض الكورسات
 // وصف الدرس: أزرار رفع صورة/PDF وإدراج رابط
-(function setupDescriptionToolbar(){
-  document.addEventListener('DOMContentLoaded', () => {
-    const uploadBtn = document.getElementById('btnUploadLessonAsset');
-    const linkBtn = document.getElementById('btnInsertLink');
-    const fileInput = document.getElementById('lessonAssetInput');
-    const descTextarea = document.getElementById('lessonDescription');
-    if (!uploadBtn || !fileInput || !descTextarea) return;
+(function setupDescriptionToolbar() {
+    document.addEventListener('DOMContentLoaded', () => {
+        const uploadBtn = document.getElementById('btnUploadLessonAsset');
+        const linkBtn = document.getElementById('btnInsertLink');
+        const fileInput = document.getElementById('lessonAssetInput');
+        const descTextarea = document.getElementById('lessonDescription');
+        if (!uploadBtn || !fileInput || !descTextarea) return;
 
-    uploadBtn.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', async (e) => {
-      const file = e.target.files && e.target.files[0];
-      if (!file) return;
-      try {
-        const fd = new FormData();
-        fd.append('file', file);
-        const token = localStorage.getItem('token') || '';
-        const res = await fetch('http://localhost:5000/api/uploads/lesson-asset', {
-          method: 'POST',
-          headers: token ? { 'Authorization': 'Bearer ' + token } : {},
-          body: fd
+        uploadBtn.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', async (e) => {
+            const file = e.target.files && e.target.files[0];
+            if (!file) return;
+            try {
+                const fd = new FormData();
+                fd.append('file', file);
+                const token = localStorage.getItem('token') || '';
+                const res = await fetch('http://localhost:5000/api/uploads/lesson-asset', {
+                    method: 'POST',
+                    headers: token ? { 'Authorization': 'Bearer ' + token } : {},
+                    body: fd
+                });
+                if (!res.ok) {
+                    const txt = await res.text();
+                    throw new Error(txt || 'فشل رفع الملف');
+                }
+                const data = await res.json();
+                // إدراج الرابط حسب النوع
+                if (data.type === 'image') {
+                    // Markdown صورة
+                    const url = data.url;
+                    insertAtCursor(descTextarea, `![صورة الدرس](${url})`);
+                } else if (data.type === 'pdf') {
+                    const url = data.url;
+                    // رابط PDF يفتح داخل العارض تلقائياً في صفحة الكورس
+                    insertAtCursor(descTextarea, `[فتح ملف PDF](${url})`);
+                }
+            } catch (err) {
+                alert(err.message || 'فشل رفع الملف');
+            } finally {
+                e.target.value = '';
+            }
         });
-        if (!res.ok) {
-          const txt = await res.text();
-          throw new Error(txt || 'فشل رفع الملف');
+
+        if (linkBtn) {
+            linkBtn.addEventListener('click', () => {
+                const url = prompt('أدخل الرابط:', 'https://');
+                if (!url) return;
+                const text = prompt('نص الرابط (اختياري):', 'رابط');
+                insertAtCursor(descTextarea, text ? `[${text}](${url})` : url);
+            });
         }
-        const data = await res.json();
-        // إدراج الرابط حسب النوع
-        if (data.type === 'image') {
-          // Markdown صورة
-          const url = data.url;
-          insertAtCursor(descTextarea, `![صورة الدرس](${url})`);
-        } else if (data.type === 'pdf') {
-          const url = data.url;
-          // رابط PDF يفتح داخل العارض تلقائياً في صفحة الكورس
-          insertAtCursor(descTextarea, `[فتح ملف PDF](${url})`);
-        }
-      } catch (err) {
-        alert(err.message || 'فشل رفع الملف');
-      } finally {
-        e.target.value = '';
-      }
     });
 
-    if (linkBtn) {
-      linkBtn.addEventListener('click', () => {
-        const url = prompt('أدخل الرابط:', 'https://');
-        if (!url) return;
-        const text = prompt('نص الرابط (اختياري):', 'رابط');
-        insertAtCursor(descTextarea, text ? `[${text}](${url})` : url);
-      });
+    function insertAtCursor(textarea, text) {
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const before = textarea.value.substring(0, start);
+        const after = textarea.value.substring(end);
+        textarea.value = before + text + after;
+        const pos = start + text.length;
+        textarea.selectionStart = textarea.selectionEnd = pos;
+        textarea.focus();
     }
-  });
-
-  function insertAtCursor(textarea, text){
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const before = textarea.value.substring(0, start);
-    const after = textarea.value.substring(end);
-    textarea.value = before + text + after;
-    const pos = start + text.length;
-    textarea.selectionStart = textarea.selectionEnd = pos;
-    textarea.focus();
-  }
 })();
 
 function renderCourses(courses) {
@@ -1571,7 +1571,7 @@ async function deleteCourse(courseId) {
     } catch (error) {
         console.error('Error deleting course:', error);
         alert(`خطأ في حذف الكورس: ${error.message}`);
-        
+
         // If unauthorized, redirect to login
         if (error.message.includes('401') || error.message.includes('403')) {
             window.location.href = 'login.html';
@@ -1586,14 +1586,14 @@ async function deleteCourse(courseId) {
 
 // Course actions - making them available globally
 // توحيد دوال فتح المودالات الخاصة بالكورسات
-window.editCourse = function(courseId) {
+window.editCourse = function (courseId) {
     // delegate
     if (window.Courses && typeof window.Courses.openEditCourse === 'function') {
         return window.Courses.openEditCourse(courseId);
     }
 };
 
-window.manageCourseContent = function(courseId, courseTitle) {
+window.manageCourseContent = function (courseId, courseTitle) {
     if (window.Courses && typeof window.Courses.manageCourseContent === 'function') {
         return window.Courses.manageCourseContent(courseId, courseTitle);
     }
@@ -1745,7 +1745,7 @@ function attachCommentActionListeners() {
     // Search functionality
     const searchInput = document.getElementById('commentSearch');
     if (searchInput) {
-        searchInput.addEventListener('input', debounce(function() {
+        searchInput.addEventListener('input', debounce(function () {
             const filter = document.getElementById('commentFilter').value;
             fetchComments(1, filter, this.value);
         }, 300));
@@ -1754,7 +1754,7 @@ function attachCommentActionListeners() {
     // Filter functionality
     const filterSelect = document.getElementById('commentFilter');
     if (filterSelect) {
-        filterSelect.addEventListener('change', function() {
+        filterSelect.addEventListener('change', function () {
             const search = document.getElementById('commentSearch').value;
             fetchComments(1, this.value, search);
         });
@@ -1863,7 +1863,7 @@ function showAddModuleForm() {
 
     const form = document.getElementById('addUnitForm');
     if (form) {
-        form.onsubmit = async function(e) {
+        form.onsubmit = async function (e) {
             e.preventDefault();
             showLoadingOverlay('جاري إضافة الوحدة...');
 
@@ -1924,201 +1924,201 @@ function showAddModuleForm() {
 window.showAddModuleForm = showAddModuleForm;
 
 // Canonical lesson edit flow injection (ensures edit button opens modal prefilled and submits PUT)
-(function ensureCanonicalLessonEdit(){
-  function getAuthHeader(){
-    const token = localStorage.getItem('token');
-    return token ? { 'Authorization': 'Bearer ' + token } : {};
-  }
+(function ensureCanonicalLessonEdit() {
+    function getAuthHeader() {
+        const token = localStorage.getItem('token');
+        return token ? { 'Authorization': 'Bearer ' + token } : {};
+    }
 
-  function fillLessonForm(lesson){
-    try{
-      const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v ?? ''; };
-      const setChk = (id, v) => { const el = document.getElementById(id); if (el) el.checked = !!v; };
-
-      setVal('lessonTitle', lesson.title || '');
-      setVal('lessonDescription', lesson.description || '');
-      setVal('lessonDuration', (lesson.duration || 30));
-      setChk('lessonIsFree', lesson.isFree !== false);
-
-      // Determine type and corresponding fields
-      const type = lesson.type || (lesson.videoUrl ? 'video' : (lesson.fileUrl ? 'pdf' : (lesson.externalUrl ? 'url' : 'video')));
-      try { selectContentType(type); } catch(e){ setVal('lessonType', type); }
-
-      if (type === 'video'){
-        const url = lesson.videoUrl || lesson.content || '';
-        setVal('lessonVideoUrl', url);
-        // Show preview for local/same-origin videos without triggering strict validation
+    function fillLessonForm(lesson) {
         try {
-          const isLocal = url && (url.startsWith('/uploads') || url.startsWith(window.location.origin) || url.startsWith('/'));
-          if (isLocal) {
-            const preview = document.getElementById('videoPreview');
-            if (preview) {
-              const vid = preview.querySelector('video');
-              if (vid) {
-                vid.src = url;
-                preview.style.display = 'block';
-                const ph = document.querySelector('#videoDropZone .upload-placeholder');
-                if (ph) ph.style.display = 'none';
-              }
+            const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v ?? ''; };
+            const setChk = (id, v) => { const el = document.getElementById(id); if (el) el.checked = !!v; };
+
+            setVal('lessonTitle', lesson.title || '');
+            setVal('lessonDescription', lesson.description || '');
+            setVal('lessonDuration', (lesson.duration || 30));
+            setChk('lessonIsFree', lesson.isFree !== false);
+
+            // Determine type and corresponding fields
+            const type = lesson.type || (lesson.videoUrl ? 'video' : (lesson.fileUrl ? 'pdf' : (lesson.externalUrl ? 'url' : 'video')));
+            try { selectContentType(type); } catch (e) { setVal('lessonType', type); }
+
+            if (type === 'video') {
+                const url = lesson.videoUrl || lesson.content || '';
+                setVal('lessonVideoUrl', url);
+                // Show preview for local/same-origin videos without triggering strict validation
+                try {
+                    const isLocal = url && (url.startsWith('/uploads') || url.startsWith(window.location.origin) || url.startsWith('/'));
+                    if (isLocal) {
+                        const preview = document.getElementById('videoPreview');
+                        if (preview) {
+                            const vid = preview.querySelector('video');
+                            if (vid) {
+                                vid.src = url;
+                                preview.style.display = 'block';
+                                const ph = document.querySelector('#videoDropZone .upload-placeholder');
+                                if (ph) ph.style.display = 'none';
+                            }
+                        }
+                    } else if (url) {
+                        // For YouTube/Drive links, use validator to build embed preview
+                        validateVideoUrl();
+                    }
+                } catch (e) { }
+                try { const file = document.getElementById('videoFileInput'); if (file) file.value = ''; } catch (e) { }
+            } else if (type === 'pdf') {
+                const url = lesson.fileUrl || lesson.content || '';
+                setVal('lessonPdfUrl', url);
+                // Avoid strict validation for local PDFs; just reflect filename/preview if present
+                try {
+                    const preview = document.getElementById('pdfPreview');
+                    if (preview) {
+                        const nameEl = preview.querySelector('.filename');
+                        if (nameEl && url) nameEl.textContent = url.split('/').pop();
+                        if (url) preview.style.display = 'block';
+                    }
+                } catch (e) { }
+                try { const file = document.getElementById('pdfFileInput'); if (file) file.value = ''; } catch (e) { }
+            } else if (type === 'url') {
+                const url = lesson.externalUrl || lesson.content || '';
+                setVal('lessonExternalUrl', url);
+                try { if (url) validateExternalUrl(); } catch (e) { }
             }
-          } else if (url) {
-            // For YouTube/Drive links, use validator to build embed preview
-            validateVideoUrl();
-          }
-        } catch(e){}
-        try { const file = document.getElementById('videoFileInput'); if (file) file.value=''; } catch(e){}
-      } else if (type === 'pdf'){
-        const url = lesson.fileUrl || lesson.content || '';
-        setVal('lessonPdfUrl', url);
-        // Avoid strict validation for local PDFs; just reflect filename/preview if present
-        try {
-          const preview = document.getElementById('pdfPreview');
-          if (preview) {
-            const nameEl = preview.querySelector('.filename');
-            if (nameEl && url) nameEl.textContent = url.split('/').pop();
-            if (url) preview.style.display = 'block';
-          }
-        } catch(e){}
-        try { const file = document.getElementById('pdfFileInput'); if (file) file.value=''; } catch(e){}
-      } else if (type === 'url'){
-        const url = lesson.externalUrl || lesson.content || '';
-        setVal('lessonExternalUrl', url);
-        try { if (url) validateExternalUrl(); } catch(e){}
-      }
-    } catch(err){ console.error('fillLessonForm failed', err); }
-  }
-
-  async function canonicalHandleEditLessonSubmit(e){
-    e.preventDefault();
-    try{
-      const title = (document.getElementById('lessonTitle')?.value || '').trim();
-      const description = (document.getElementById('lessonDescription')?.value || '').trim();
-      const duration = parseInt(document.getElementById('lessonDuration')?.value) || 30;
-      const type = (document.getElementById('lessonType')?.value || 'video');
-      const isFree = !!(document.getElementById('lessonIsFree')?.checked);
-      if (!title) return alert('عنوان الدرس مطلوب');
-
-      // Build payload (URL-first; file uploads ليست جزء من PUT الحالي)
-      const payload = { title, description, duration, type, isFree };
-      if (type === 'video') {
-        const videoUrl = (document.getElementById('lessonVideoUrl')?.value || '').trim();
-        payload.videoUrl = videoUrl;
-      } else if (type === 'pdf') {
-        const fileUrl = (document.getElementById('lessonPdfUrl')?.value || '').trim();
-        payload.fileUrl = fileUrl;
-      } else if (type === 'url') {
-        const externalUrl = (document.getElementById('lessonExternalUrl')?.value || '').trim();
-        payload.externalUrl = externalUrl;
-      }
-
-      if (!window.currentUnitId || !window.currentLessonId) {
-        console.error('Missing currentUnitId/currentLessonId for PUT');
-        return alert('حدث خطأ داخلي: معرّفات الدرس غير معروفة');
-      }
-
-      const res = await fetch(`/api/courses/${window.currentCourseId}/units/${window.currentUnitId}/lessons/${window.currentLessonId}` , {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) {
-        let msg = '';
-        try { msg = (await res.json()).error || ''; } catch(e){}
-        throw new Error(msg || ('فش�� تحديث الدرس ('+res.status+')'));
-      }
-
-      if (window.showToast) {
-        window.showToast('تم تحديث الدرس بنجاح!', {
-          type: 'success',
-          timeout: 4000,
-          title: 'نجح التحديث',
-          icon: 'fas fa-check-circle'
-        });
-      } else {
-        alert('تم تحديث الدرس بنجاح!');
-      }
-      try { closeAddLessonModal(); } catch(e){}
-
-      // Refresh course content in the modal
-      if (window.currentCourseId) {
-        try {
-          const r = await fetch(`/api/courses/${window.currentCourseId}/content`, { headers: getAuthHeader() });
-          if (r.ok) {
-            const data = await r.json();
-            try { if (typeof displayCourseContent === 'function') displayCourseContent(data); } catch(e){}
-            try { if (window.Courses && typeof window.Courses.displayCourseContent === 'function') window.Courses.displayCourseContent(data); } catch(e){}
-          }
-        } catch(e){ console.warn('Refresh content after edit failed', e); }
-      }
-    } catch(err){
-      console.error('Edit lesson submit failed', err);
-      alert(err.message || 'فشل في تحديث الدرس');
+        } catch (err) { console.error('fillLessonForm failed', err); }
     }
-  }
 
-  async function canonicalEditLesson(courseId, unitId, lessonId){
-    try{
-      if (!courseId || !unitId || !lessonId) return alert('بيانات الدرس غير مكتملة');
-      window.currentCourseId = courseId;
-      window.currentUnitId = unitId;
-      window.currentLessonId = lessonId;
+    async function canonicalHandleEditLessonSubmit(e) {
+        e.preventDefault();
+        try {
+            const title = (document.getElementById('lessonTitle')?.value || '').trim();
+            const description = (document.getElementById('lessonDescription')?.value || '').trim();
+            const duration = parseInt(document.getElementById('lessonDuration')?.value) || 30;
+            const type = (document.getElementById('lessonType')?.value || 'video');
+            const isFree = !!(document.getElementById('lessonIsFree')?.checked);
+            if (!title) return alert('عنوان الدرس مطلوب');
 
-      const res = await fetch(`/api/courses/${courseId}/content`, { headers: getAuthHeader() });
-      if (!res.ok) throw new Error('فشل في جلب محتوى الكورس');
-      const content = await res.json();
-      const unit = (content.units || []).find(u => String(u._id) === String(unitId));
-      if (!unit) return alert('لم يتم العثور على الوحدة');
-      const lesson = (unit.lessons || []).find(l => String(l._id) === String(lessonId));
-      if (!lesson) return alert('لم يتم العثور على الدرس');
+            // Build payload (URL-first; file uploads ليست جزء من PUT الحالي)
+            const payload = { title, description, duration, type, isFree };
+            if (type === 'video') {
+                const videoUrl = (document.getElementById('lessonVideoUrl')?.value || '').trim();
+                payload.videoUrl = videoUrl;
+            } else if (type === 'pdf') {
+                const fileUrl = (document.getElementById('lessonPdfUrl')?.value || '').trim();
+                payload.fileUrl = fileUrl;
+            } else if (type === 'url') {
+                const externalUrl = (document.getElementById('lessonExternalUrl')?.value || '').trim();
+                payload.externalUrl = externalUrl;
+            }
 
-      // Open modal and populate
-      const modal = document.getElementById('addLessonModal');
-      if (!modal) return alert('نموذج الدرس غير متاح');
-      fillLessonForm(lesson);
-      modal.style.display = 'flex';
-      modal.classList.add('show');
-      try { modal.style.zIndex = '20000'; } catch(e){}
-      document.body.classList.add('modal-open');
-      try { (document.getElementById('lessonTitle')||{}).focus && document.getElementById('lessonTitle').focus(); } catch(e){}
+            if (!window.currentUnitId || !window.currentLessonId) {
+                console.error('Missing currentUnitId/currentLessonId for PUT');
+                return alert('حدث خطأ داخلي: معرّفات الدرس غير معروفة');
+            }
 
-      // Wire submit to PUT
-      const form = document.getElementById('addLessonForm');
-      if (form){
-        try { form.removeEventListener('submit', handleAddLessonSubmit); } catch(e){}
-        try { form.removeEventListener('submit', canonicalHandleEditLessonSubmit); } catch(e){}
-        form.addEventListener('submit', canonicalHandleEditLessonSubmit);
-        const btn = form.querySelector('button[type="submit"]');
-        if (btn) btn.textContent = 'تحديث الدرس';
-      }
+            const res = await fetch(`/api/courses/${window.currentCourseId}/units/${window.currentUnitId}/lessons/${window.currentLessonId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+                body: JSON.stringify(payload)
+            });
 
-      // Update modal title
-      try {
-        const titleEl = modal.querySelector('.modal-header h3, h3');
-        if (titleEl) titleEl.textContent = 'تعديل الدرس';
-      } catch(e){}
+            if (!res.ok) {
+                let msg = '';
+                try { msg = (await res.json()).error || ''; } catch (e) { }
+                throw new Error(msg || ('فش�� تحديث الدرس (' + res.status + ')'));
+            }
 
-    } catch(err){
-      console.error('canonicalEditLesson failed', err);
-      alert(err.message || 'تعذر فتح تعديل الدرس');
+            if (window.showToast) {
+                window.showToast('تم تحديث الدرس بنجاح!', {
+                    type: 'success',
+                    timeout: 4000,
+                    title: 'نجح التحديث',
+                    icon: 'fas fa-check-circle'
+                });
+            } else {
+                alert('تم تحديث الدرس بنجاح!');
+            }
+            try { closeAddLessonModal(); } catch (e) { }
+
+            // Refresh course content in the modal
+            if (window.currentCourseId) {
+                try {
+                    const r = await fetch(`/api/courses/${window.currentCourseId}/content`, { headers: getAuthHeader() });
+                    if (r.ok) {
+                        const data = await r.json();
+                        try { if (typeof displayCourseContent === 'function') displayCourseContent(data); } catch (e) { }
+                        try { if (window.Courses && typeof window.Courses.displayCourseContent === 'function') window.Courses.displayCourseContent(data); } catch (e) { }
+                    }
+                } catch (e) { console.warn('Refresh content after edit failed', e); }
+            }
+        } catch (err) {
+            console.error('Edit lesson submit failed', err);
+            alert(err.message || 'فشل في تحديث الدرس');
+        }
     }
-  }
 
-  // Expose globally and override any previous conflicting definitions
-  try { window.editLesson = canonicalEditLesson; } catch(e){}
+    async function canonicalEditLesson(courseId, unitId, lessonId) {
+        try {
+            if (!courseId || !unitId || !lessonId) return alert('بيانات الدرس غير مكتملة');
+            window.currentCourseId = courseId;
+            window.currentUnitId = unitId;
+            window.currentLessonId = lessonId;
+
+            const res = await fetch(`/api/courses/${courseId}/content`, { headers: getAuthHeader() });
+            if (!res.ok) throw new Error('فشل في جلب محتوى الكورس');
+            const content = await res.json();
+            const unit = (content.units || []).find(u => String(u._id) === String(unitId));
+            if (!unit) return alert('لم يتم العثور على الوحدة');
+            const lesson = (unit.lessons || []).find(l => String(l._id) === String(lessonId));
+            if (!lesson) return alert('لم يتم العثور على الدرس');
+
+            // Open modal and populate
+            const modal = document.getElementById('addLessonModal');
+            if (!modal) return alert('نموذج الدرس غير متاح');
+            fillLessonForm(lesson);
+            modal.style.display = 'flex';
+            modal.classList.add('show');
+            try { modal.style.zIndex = '20000'; } catch (e) { }
+            document.body.classList.add('modal-open');
+            try { (document.getElementById('lessonTitle') || {}).focus && document.getElementById('lessonTitle').focus(); } catch (e) { }
+
+            // Wire submit to PUT
+            const form = document.getElementById('addLessonForm');
+            if (form) {
+                try { form.removeEventListener('submit', handleAddLessonSubmit); } catch (e) { }
+                try { form.removeEventListener('submit', canonicalHandleEditLessonSubmit); } catch (e) { }
+                form.addEventListener('submit', canonicalHandleEditLessonSubmit);
+                const btn = form.querySelector('button[type="submit"]');
+                if (btn) btn.textContent = 'تحديث الدرس';
+            }
+
+            // Update modal title
+            try {
+                const titleEl = modal.querySelector('.modal-header h3, h3');
+                if (titleEl) titleEl.textContent = 'تعديل الدرس';
+            } catch (e) { }
+
+        } catch (err) {
+            console.error('canonicalEditLesson failed', err);
+            alert(err.message || 'تعذر فتح تعديل الدرس');
+        }
+    }
+
+    // Expose globally and override any previous conflicting definitions
+    try { window.editLesson = canonicalEditLesson; } catch (e) { }
 })();
 
 // تهيئة الصفحة
 document.addEventListener('DOMContentLoaded', () => {
     if (window.__dashInit) return;
     window.__dashInit = true;
-    
+
     // تهيئة أزرار الكورس
     const addCourseBtn = document.getElementById('add-course-button');
     if (addCourseBtn) {
         console.log('Found add course button');
-        try { addCourseBtn.onclick = null; } catch(e){}
-        addCourseBtn.addEventListener('click', function(e) {
+        try { addCourseBtn.onclick = null; } catch (e) { }
+        addCourseBtn.addEventListener('click', function (e) {
             e.preventDefault();
             console.log('Add course button clicked');
 
@@ -2155,7 +2155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 document.body.style.overflow = 'hidden';
                 // focus first input
                 const first = modal.querySelector('input, textarea, select, button');
-                if (first) try { first.focus(); } catch(e){}
+                if (first) try { first.focus(); } catch (e) { }
             };
 
             show();
@@ -2165,12 +2165,12 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
         console.warn('Add course button not found');
     }
-    
+
     // تحميل البيانات الأولية
     fetchUsers();
     fetchCourses();
     fetchComments(); // Add initial comments load
-    
+
     // تعيين القسم الافتراضي
     switchSection('users');
 });
@@ -2179,16 +2179,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function switchSection(sectionId) {
     console.log('=== SWITCHING SECTION TO:', sectionId, '===');
-    
+
     // قائمة جميع الأقسام المعروفة
     const allSections = [
         'users-section',
-        'courses-section', 
+        'courses-section',
         'comments-section',
         'settings-section',
         'products-section'
     ];
-    
+
     // 1. إخفاء جميع الأقسام
     allSections.forEach(sectionName => {
         const section = document.getElementById(sectionName);
@@ -2211,12 +2211,12 @@ function switchSection(sectionId) {
         console.error('❌ Target section not found:', `${sectionId}-section`);
         return; // إيقاف إذا لم يتم العثور على القسم
     }
-    
+
     // 3. تحديث القائمة الجانبية
     document.querySelectorAll('.menu-item').forEach(item => {
         item.classList.remove('active');
     });
-    
+
     const activeMenuItem = document.querySelector(`.menu-item[href="#${sectionId}"]`);
     if (activeMenuItem) {
         activeMenuItem.classList.add('active');
@@ -2224,10 +2224,10 @@ function switchSection(sectionId) {
     } else {
         console.error('❌ Menu item not found for:', sectionId);
     }
-    
+
     // 4. تحميل البيانات حسب القسم
     console.log('Loading data for section:', sectionId);
-    switch(sectionId) {
+    switch (sectionId) {
         case 'courses':
             if (typeof fetchCourses === 'function') {
                 fetchCourses();
@@ -2260,12 +2260,12 @@ function switchSection(sectionId) {
                 initProducts();
             } else {
                 console.error('loadProducts function not found');
-            } 
+            }
             break;
         default:
             console.warn('Unknown section:', sectionId);
     }
-    
+
     console.log('=== SECTION SWITCH COMPLETE ===');
 }
 
@@ -2275,19 +2275,19 @@ function switchSection(sectionId) {
 // تأكد من وجود Quill في النطاق العام
 let Quill = window.Quill;
 const BlockEmbed = (window.Quill && window.Quill.import)
-  ? window.Quill.import('blots/block/embed')
-  : class { static create(){ return document.createElement('div'); } static value(){ return ''; } };
+    ? window.Quill.import('blots/block/embed')
+    : class { static create() { return document.createElement('div'); } static value() { return ''; } };
 class CustomVideo extends BlockEmbed {
-  static create(value) {
-    const node = super.create();
-    node.setAttribute('src', value);
-    node.setAttribute('controls', true);
-    node.setAttribute('style', 'max-width:100%;border-radius:10px;margin:10px 0;');
-    return node;
-  }
-  static value(node) {
-    return node.getAttribute('src');
-  }
+    static create(value) {
+        const node = super.create();
+        node.setAttribute('src', value);
+        node.setAttribute('controls', true);
+        node.setAttribute('style', 'max-width:100%;border-radius:10px;margin:10px 0;');
+        return node;
+    }
+    static value(node) {
+        return node.getAttribute('src');
+    }
 }
 
 
@@ -2335,7 +2335,7 @@ async function handleAddLessonSubmit(e) {
         if (!currentCourseId || !currentUnitId) {
             throw new Error('لم يتم تحديد الكورس أو الوحدة');
         }
-        
+
         // التأكد من حفظ المتغيرات العامة
         const courseIdToUse = currentCourseId || window.currentCourseId;
         const courseTitleToUse = currentCourseTitle || window.currentCourseTitle;
@@ -2360,13 +2360,13 @@ async function handleAddLessonSubmit(e) {
             case 'video':
                 const videoUrl = document.getElementById('lessonVideoUrl').value.trim();
                 const videoFile = document.getElementById('videoFileInput').files[0];
-                
+
                 if (videoUrl) {
                     lessonData.content = videoUrl;
                 } else if (videoFile) {
                     const formData = new FormData();
                     formData.append('video', videoFile);
-                    
+
                     const uploadResponse = await fetch('/api/uploads/lesson-video', {
                         method: 'POST',
                         headers: {
@@ -2374,11 +2374,11 @@ async function handleAddLessonSubmit(e) {
                         },
                         body: formData
                     });
-                    
+
                     if (!uploadResponse.ok) {
                         throw new Error('فشل في رفع ملف الفيديو');
                     }
-                    
+
                     const uploadResult = await uploadResponse.json();
                     lessonData.content = uploadResult.url;
                 } else {
@@ -2389,13 +2389,13 @@ async function handleAddLessonSubmit(e) {
             case 'pdf':
                 const pdfUrl = document.getElementById('lessonPdfUrl').value.trim();
                 const pdfFile = document.getElementById('pdfFileInput').files[0];
-                
+
                 if (pdfUrl) {
                     lessonData.content = pdfUrl;
                 } else if (pdfFile) {
                     const formData = new FormData();
                     formData.append('pdf', pdfFile);
-                    
+
                     const uploadResponse = await fetch('/api/uploads/lesson-pdf', {
                         method: 'POST',
                         headers: {
@@ -2403,11 +2403,11 @@ async function handleAddLessonSubmit(e) {
                         },
                         body: formData
                     });
-                    
+
                     if (!uploadResponse.ok) {
                         throw new Error('فشل في رفع ملف PDF');
                     }
-                    
+
                     const uploadResult = await uploadResponse.json();
                     lessonData.content = uploadResult.url;
                 } else {
@@ -2441,7 +2441,7 @@ async function handleAddLessonSubmit(e) {
         }
 
         alert('تم إضافة الدرس بنجاح!');
-        
+
         // إعادة تحميل محتوى الكورس قبل إغلاق النموذج
         try {
             const contentResponse = await fetch(`/api/courses/${currentCourseId}/content`, {
@@ -2455,7 +2455,7 @@ async function handleAddLessonSubmit(e) {
         } catch (refreshError) {
             console.error('Error refreshing course content:', refreshError);
         }
-        
+
         // إغلاق النموذج بعد انتهاء التحديث
         closeAddLessonModal();
 
@@ -2473,7 +2473,7 @@ async function addLessonToUnit(courseId, unitId) {
         alert('خطأ: لم يتم تحديد الكورس أو الوحدة');
         return;
     }
-    
+
     currentCourseId = courseId;
     currentUnitId = unitId;
     const modal = document.getElementById('addLessonModal');
@@ -2485,10 +2485,10 @@ async function addLessonToUnit(courseId, unitId) {
             form.removeEventListener('submit', handleAddLessonSubmit);
             form.addEventListener('submit', handleAddLessonSubmit);
         }
-        
+
         // Reset content type to video by default
         selectContentType('video');
-        
+
         modal.style.display = 'block';
         document.body.style.overflow = 'hidden';
     } else {
@@ -2500,23 +2500,23 @@ async function addLessonToUnit(courseId, unitId) {
 function selectContentType(type) {
     // تحديث قيمة نوع المحتوى
     document.getElementById('lessonType').value = type;
-    
+
     // إزالة الكلاس active من جميع الأزرار
     document.querySelectorAll('.content-type-btn').forEach(btn => {
         btn.classList.remove('active');
     });
-    
+
     // إضافة الكلاس active للزر المحدد
     const selectedBtn = document.querySelector(`.content-type-btn[data-type="${type}"]`);
     if (selectedBtn) {
         selectedBtn.classList.add('active');
     }
-    
+
     // إخفاء جميع أقسام المحتوى
     document.querySelectorAll('.content-input-section').forEach(section => {
         section.classList.remove('active');
     });
-    
+
     // إظهار قسم المحتوى المناسب
     const selectedSection = document.getElementById(`${type}InputSection`);
     if (selectedSection) {
@@ -2541,8 +2541,8 @@ function closeAddLessonModal() {
         }
 
         // remove any selected files / previews
-        try { removeVideo(); } catch(e) { /* ignore */ }
-        try { removePdf(); } catch(e) { /* ignore */ }
+        try { removeVideo(); } catch (e) { /* ignore */ }
+        try { removePdf(); } catch (e) { /* ignore */ }
 
         // clear URL inputs
         const vUrl = document.getElementById('lessonVideoUrl'); if (vUrl) vUrl.value = '';
@@ -2550,7 +2550,7 @@ function closeAddLessonModal() {
         const extUrl = document.getElementById('lessonExternalUrl'); if (extUrl) extUrl.value = '';
 
         // reset content type and button text
-        try { selectContentType('video'); } catch(e) {}
+        try { selectContentType('video'); } catch (e) { }
         const submitBtn = document.querySelector('#addLessonForm button[type="submit"]');
         if (submitBtn) {
             submitBtn.disabled = false;
@@ -2627,7 +2627,7 @@ async function manageCourseContent(courseId, courseTitle) {
 function displayCourseContent(courseContent, course) {
     console.log('displayCourseContent called with:', courseContent, course);
     // Diagnostic: show both global and window-scoped currentCourseId
-    try { console.log('DIAG currentCourseId (local):', typeof currentCourseId !== 'undefined' ? currentCourseId : '<<undefined>>', 'window.currentCourseId:', window.currentCourseId); } catch(e) { console.warn('DIAG log failed', e); }
+    try { console.log('DIAG currentCourseId (local):', typeof currentCourseId !== 'undefined' ? currentCourseId : '<<undefined>>', 'window.currentCourseId:', window.currentCourseId); } catch (e) { console.warn('DIAG log failed', e); }
 
     const container = document.getElementById('modulesContainer');
     if (!container) {
@@ -2641,7 +2641,7 @@ function displayCourseContent(courseContent, course) {
     const isPaid = course && !course.isFree;
     console.log('Course data:', course);
     console.log('Is paid course:', isPaid);
-    
+
     // Show/hide promo video section in modal (robust detection for paid courses)
     const promoSection = document.getElementById('promoVideoSection');
     const isPaidRobust = (course && (
@@ -2666,7 +2666,7 @@ function displayCourseContent(courseContent, course) {
                 if (typeof updatePromoVideoPreview === 'function') updatePromoVideoPreview(course.promoVideo);
             }
             // Default promo type to link when showing
-            try { selectPromoType('link'); } catch(e) {}
+            try { selectPromoType('link'); } catch (e) { }
         }
     }
 
@@ -2703,7 +2703,7 @@ function displayCourseContent(courseContent, course) {
                         </div>
                         <div class="lessons-list" style="margin-top: 15px;">
                             ${unit.lessons && unit.lessons.length > 0 ?
-                                unit.lessons.map((lesson, lessonIndex) => `
+                        unit.lessons.map((lesson, lessonIndex) => `
                                     <div class="lesson-item" style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee;">
                                         <span>الدرس ${lessonIndex + 1}: ${lesson.title}</span>
                                         <div class="lesson-actions">
@@ -2716,8 +2716,8 @@ function displayCourseContent(courseContent, course) {
                                         </div>
                                     </div>
                                 `).join('')
-                                : '<p style="text-align: center; color: #999; margin: 10px 0;">لا توجد دروس في هذه الوحدة</p>'
-                            }
+                        : '<p style="text-align: center; color: #999; margin: 10px 0;">لا توجد دروس في هذه الوحدة</p>'
+                    }
                         </div>
                     </div>
                 `;
@@ -2835,10 +2835,10 @@ const ModalSystem = {
         try {
             modal.dataset.ignoreBackdropClick = 'true';
             setTimeout(() => delete modal.dataset.ignoreBackdropClick, 250);
-        } catch (e) {}
+        } catch (e) { }
         return true;
     },
-    
+
     closeModal(modalId) {
         console.log(`Closing modal: ${modalId}`);
         const modal = document.getElementById(modalId);
@@ -2846,7 +2846,7 @@ const ModalSystem = {
             console.warn(`Modal not found: ${modalId}`);
             return false;
         }
-        
+
         modal.style.display = 'none';
         modal.classList.remove('show');
         // Only remove modal-open if no other modal remains shown
@@ -2858,7 +2858,7 @@ const ModalSystem = {
         document.body.style.overflow = 'auto';
         return true;
     },
-    
+
     closeAllModals() {
         console.log('Closing all modals');
         document.querySelectorAll('.modal').forEach(modal => {
@@ -2868,10 +2868,10 @@ const ModalSystem = {
         document.body.classList.remove('modal-open');
         document.body.style.overflow = 'auto';
     },
-    
+
     setupEvents() {
         console.log('Setting up modal events...');
-        
+
         // Close button handler
         document.querySelectorAll('.modal-close').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -2879,7 +2879,7 @@ const ModalSystem = {
                 if (modal) this.closeModal(modal.id);
             });
         });
-        
+
         // Backdrop click handler
         document.querySelectorAll('.modal').forEach(modal => {
             modal.addEventListener('click', (e) => {
@@ -2894,12 +2894,12 @@ const ModalSystem = {
                 }
             });
         });
-        
+
         // ESC key handler
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') this.closeAllModals();
         });
-        
+
         console.log('Modal events setup complete');
     }
 };
@@ -2959,13 +2959,13 @@ function toggleModule(moduleId) {
 function selectContentType(type) {
     // Update hidden input
     document.getElementById('lessonType').value = type;
-    
+
     // Update button states
     document.querySelectorAll('.content-type-btn').forEach(btn => {
         btn.classList.remove('active');
     });
     document.querySelector(`.content-type-btn[data-type="${type}"]`).classList.add('active');
-    
+
     // Show corresponding section
     document.querySelectorAll('.content-input-section').forEach(section => {
         section.classList.remove('active');
@@ -2985,9 +2985,9 @@ function handleVideoFileSelected(event) {
         return;
     }
 
-    // Validate file size (100MB)
-    if (file.size > 100 * 1024 * 1024) {
-        alert('حجم الفيديو يجب أن يكون أقل من 100 ميجابايت');
+    // Validate file size (500MB)
+    if (file.size > 500 * 1024 * 1024) {
+        alert('حجم الفيديو يجب أن يكون أقل من 500 ميجابايت');
         event.target.value = '';
         return;
     }
@@ -3008,11 +3008,11 @@ function removeVideo() {
     const fileInput = document.getElementById('videoFileInput');
     const previewDiv = document.getElementById('videoPreview');
     const placeholder = document.querySelector('.upload-placeholder');
-    
+
     fileInput.value = '';
     previewDiv.style.display = 'none';
     placeholder.style.display = 'block';
-    
+
     const video = previewDiv.querySelector('video');
     if (video) {
         URL.revokeObjectURL(video.src);
@@ -3052,7 +3052,7 @@ function removePdf() {
     const fileInput = document.getElementById('pdfFileInput');
     const previewDiv = document.getElementById('pdfPreview');
     const placeholder = document.querySelector('#pdfDropZone .upload-placeholder');
-    
+
     fileInput.value = '';
     previewDiv.style.display = 'none';
     placeholder.style.display = 'block';
@@ -3062,7 +3062,7 @@ function removePdf() {
 async function validateVideoUrl() {
     const urlInput = document.getElementById('lessonVideoUrl');
     const url = urlInput.value.trim();
-    
+
     if (!url) {
         alert('يرجى إدخال رابط الفيديو');
         return;
@@ -3085,7 +3085,7 @@ async function validateVideoUrl() {
 function removeVideoUrl() {
     const urlInput = document.getElementById('lessonVideoUrl');
     const previewDiv = document.getElementById('urlVideoPreview');
-    
+
     urlInput.value = '';
     previewDiv.style.display = 'none';
     previewDiv.querySelector('.preview-frame').innerHTML = '';
@@ -3095,7 +3095,7 @@ function removeVideoUrl() {
 async function validatePdfUrl() {
     const urlInput = document.getElementById('lessonPdfUrl');
     const url = urlInput.value.trim();
-    
+
     if (!url) {
         alert('يرجى إدخال رابط ملف PDF');
         return;
@@ -3104,7 +3104,7 @@ async function validatePdfUrl() {
     try {
         const response = await fetch(url, { method: 'HEAD' });
         if (!response.ok) throw new Error('الرابط غير صالح');
-        
+
         const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('pdf')) {
             throw new Error('الملف ليس بصيغة PDF');
@@ -3121,7 +3121,7 @@ async function validatePdfUrl() {
 async function validateExternalUrl() {
     const urlInput = document.getElementById('lessonExternalUrl');
     const url = urlInput.value.trim();
-    
+
     if (!url) {
         alert('يرجى إدخال الرابط');
         return;
@@ -3181,7 +3181,7 @@ function getEmbedUrl(url) {
         }
         return `https://www.youtube.com/embed/${videoId}`;
     }
-    
+
     // Google Drive URL
     if (url.includes('drive.google.com')) {
         const fileId = url.match(/[-\w]{25,}/);
@@ -3189,22 +3189,22 @@ function getEmbedUrl(url) {
             return `https://drive.google.com/file/d/${fileId[0]}/preview`;
         }
     }
-    
+
     return url;
 }
 
 // Make sure these functions are available in the global scope (delegators)
-window.openAddCourseModal = function() {
+window.openAddCourseModal = function () {
     if (window.Courses && typeof window.Courses.openAddCourseModal === 'function') return window.Courses.openAddCourseModal();
     console.warn('openAddCourseModal delegated: Courses module not available');
 };
 
-window.editCourse = function(courseId) {
+window.editCourse = function (courseId) {
     if (window.Courses && typeof window.Courses.openEditCourse === 'function') return window.Courses.openEditCourse(courseId);
     console.warn('editCourse delegated: Courses module not available');
 };
 
-window.manageCourseContent = function(courseId, courseTitle) {
+window.manageCourseContent = function (courseId, courseTitle) {
     if (window.Courses && typeof window.Courses.manageCourseContent === 'function') return window.Courses.manageCourseContent(courseId, courseTitle);
     console.warn('manageCourseContent delegated: Courses module not available');
 };
@@ -3226,18 +3226,18 @@ async function deleteLesson(courseId, unitId, lessonId) {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
     })
-    .then(response => {
-        if (!response.ok) throw new Error('فشل حذف الدرس');
-        return response.json();
-    })
-    .then(() => {
-        manageCourseContent(courseId); // Refresh content
-        alert('تم حذف الدرس بنجاح');
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('حدث خطأ أثناء حذف الدرس');
-    });
+        .then(response => {
+            if (!response.ok) throw new Error('فشل حذف الدرس');
+            return response.json();
+        })
+        .then(() => {
+            manageCourseContent(courseId); // Refresh content
+            alert('تم حذف الدرس بنجاح');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('حدث خطأ أثناء حذف الدرس');
+        });
 }
 
 function editLesson(courseId, unitId, lessonId) {
@@ -3255,74 +3255,74 @@ function editLesson(courseId, unitId, lessonId) {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
     })
-    .then(response => {
-        if (!response.ok) throw new Error('فشل في جلب بيانات الدرس');
-        return response.json();
-    })
-    .then(lesson => {
-        // Populate the form
-        document.getElementById('lessonTitle').value = lesson.title || '';
-        document.getElementById('lessonDescription').value = lesson.description || '';
-        document.getElementById('lessonDuration').value = lesson.duration || 30;
-        document.getElementById('lessonSpecialization').value = lesson.specialization || 'cybersecurity';
-        document.getElementById('lessonIsFree').checked = lesson.isFree || false;
-        
-        // Set content type
-        const lessonType = lesson.type || 'video';
-        selectContentType(lessonType);
-        
-        // Handle content based on type
-        if (lessonType === 'video') {
-            const videoUrl = lesson.videoUrl || lesson.content || '';
-            if (videoUrl) {
-                if (videoUrl.startsWith('http') || videoUrl.startsWith('/uploads/')) {
-                    document.getElementById('lessonVideoUrl').value = videoUrl;
-                    validateVideoUrl();
-                } else {
-                    // If it's a local file path, show it in preview
-                    document.getElementById('lessonVideoUrl').value = videoUrl;
+        .then(response => {
+            if (!response.ok) throw new Error('فشل في جلب بيانات الدرس');
+            return response.json();
+        })
+        .then(lesson => {
+            // Populate the form
+            document.getElementById('lessonTitle').value = lesson.title || '';
+            document.getElementById('lessonDescription').value = lesson.description || '';
+            document.getElementById('lessonDuration').value = lesson.duration || 30;
+            document.getElementById('lessonSpecialization').value = lesson.specialization || 'cybersecurity';
+            document.getElementById('lessonIsFree').checked = lesson.isFree || false;
+
+            // Set content type
+            const lessonType = lesson.type || 'video';
+            selectContentType(lessonType);
+
+            // Handle content based on type
+            if (lessonType === 'video') {
+                const videoUrl = lesson.videoUrl || lesson.content || '';
+                if (videoUrl) {
+                    if (videoUrl.startsWith('http') || videoUrl.startsWith('/uploads/')) {
+                        document.getElementById('lessonVideoUrl').value = videoUrl;
+                        validateVideoUrl();
+                    } else {
+                        // If it's a local file path, show it in preview
+                        document.getElementById('lessonVideoUrl').value = videoUrl;
+                    }
                 }
+                // Clear file input
+                const videoFileInput = document.getElementById('videoFileInput');
+                if (videoFileInput) videoFileInput.value = '';
+            } else if (lessonType === 'pdf') {
+                const pdfUrl = lesson.fileUrl || lesson.content || '';
+                if (pdfUrl) {
+                    document.getElementById('lessonPdfUrl').value = pdfUrl;
+                    validatePdfUrl();
+                }
+                // Clear file input
+                const pdfFileInput = document.getElementById('pdfFileInput');
+                if (pdfFileInput) pdfFileInput.value = '';
+            } else if (lessonType === 'url') {
+                const externalUrl = lesson.externalUrl || lesson.content || '';
+                document.getElementById('lessonExternalUrl').value = externalUrl;
+            } else if (lessonType === 'text') {
+                const textContent = lesson.content || '';
+                document.getElementById('lessonTextContent').value = textContent;
             }
-            // Clear file input
-            const videoFileInput = document.getElementById('videoFileInput');
-            if (videoFileInput) videoFileInput.value = '';
-        } else if (lessonType === 'pdf') {
-            const pdfUrl = lesson.fileUrl || lesson.content || '';
-            if (pdfUrl) {
-                document.getElementById('lessonPdfUrl').value = pdfUrl;
-                validatePdfUrl();
+
+            // Update modal title
+            const modalTitle = modal.querySelector('h3') || modal.querySelector('.modal-header h3');
+            if (modalTitle) {
+                modalTitle.textContent = 'تعديل الدرس';
             }
-            // Clear file input
-            const pdfFileInput = document.getElementById('pdfFileInput');
-            if (pdfFileInput) pdfFileInput.value = '';
-        } else if (lessonType === 'url') {
-            const externalUrl = lesson.externalUrl || lesson.content || '';
-            document.getElementById('lessonExternalUrl').value = externalUrl;
-        } else if (lessonType === 'text') {
-            const textContent = lesson.content || '';
-            document.getElementById('lessonTextContent').value = textContent;
-        }
-        
-        // Update modal title
-        const modalTitle = modal.querySelector('h3') || modal.querySelector('.modal-header h3');
-        if (modalTitle) {
-            modalTitle.textContent = 'تعديل الدرس';
-        }
-        
-        // Update form submit handler
-        const form = document.getElementById('addLessonForm');
-        if (form) {
-            form.removeEventListener('submit', handleAddLessonSubmit);
-            form.removeEventListener('submit', handleEditLessonSubmit);
-            form.addEventListener('submit', handleEditLessonSubmit);
-        }
-        
-        modal.style.display = 'block';
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('حدث خطأ أثناء تحميل بيانات الدرس: ' + error.message);
-    });
+
+            // Update form submit handler
+            const form = document.getElementById('addLessonForm');
+            if (form) {
+                form.removeEventListener('submit', handleAddLessonSubmit);
+                form.removeEventListener('submit', handleEditLessonSubmit);
+                form.addEventListener('submit', handleEditLessonSubmit);
+            }
+
+            modal.style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('حدث خطأ أثناء تحميل بيانات الدرس: ' + error.message);
+        });
 }
 
 // دالة معالجة تعديل درس
@@ -3357,13 +3357,13 @@ async function handleEditLessonSubmit(e) {
             case 'video':
                 const videoUrl = document.getElementById('lessonVideoUrl').value.trim();
                 const videoFile = document.getElementById('videoFileInput').files[0];
-                
+
                 if (videoUrl) {
                     lessonData.videoUrl = videoUrl;
                 } else if (videoFile) {
                     const formData = new FormData();
                     formData.append('video', videoFile);
-                    
+
                     const uploadResponse = await fetch('/api/uploads/lesson-video', {
                         method: 'POST',
                         headers: {
@@ -3371,11 +3371,11 @@ async function handleEditLessonSubmit(e) {
                         },
                         body: formData
                     });
-                    
+
                     if (!uploadResponse.ok) {
                         throw new Error('فشل في رفع ملف الفيديو');
                     }
-                    
+
                     const uploadResult = await uploadResponse.json();
                     lessonData.videoUrl = uploadResult.url;
                 } else {
@@ -3386,13 +3386,13 @@ async function handleEditLessonSubmit(e) {
             case 'pdf':
                 const pdfUrl = document.getElementById('lessonPdfUrl').value.trim();
                 const pdfFile = document.getElementById('pdfFileInput').files[0];
-                
+
                 if (pdfUrl) {
                     lessonData.fileUrl = pdfUrl;
                 } else if (pdfFile) {
                     const formData = new FormData();
                     formData.append('pdf', pdfFile);
-                    
+
                     const uploadResponse = await fetch('/api/uploads/lesson-pdf', {
                         method: 'POST',
                         headers: {
@@ -3400,11 +3400,11 @@ async function handleEditLessonSubmit(e) {
                         },
                         body: formData
                     });
-                    
+
                     if (!uploadResponse.ok) {
                         throw new Error('فشل في رفع ملف PDF');
                     }
-                    
+
                     const uploadResult = await uploadResponse.json();
                     lessonData.fileUrl = uploadResult.url;
                 } else {
@@ -3442,7 +3442,7 @@ async function handleEditLessonSubmit(e) {
         }
 
         alert('تم تحديث الدرس بنجاح!');
-        
+
         // إعادة تحميل محتوى الكورس قبل إغلاق النموذج
         try {
             const contentResponse = await fetch(`/api/courses/${currentCourseId}/content`, {
@@ -3463,7 +3463,7 @@ async function handleEditLessonSubmit(e) {
                 console.error('Alternative refresh failed:', e);
             }
         }
-        
+
         // إغلاق النموذج بعد انتهاء التحديث
         closeAddLessonModal();
 
@@ -3477,12 +3477,12 @@ async function handleEditLessonSubmit(e) {
 
 function renderModules() {
     const container = document.getElementById('modulesContainer');
-    
+
     if (modules.length === 0) {
         container.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">لا توجد وحدات. اضغط "إضافة وحدة" لبدء إضافة المحتوى.</p>';
         return;
     }
-    
+
     container.innerHTML = modules.map(module => `
         <div class="module-card">
             <div class="module-header" onclick="toggleModule(${module.id})">
@@ -3497,9 +3497,9 @@ function renderModules() {
                 </div>
             </div>
             <div class="module-content ${module.isExpanded ? 'active' : ''}">
-                ${module.lessons.length === 0 ? 
-                    '<p style="text-align: center; color: #666; padding: 10px;">لا توجد دروس في هذه الوحدة.</p>' :
-                    module.lessons.map(lesson => `
+                ${module.lessons.length === 0 ?
+            '<p style="text-align: center; color: #666; padding: 10px;">لا توجد دروس في هذه الوحدة.</p>' :
+            module.lessons.map(lesson => `
                         <div class="lesson-item">
                             <div class="lesson-info">
                                 <div class="lesson-title">${lesson.title}</div>
@@ -3519,7 +3519,7 @@ function renderModules() {
                             </div>
                         </div>
                     `).join('')
-                }
+        }
             </div>
         </div>
     `).join('');
@@ -3530,7 +3530,7 @@ async function saveCourseContent() {
         alert('لا يوجد كورس محدد');
         return;
     }
-    
+
     try {
         const response = await fetch(`/api/courses/${currentState.courseId}`, {
             method: 'PUT',
@@ -3540,10 +3540,10 @@ async function saveCourseContent() {
             },
             body: JSON.stringify({ units: modules }) // Send the updated modules array
         });
-        
+
         const result = await response.json();
         if (!response.ok) throw new Error(result.message || 'فشل في حفظ محتوى الكورس');
-        
+
         alert('تم حفظ محتوى الكورس بنجاح!');
         closeCourseContentModal();
         fetchCourses(); // Refresh the courses list
@@ -3562,12 +3562,12 @@ let uploadedFiles = {};
 //     const videoSection = document.getElementById('videoUploadSection');
 //     const pdfSection = document.getElementById('pdfUploadSection');
 //     const urlSection = document.getElementById('urlInputSection');
-    
+
 //     // Hide all sections
 //     videoSection.style.display = 'none';
 //     pdfSection.style.display = 'none';
 //     urlSection.style.display = 'none';
-    
+
 //     // Show selected section
 //     switch(contentType) {
 //         case 'video':
@@ -3586,28 +3586,28 @@ let uploadedFiles = {};
 function handleVideoUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
-    
+
     // Validate file type
     if (!file.type.startsWith('video/')) {
         alert('يرجى اختيار ملف فيديو صحيح');
         event.target.value = '';
         return;
     }
-    
-    // Validate file size (100MB limit)
-    if (file.size > 100 * 1024 * 1024) {
-        alert('حجم الملف يجب أن يكون أقل من 100 ميجابايت');
+
+    // Validate file size (500MB limit)
+    if (file.size > 500 * 1024 * 1024) {
+        alert('حجم الملف يجب أن يكون أقل من 500 ميجابايت');
         event.target.value = '';
         return;
     }
-    
+
     // Show upload progress
     const progressSection = document.getElementById('videoUploadProgress');
     const progressFill = document.getElementById('videoProgressFill');
     const progressText = document.getElementById('videoProgressText');
-    
+
     progressSection.style.display = 'block';
-    
+
     // Simulate upload progress
     simulateUpload(file, progressFill, progressText, 'video');
 }
@@ -3616,28 +3616,28 @@ function handleVideoUpload(event) {
 function handlePdfUpload(event) {
     const file = event.target.files[0];
     if (!file) return;
-    
+
     // Validate file type
     if (file.type !== 'application/pdf') {
         alert('يرجى اختيار ملف PDF صحيح');
         event.target.value = '';
         return;
     }
-    
+
     // Validate file size (50MB limit)
     if (file.size > 50 * 1024 * 1024) {
         alert('حجم الملف يجب أن يكون أقل من 50 ميجابايت');
         event.target.value = '';
         return;
     }
-    
+
     // Show upload progress
     const progressSection = document.getElementById('pdfUploadProgress');
     const progressFill = document.getElementById('pdfProgressFill');
     const progressText = document.getElementById('pdfProgressText');
-    
+
     progressSection.style.display = 'block';
-    
+
     // Simulate upload progress
     simulateUpload(file, progressFill, progressText, 'pdf');
 }
@@ -3650,7 +3650,7 @@ function simulateUpload(file, progressFill, progressText, type) {
         if (progress >= 100) {
             progress = 100;
             clearInterval(interval);
-            
+
             // Store uploaded file info
             uploadedFiles[type] = {
                 name: file.name,
@@ -3658,11 +3658,11 @@ function simulateUpload(file, progressFill, progressText, type) {
                 type: file.type,
                 file: file
             };
-            
+
             // Show success message
             progressText.textContent = 'تم الرفع بنجاح!';
             progressFill.style.background = '#27ae60';
-            
+
             setTimeout(() => {
                 document.getElementById(`${type}UploadProgress`).style.display = 'none';
                 progressFill.style.background = 'var(--main-color)';
@@ -3681,18 +3681,18 @@ function quickAddLesson() {
     const title = document.getElementById('quickLessonTitle').value.trim();
     const contentType = document.getElementById('quickLessonType').value;
     const description = document.getElementById('quickLessonDescription').value.trim();
-    
+
     // Validate required fields
     if (!title) {
         alert('يرجى إدخال عنوان الدرس');
         return;
     }
-    
+
     let content = '';
     let lessonType = '';
-    
+
     // Get content based on type
-    switch(contentType) {
+    switch (contentType) {
         case 'video':
             if (!uploadedFiles.video) {
                 alert('يرجى رفع ملف الفيديو');
@@ -3701,7 +3701,7 @@ function quickAddLesson() {
             content = uploadedFiles.video.name; // In real implementation, this would be the uploaded URL
             lessonType = 'video';
             break;
-            
+
         case 'pdf':
             if (!uploadedFiles.pdf) {
                 alert('يرجى رفع ملف PDF');
@@ -3710,7 +3710,7 @@ function quickAddLesson() {
             content = uploadedFiles.pdf.name; // In real implementation, this would be the uploaded URL
             lessonType = 'pdf';
             break;
-            
+
         case 'url':
             const url = document.getElementById('lessonUrl').value.trim();
             if (!url) {
@@ -3721,7 +3721,7 @@ function quickAddLesson() {
             lessonType = 'url';
             break;
     }
-    
+
     // Create lesson object
     const lesson = {
         id: Date.now().toString(),
@@ -3731,7 +3731,7 @@ function quickAddLesson() {
         description: description,
         duration: '5 دقائق' // Default duration
     };
-    
+
     // Add lesson to selected module or first module
     let targetModule;
     if (modules.length === 0) {
@@ -3751,26 +3751,26 @@ function quickAddLesson() {
         // If multiple modules exist, ask user which one to add to
         const moduleOptions = modules.map((module, index) => `${index + 1}. ${module.title}`).join('\n');
         const moduleChoice = prompt(`اختر الوحدة لإضافة الدرس إليها:\n${moduleOptions}\n\nأدخل رقم الوحدة:`);
-        
+
         if (!moduleChoice) return;
-        
+
         const moduleIndex = parseInt(moduleChoice) - 1;
         if (isNaN(moduleIndex) || moduleIndex < 0 || moduleIndex >= modules.length) {
             alert('اختيار غير صحيح');
             return;
         }
-        
+
         targetModule = modules[moduleIndex];
     }
-    
+
     targetModule.lessons.push(lesson);
-    
+
     // Update UI
     renderModules();
-    
+
     // Clear form
     clearQuickForm();
-    
+
     // Show success message
     alert('تم إضافة الدرس بنجاح!');
 }
@@ -3793,17 +3793,17 @@ function clearQuickForm() {
 
     // Reset content type to video
     const qType = document.getElementById('quickLessonType'); if (qType) qType.value = 'video';
-    try { toggleContentInput(); } catch(e) { /* ignore if not present */ }
+    try { toggleContentInput(); } catch (e) { /* ignore if not present */ }
 }
 
 // Initialize enhanced content features
 function initializeEnhancedContent() {
     // Set up drag and drop for file uploads
     setupDragAndDrop();
-    
+
     // Set up file validation
     setupFileValidation();
-    
+
     // Initialize content type toggle
     // toggleContentInput();
 }
@@ -3812,7 +3812,7 @@ function initializeEnhancedContent() {
 function setupDragAndDrop() {
     const videoInput = document.getElementById('videoFile');
     const pdfInput = document.getElementById('pdfFile');
-    
+
     [videoInput, pdfInput].forEach(input => {
         if (input) {
             input.addEventListener('dragover', (e) => {
@@ -3820,18 +3820,18 @@ function setupDragAndDrop() {
                 input.style.borderColor = 'var(--main-color)';
                 input.style.background = '#f0f8ff';
             });
-            
+
             input.addEventListener('dragleave', (e) => {
                 e.preventDefault();
                 input.style.borderColor = '#dee2e6';
                 input.style.background = '#f8f9fa';
             });
-            
+
             input.addEventListener('drop', (e) => {
                 e.preventDefault();
                 input.style.borderColor = '#dee2e6';
                 input.style.background = '#f8f9fa';
-                
+
                 const files = e.dataTransfer.files;
                 if (files.length > 0) {
                     input.files = files;
@@ -3847,7 +3847,7 @@ function setupFileValidation() {
     // Add real-time file size validation
     const videoInput = document.getElementById('videoFile');
     const pdfInput = document.getElementById('pdfFile');
-    
+
     if (videoInput) {
         videoInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
@@ -3857,7 +3857,7 @@ function setupFileValidation() {
             }
         });
     }
-    
+
     if (pdfInput) {
         pdfInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
@@ -3871,7 +3871,7 @@ function setupFileValidation() {
 
 // Initialize enhanced content when course content modal is opened
 const originalManageCourseContent = manageCourseContent;
-manageCourseContent = function(courseId, courseTitle) {
+manageCourseContent = function (courseId, courseTitle) {
     originalManageCourseContent(courseId, courseTitle);
     setTimeout(initializeEnhancedContent, 100);
 };
@@ -3882,37 +3882,37 @@ window.Quill && window.Quill.register && window.Quill.register(CustomVideo);
 
 // نموذج إضافة وحدة (module)
 function toggleAddModuleForm() {
-  const form = document.getElementById('addModuleForm');
-  if (form.style.display === 'none' || form.style.display === '') {
-    form.style.display = 'block';
-    document.getElementById('moduleTitleInput').focus();
-  } else {
-    form.style.display = 'none';
-    document.getElementById('moduleTitleInput').value = '';
-  }
+    const form = document.getElementById('addModuleForm');
+    if (form.style.display === 'none' || form.style.display === '') {
+        form.style.display = 'block';
+        document.getElementById('moduleTitleInput').focus();
+    } else {
+        form.style.display = 'none';
+        document.getElementById('moduleTitleInput').value = '';
+    }
 }
 
 function submitAddModule() {
-  const input = document.getElementById('moduleTitleInput');
-  const title = input.value.trim();
-  if (!title) {
-    input.style.borderColor = '#e74c3c';
-    input.placeholder = 'يرجى إدخال اسم الوحدة';
-    input.focus();
-    setTimeout(() => { input.style.borderColor = ''; }, 1200);
-    return;
-  }
-  
-  // إضافة الوحدة للمصفوفة modules
-  const newModule = {
-    id: Date.now().toString(),
-    title: title,
-    lessons: [],
-    isExpanded: true
-  };
-  modules.push(newModule);
-  renderModules();
-  toggleAddModuleForm();
+    const input = document.getElementById('moduleTitleInput');
+    const title = input.value.trim();
+    if (!title) {
+        input.style.borderColor = '#e74c3c';
+        input.placeholder = 'يرجى إدخال اسم الوحدة';
+        input.focus();
+        setTimeout(() => { input.style.borderColor = ''; }, 1200);
+        return;
+    }
+
+    // إضافة الوحدة للمصفوفة modules
+    const newModule = {
+        id: Date.now().toString(),
+        title: title,
+        lessons: [],
+        isExpanded: true
+    };
+    modules.push(newModule);
+    renderModules();
+    toggleAddModuleForm();
 }
 
 // دالة لحفظ محتوى الكورس
@@ -3965,7 +3965,7 @@ async function saveCourseContentWithCurrentData() {
         // حفظ المحتوى
         await saveCourseContent(currentCourseId, units);
         alert('تم حفظ محتوى الكورس بنجاح!');
-        
+
     } catch (error) {
         console.error('خطأ في حفظ محتوى الكورس:', error);
         alert(`خطأ: ${error.message}`);
@@ -4074,7 +4074,7 @@ async function addLessonToUnitAPI(courseId, unitId, lessonData, file) {
             throw new Error('يرجى إدخال الرابط الخارجي');
         }
     }
-    
+
     const response = await fetch(`/api/courses/${courseId}/units/${unitId}/lessons`, {
         method: 'POST',
         headers: {
@@ -4137,7 +4137,7 @@ async function addUnitToCourse(courseId) {
 }
 
 // Expose to window for inline onclick handlers and external callers
-try { if (typeof window !== 'undefined') window.addUnitToCourse = addUnitToCourse; } catch(e) { /* ignore */ }
+try { if (typeof window !== 'undefined') window.addUnitToCourse = addUnitToCourse; } catch (e) { /* ignore */ }
 
 // دالة فتح مودال إضافة وحدة
 function openAddUnitModal(closeOthers = true) {
@@ -4148,7 +4148,7 @@ function openAddUnitModal(closeOthers = true) {
     // Reset the form
     const form = document.getElementById('addUnitForm');
     if (form) {
-        try { form.removeEventListener('submit', handleAddUnitSubmit); } catch(e) {}
+        try { form.removeEventListener('submit', handleAddUnitSubmit); } catch (e) { }
         form.addEventListener('submit', handleAddUnitSubmit);
         form.reset();
     }
@@ -4158,7 +4158,7 @@ function openAddUnitModal(closeOthers = true) {
         if (typeof ModalSystem !== 'undefined' && ModalSystem && typeof ModalSystem.openModal === 'function') {
             ModalSystem.openModal('addUnitModal', closeOthers);
             // focus first input after a short delay
-            setTimeout(() => { const first = modal.querySelector('input, textarea, select, button'); if (first) try { first.focus(); } catch(e) {} }, 60);
+            setTimeout(() => { const first = modal.querySelector('input, textarea, select, button'); if (first) try { first.focus(); } catch (e) { } }, 60);
             return;
         }
     } catch (err) {
@@ -4180,7 +4180,7 @@ function openAddUnitModal(closeOthers = true) {
     modal.style.zIndex = '30000';
     document.body.style.overflow = 'hidden';
     const first = modal.querySelector('input, textarea, select, button');
-    if (first) try { first.focus(); } catch(e) {}
+    if (first) try { first.focus(); } catch (e) { }
 }
 
 // دالة إغلاق مودال إضافة وحدة
@@ -4193,37 +4193,37 @@ function closeAddUnitModal() {
 // دالة معالجة إرسال نموذج إضافة وحدة
 async function handleAddUnitSubmit(e) {
     e.preventDefault();
-    
+
     const unitTitle = document.getElementById('unitTitle').value.trim();
     const unitDescription = document.getElementById('unitDescription').value.trim();
     const unitOrder = parseInt(document.getElementById('unitOrder').value) || 1;
-    
+
     if (!unitTitle) {
         alert('يرجى إدخال عنوان الوحدة');
         return;
     }
-    
+
     try {
         const unitData = {
             title: unitTitle,
             description: unitDescription,
             order: unitOrder
         };
-        
+
         // استخدام currentState أو currentCourseId
         const courseId = currentState.courseId || currentCourseId || window.currentCourseId;
         const courseTitle = currentState.courseTitle || currentCourseTitle || window.currentCourseTitle || 'الكورس';
-        
+
         if (!courseId) {
             throw new Error('لم يتم تحديد معرف الكورس');
         }
-        
+
         await addUnitToCourseAPI(courseId, unitData);
         alert('تم إضافة الوحدة بنجاح!');
-        
+
         // إغلاق النموذج أولاً
         closeAddUnitModal();
-        
+
         // ثم إعادة تحميل محتوى الكورس بدون فتح مودال جديد
         try {
             const res = await fetch(`/api/courses/${courseId}/content`, {
@@ -4237,7 +4237,7 @@ async function handleAddUnitSubmit(e) {
         } catch (refreshError) {
             console.error('Error refreshing course content:', refreshError);
         }
-        
+
     } catch (error) {
         console.error('خطأ في إضافة الوحدة:', error);
         alert(`خطأ: ${error.message}`);
@@ -4255,7 +4255,7 @@ async function addLessonToUnit(courseId, unitId) {
     window.currentState = window.currentState || {};
     window.currentState.courseId = courseId;
     window.currentState.unitId = unitId;
-    
+
     const modal = document.getElementById('addLessonModal');
     if (modal) {
         console.log('Opening lesson modal for unit:', unitId);
@@ -4265,10 +4265,10 @@ async function addLessonToUnit(courseId, unitId) {
             form.removeEventListener('submit', handleAddLessonSubmit);
             form.addEventListener('submit', handleAddLessonSubmit);
         }
-        
+
         // Reset content type to video by default
         selectContentType('video');
-        
+
         modal.style.display = 'flex';
         modal.classList.add('show');
         document.body.style.overflow = 'hidden';
@@ -4282,22 +4282,22 @@ function openAddLessonModal() {
     const modal = document.getElementById('addLessonModal');
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
-    
+
     // إعادة تعيين النموذج
     document.getElementById('addLessonForm').reset();
-    
+
     // إخفاء جميع أقسام المحتوى
     document.querySelectorAll('.content-input-section').forEach(section => {
         section.style.display = 'none';
     });
-    
+
     // إعادة تعيين معالج النموذج للإضافة
     document.getElementById('addLessonForm').onsubmit = handleAddLessonSubmit;
-    
+
     // تغيير نص الزر
     const submitBtn = document.querySelector('#addLessonForm button[type="submit"]');
     submitBtn.textContent = 'إضافة الدرس';
-    
+
     // مسح معرف الدرس الحالي
     window.currentLessonId = null;
 }
@@ -4312,13 +4312,13 @@ function closeAddLessonModal() {
         }
         // reset form and previews
         const form = document.getElementById('addLessonForm');
-        if (form) try { form.reset(); } catch(e) {}
-        try { removeVideo(); } catch(e) {}
-        try { removePdf(); } catch(e) {}
+        if (form) try { form.reset(); } catch (e) { }
+        try { removeVideo(); } catch (e) { }
+        try { removePdf(); } catch (e) { }
         const vUrl = document.getElementById('lessonVideoUrl'); if (vUrl) vUrl.value = '';
         const pUrl = document.getElementById('lessonPdfUrl'); if (pUrl) pUrl.value = '';
         const extUrl = document.getElementById('lessonExternalUrl'); if (extUrl) extUrl.value = '';
-        try { selectContentType('video'); } catch(e) {}
+        try { selectContentType('video'); } catch (e) { }
         const submitBtn = document.querySelector('#addLessonForm button[type="submit"]');
         if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'إضافة الدرس'; }
     } finally {
@@ -4329,14 +4329,14 @@ function closeAddLessonModal() {
 // دالة تبديل حقول المحتوى حسب النوع
 function toggleLessonContentInput() {
     const lessonType = document.getElementById('lessonType').value;
-    
+
     // إخفاء جميع أقسام المحتوى
     document.querySelectorAll('.content-input-section').forEach(section => {
         section.style.display = 'none';
     });
-    
+
     // إظهار القسم المناسب
-    switch(lessonType) {
+    switch (lessonType) {
         case 'video':
             document.getElementById('videoInputSection').style.display = 'block';
             break;
@@ -4360,23 +4360,23 @@ function toggleLessonContentInput() {
 //     const file = fileInput ? fileInput.files[0] : null;
 
 //     e.preventDefault();
-    
+
 //     const lessonTitle = document.getElementById('lessonTitle').value.trim();
 //     const lessonDescription = document.getElementById('lessonDescription').value.trim();
 //     const lessonType = document.getElementById('lessonType').value;
 //     const lessonDuration = parseInt(document.getElementById('lessonDuration').value) || 30;
 //     const lessonIsFree = document.getElementById('lessonIsFree').checked;
-    
+
 //     if (!lessonTitle) {
 //         alert('يرجى إدخال عنوان الدرس');
 //         return;
 //     }
-    
+
 //     if (!lessonType) {
 //         alert('يرجى اختيار نوع المحتوى');
 //         return;
 //     }
-    
+
 //     try {
 //         let lessonData = {
 //             title: lessonTitle,
@@ -4385,7 +4385,7 @@ function toggleLessonContentInput() {
 //             type: lessonType,
 //             isFree: lessonIsFree
 //         };
-        
+
 //         // إضافة المحتوى حسب النوع
 //         switch(lessonType) {
 //             case 'video':
@@ -4396,7 +4396,7 @@ function toggleLessonContentInput() {
 //                 }
 //                 lessonData.videoUrl = videoUrl;
 //                 break;
-                
+
 //             case 'pdf':
 //                 const pdfUrl = document.getElementById('lessonPdfUrl').value.trim();
 //                 if (!pdfUrl) {
@@ -4405,7 +4405,7 @@ function toggleLessonContentInput() {
 //                 }
 //                 lessonData.fileUrl = pdfUrl;
 //                 break;
-                
+
 //             case 'url':
 //                 const externalUrl = document.getElementById('lessonExternalUrl').value.trim();
 //                 if (!externalUrl) {
@@ -4415,17 +4415,17 @@ function toggleLessonContentInput() {
 //                 lessonData.externalUrl = externalUrl;
 //                 break;
 //         }
-        
+
 //         await addLessonToUnitAPI(currentCourseId, currentUnitId, lessonData);
 //         alert('تم إضافة الدرس بنجاح!');
-        
+
 //         closeAddLessonModal();
-        
+
 //         // إعادة تحميل محتوى الكورس
 //         manageCourseContent(currentCourseId, currentCourseTitle);
-        console.log('Handling lesson form submission...');
-        showLoadingOverlay(); // Add loading indicator
-        
+console.log('Handling lesson form submission...');
+showLoadingOverlay(); // Add loading indicator
+
 //     } catch (error) {
 //         console.error('خطأ في إضافة الدرس:', error);
 //         alert(`خطأ: ${error.message}`);
@@ -4500,7 +4500,7 @@ function toggleLessonContentInput() {
 //     closeAddLessonModal();
 //     manageCourseContent(currentCourseId, currentCourseTitle);
 
-        hideLoadingOverlay(); // Remove loading indicator
+hideLoadingOverlay(); // Remove loading indicator
 // } catch (error) {
 //     console.error('خطأ في إضافة الدرس:', error);
 //     alert(`خطأ: ${error.message}`);
@@ -4512,11 +4512,11 @@ async function handleAddLessonSubmit(e) {
 
     const submitBtn = document.querySelector('#addLessonForm button[type="submit"]');
     if (submitBtn) {
-        try { submitBtn.dataset.origText = submitBtn.textContent || 'إضافة الدرس'; } catch(e) {}
+        try { submitBtn.dataset.origText = submitBtn.textContent || 'إضافة الدرس'; } catch (e) { }
         submitBtn.disabled = true;
         submitBtn.textContent = 'جاري الرفع...';
     }
-    try { showLoadingOverlay('جاري رفع الدرس...'); } catch(e) { console.warn('showLoadingOverlay not available'); }
+    try { showLoadingOverlay('جاري رفع الدرس...'); } catch (e) { console.warn('showLoadingOverlay not available'); }
 
     if (!window.currentState?.courseId || !window.currentState?.unitId) {
         console.error('Missing courseId or unitId', window.currentState);
@@ -4635,10 +4635,10 @@ async function handleAddLessonSubmit(e) {
             alert(`خطأ: ${error.message || error}`);
         }
     } finally {
-        try { hideLoadingOverlay(); } catch(e) { /* ignore */ }
+        try { hideLoadingOverlay(); } catch (e) { /* ignore */ }
         if (submitBtn) {
             submitBtn.disabled = false;
-            try { submitBtn.textContent = submitBtn.dataset.origText || 'إضافة الدرس'; } catch(e) { submitBtn.textContent = 'إضافة الدرس'; }
+            try { submitBtn.textContent = submitBtn.dataset.origText || 'إضافة الدرس'; } catch (e) { submitBtn.textContent = 'إضافة الدرس'; }
         }
     }
 }
@@ -4698,9 +4698,9 @@ async function editLesson(courseId, unitId, lessonId) {
         if (!response.ok) {
             throw new Error('فشل في جلب بيانات الدرس');
         }
-        
+
         const lesson = await response.json();
-        
+
         // استخدام المودال الجديد لتعديل الدرس
         currentState.courseId = courseId;
         currentState.unitId = unitId;
@@ -4761,22 +4761,22 @@ function openEditLessonModal(lesson) {
     const modal = document.getElementById('addLessonModal');
     modal.style.display = 'flex';
     document.body.style.overflow = 'hidden';
-    
+
     // حفظ معرف الدرس للتحديث
     window.currentLessonId = lesson._id;
-    
+
     // ملء النموذج ببيانات الدرس الحالية
     document.getElementById('lessonTitle').value = lesson.title || '';
     document.getElementById('lessonDescription').value = lesson.description || '';
     document.getElementById('lessonDuration').value = lesson.duration || 30;
     document.getElementById('lessonIsFree').checked = lesson.isFree !== false;
-    
+
     // تحديد نوع المحتوى
     document.getElementById('lessonType').value = lesson.type || '';
     toggleLessonContentInput();
-    
+
     // ملء محتوى النوع المحدد
-    switch(lesson.type) {
+    switch (lesson.type) {
         case 'video':
             document.getElementById('lessonVideoUrl').value = lesson.videoUrl || '';
             break;
@@ -4788,11 +4788,11 @@ function openEditLessonModal(lesson) {
             break;
 
     }
-    
+
     // تغيير نص الزر
     const submitBtn = document.querySelector('#addLessonForm button[type="submit"]');
     submitBtn.textContent = 'تحديث الدرس';
-    
+
     // تغيير معالج النموذج
     document.getElementById('addLessonForm').onsubmit = handleUpdateLessonSubmit;
 }
@@ -4805,7 +4805,7 @@ async function handleUpdateLessonSubmit(e) {
     const lessonType = document.getElementById('lessonType').value;
     const lessonDuration = parseInt(document.getElementById('lessonDuration').value) || 30;
     const lessonIsFree = document.getElementById('lessonIsFree').checked;
-    
+
     if (!lessonTitle) {
         alert('يرجى إدخال عنوان الدرس');
         return;
@@ -4814,7 +4814,7 @@ async function handleUpdateLessonSubmit(e) {
         alert('يرجى اختيار نوع المحتوى');
         return;
     }
-    
+
     try {
         let lessonData = {
             title: lessonTitle,
@@ -4823,8 +4823,8 @@ async function handleUpdateLessonSubmit(e) {
             type: lessonType,
             isFree: lessonIsFree
         };
-        
-        switch(lessonType) {
+
+        switch (lessonType) {
             case 'video':
                 const videoUrl = document.getElementById('lessonVideoUrl').value.trim();
                 if (!videoUrl) {
@@ -4851,7 +4851,7 @@ async function handleUpdateLessonSubmit(e) {
                 break;
 
         }
-        
+
         // استخدام API لتحديث الدرس
         const response = await fetch(`/api/courses/${currentCourseId}/units/${currentUnitId}/lessons/${window.currentLessonId}`, {
             method: 'PUT',
@@ -4861,12 +4861,12 @@ async function handleUpdateLessonSubmit(e) {
             },
             body: JSON.stringify(lessonData)
         });
-        
+
         if (!response.ok) {
             const error = await response.json();
             throw new Error(error.error || 'فشل في تحديث الدرس');
         }
-        
+
         alert('تم تحديث الدرس بنجاح!');
         closeAddLessonModal();
         manageCourseContent(currentCourseId, currentCourseTitle);
@@ -4928,18 +4928,18 @@ document.addEventListener('click', (e) => {
         }
     }
 });
-(function attachCourseDelegators(){
+(function attachCourseDelegators() {
     try {
         if (window.Courses) {
             console.log('Setting up Courses module delegators...');
-            
+
             // تأكد من أن جميع الدوال موجودة قبل استخدام bind
             if (typeof window.Courses.openAddCourseModal === 'function') {
-                window.openAddCourseModal = function() {
+                window.openAddCourseModal = function () {
                     return window.Courses.openAddCourseModal();
                 };
             } else {
-                window.openAddCourseModal = function() {
+                window.openAddCourseModal = function () {
                     console.warn('Courses.openAddCourseModal not available');
                     // Fallback implementation
                     const modal = document.getElementById('courseModal');
@@ -4963,23 +4963,23 @@ document.addEventListener('click', (e) => {
             }
 
             if (typeof window.Courses.openEditCourse === 'function') {
-                window.editCourse = function(courseId) {
+                window.editCourse = function (courseId) {
                     return window.Courses.openEditCourse(courseId);
                 };
             }
 
             if (typeof window.Courses.manageCourseContent === 'function') {
-                window.manageCourseContent = function(courseId, courseTitle) {
+                window.manageCourseContent = function (courseId, courseTitle) {
                     return window.Courses.manageCourseContent(courseId, courseTitle);
                 };
             }
 
             if (typeof window.Courses.closeCourseModal === 'function') {
-                window.closeCourseModal = function() {
+                window.closeCourseModal = function () {
                     return window.Courses.closeCourseModal();
                 };
             } else {
-                window.closeCourseModal = function() {
+                window.closeCourseModal = function () {
                     const modal = document.getElementById('courseModal');
                     if (modal) {
                         modal.style.display = 'none';
@@ -4991,11 +4991,11 @@ document.addEventListener('click', (e) => {
             }
 
             if (typeof window.Courses.closeCourseContentModal === 'function') {
-                window.closeCourseContentModal = function() {
+                window.closeCourseContentModal = function () {
                     return window.Courses.closeCourseContentModal();
                 };
             } else {
-                window.closeCourseContentModal = function() {
+                window.closeCourseContentModal = function () {
                     const modal = document.getElementById('courseContentModal');
                     if (modal) {
                         modal.style.display = 'none';
@@ -5009,7 +5009,7 @@ document.addEventListener('click', (e) => {
 
             // معالج نموذج الكورس
             if (typeof window.Courses.handleAddCourseSubmit === 'function') {
-                window.handleAddCourseSubmit = function(e) {
+                window.handleAddCourseSubmit = function (e) {
                     return window.Courses.handleAddCourseSubmit(e);
                 };
             }
@@ -5022,14 +5022,14 @@ document.addEventListener('click', (e) => {
             console.warn('Courses module not available, using fallbacks');
             setupFallbackFunctions();
         }
-    } catch(err) {
+    } catch (err) {
         console.warn('attachCourseDelegators failed, using fallbacks:', err);
         setupFallbackFunctions();
     }
 
     // دالة للبدائل في حالة فشل التهيئة
     function setupFallbackFunctions() {
-        window.openAddCourseModal = function() {
+        window.openAddCourseModal = function () {
             console.log('Fallback: Opening add course modal');
             const modal = document.getElementById('courseModal');
             if (modal) {
@@ -5059,17 +5059,17 @@ document.addEventListener('click', (e) => {
             }
         };
 
-        window.editCourse = function(courseId) {
+        window.editCourse = function (courseId) {
             console.log('Fallback: Edit course', courseId);
             // تنفيذ بديل للتعديل
         };
 
-        window.manageCourseContent = function(courseId, courseTitle) {
+        window.manageCourseContent = function (courseId, courseTitle) {
             console.log('Fallback: Manage course content', courseId, courseTitle);
             // تنفيذ بديل لإدارة المحتوى
         };
 
-        window.closeCourseModal = function() {
+        window.closeCourseModal = function () {
             const modal = document.getElementById('courseModal');
             if (modal) {
                 modal.style.display = 'none';
@@ -5079,7 +5079,7 @@ document.addEventListener('click', (e) => {
             }
         };
 
-        window.closeCourseContentModal = function() {
+        window.closeCourseContentModal = function () {
             const modal = document.getElementById('courseContentModal');
             if (modal) {
                 modal.style.display = 'none';
@@ -5090,7 +5090,7 @@ document.addEventListener('click', (e) => {
             }
         };
 
-        window.handleAddCourseSubmit = async function(e) {
+        window.handleAddCourseSubmit = async function (e) {
             e.preventDefault();
             console.log('Fallback: Handling course submission');
             alert('وظيفة إضافة الكورس غير متاحة حالياً. الرجاء المحاولة لاحقاً.');
@@ -5107,10 +5107,10 @@ function openAddCourseModal() {
         console.error('Course modal not found');
         return;
     }
-    
+
     // تعيين العنوان
     document.getElementById('courseModalTitle').textContent = 'إضافة كورس جديد';
-    
+
     // إعادة تعيين النموذج
     const form = document.getElementById('addCourseForm');
     if (form) {
@@ -5124,17 +5124,17 @@ function openAddCourseModal() {
         delete form.dataset.courseId;
         form.onsubmit = handleAddCourseSubmit;
     }
-    
+
     // إعادة تعيين متغيرات الحالة
     window.editingCourseId = null;
     window.mediaItems = [];
     window.currentPromoVideoId = null;
-    
+
     // فتح المودال
     modal.style.display = 'flex';
     modal.classList.add('show');
     document.body.style.overflow = 'hidden';
-    
+
     // تصيير شبكة الوسائط الفارغة
     if (typeof window.renderMediaGrid === 'function') {
         setTimeout(() => {
@@ -5167,47 +5167,47 @@ function openEditCourseModal(courseId) {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
     })
-    .then(response => {
-        if (!response.ok) throw new Error('فشل في جلب بيانات الكورس');
-        return response.json();
-    })
-    .then(course => {
-        const modal = document.getElementById('courseModal');
-        if (!modal) {
-            console.error('Course modal not found');
-            return;
-        }
+        .then(response => {
+            if (!response.ok) throw new Error('فشل في جلب بيانات الكورس');
+            return response.json();
+        })
+        .then(course => {
+            const modal = document.getElementById('courseModal');
+            if (!modal) {
+                console.error('Course modal not found');
+                return;
+            }
 
-        // تعيين العنوان
-        document.getElementById('courseModalTitle').textContent = 'تعديل الكورس';
-        
-        // تعبئة البيانات
-        document.getElementById('courseTitle').value = course.title || '';
-        document.getElementById('courseDescription').value = course.description || '';
-        document.getElementById('courseInstructor').value = course.instructor || '';
-        document.getElementById('courseDuration').value = course.duration || 1;
-        document.getElementById('coursePrice').value = course.price || 0;
-        try {
-            document.querySelectorAll('.category-input').forEach(input => {
-                input.checked = course.categories && Array.isArray(course.categories) && course.categories.some(c => c.mainCategory === input.value);
-            });
-        } catch (e) {}
-        (function(){ const el = document.getElementById('courseTags'); if (el) el.value = (course.tags || []).join(', '); })();
-        document.getElementById('courseIcon').value = course.icon || '';
+            // تعيين العنوان
+            document.getElementById('courseModalTitle').textContent = 'تعديل الكورس';
 
-        // تعيين معرف الكورس للتعديل
-        window.editingCourseId = courseId;
+            // تعبئة البيانات
+            document.getElementById('courseTitle').value = course.title || '';
+            document.getElementById('courseDescription').value = course.description || '';
+            document.getElementById('courseInstructor').value = course.instructor || '';
+            document.getElementById('courseDuration').value = course.duration || 1;
+            document.getElementById('coursePrice').value = course.price || 0;
+            try {
+                document.querySelectorAll('.category-input').forEach(input => {
+                    input.checked = course.categories && Array.isArray(course.categories) && course.categories.some(c => c.mainCategory === input.value);
+                });
+            } catch (e) { }
+            (function () { const el = document.getElementById('courseTags'); if (el) el.value = (course.tags || []).join(', '); })();
+            document.getElementById('courseIcon').value = course.icon || '';
 
-        // فتح المودال
-        modal.style.display = 'flex';
-        modal.classList.add('show');
-        document.body.style.overflow = 'hidden';
+            // تعيين معرف الكورس للتعديل
+            window.editingCourseId = courseId;
 
-    })
-    .catch(error => {
-        console.error('Error loading course:', error);
-        alert(`خطأ: ${error.message}`);
-    });
+            // فتح المودال
+            modal.style.display = 'flex';
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+
+        })
+        .catch(error => {
+            console.error('Error loading course:', error);
+            alert(`خطأ: ${error.message}`);
+        });
 }
 
 // دالة إغلاق مودال الكورس
@@ -5254,23 +5254,23 @@ function manageCourseContent(courseId, courseTitle) {
             }
         })
     ])
-    .then(([courseResponse, contentResponse]) => {
-        if (!courseResponse.ok) throw new Error('فشل في جلب بيانات الكورس');
-        if (!contentResponse.ok) throw new Error('فشل في جلب محتوى الكورس');
-        return Promise.all([courseResponse.json(), contentResponse.json()]);
-    })
-    .then(([course, courseContent]) => {
-        displayCourseContent(courseContent, course);
+        .then(([courseResponse, contentResponse]) => {
+            if (!courseResponse.ok) throw new Error('فشل في جلب بيانات الكورس');
+            if (!contentResponse.ok) throw new Error('فشل في جلب محتوى الكورس');
+            return Promise.all([courseResponse.json(), contentResponse.json()]);
+        })
+        .then(([course, courseContent]) => {
+            displayCourseContent(courseContent, course);
 
-        // فتح المودال
-        modal.style.display = 'flex';
-        modal.classList.add('show');
-        document.body.style.overflow = 'hidden';
-    })
-    .catch(error => {
-        console.error('Error loading course content:', error);
-        alert(`خطأ: ${error.message}`);
-    });
+            // فتح المودال
+            modal.style.display = 'flex';
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        })
+        .catch(error => {
+            console.error('Error loading course content:', error);
+            alert(`خطأ: ${error.message}`);
+        });
 }
 
 // دالة عرض محتوى الكورس
@@ -5302,8 +5302,8 @@ function displayCourseContent(courseContent) {
                 </div>
             </div>
             <div class="lessons-list" style="margin-top: 15px;">
-                ${unit.lessons && unit.lessons.length > 0 ? 
-                    unit.lessons.map((lesson, lessonIndex) => `
+                ${unit.lessons && unit.lessons.length > 0 ?
+            unit.lessons.map((lesson, lessonIndex) => `
                         <div class="lesson-item" style="display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee;">
                             <span>الدرس ${lessonIndex + 1}: ${lesson.title}</span>
                             <div class="lesson-actions">
@@ -5317,9 +5317,9 @@ function displayCourseContent(courseContent) {
                                 </button>
                             </div>
                         </div>
-                    `).join('') 
-                    : '<p style="text-align: center; color: #999; margin: 10px 0;">لا توجد دروس في هذه الوحدة</p>'
-                }
+                    `).join('')
+            : '<p style="text-align: center; color: #999; margin: 10px 0;">لا توجد دروس في هذه الوحدة</p>'
+        }
             </div>
         </div>
     `).join('');
@@ -5329,20 +5329,20 @@ function displayCourseContent(courseContent) {
 // دالة فتح مودال إضافة مستخدم
 function openAddUserModal() {
     console.log('Opening add user modal');
-    
+
     const modal = document.getElementById('addUserModal');
     if (modal) {
         modal.classList.add('show');
         modal.style.display = 'flex';
     }
-    
+
     const form = document.getElementById('addUserForm');
     if (form) {
         form.reset();
         // Remove all previous event listeners
         const newForm = form.cloneNode(true);
         form.parentNode.replaceChild(newForm, form);
-        
+
         // Add new event listener
         document.getElementById('addUserForm').addEventListener('submit', addUser);
     }
@@ -5382,9 +5382,9 @@ window.openAddModal = openAddModal;
 // ربط event listeners للعناصر التي يتم إنشاؤها ديناميكياً
 function setupDynamicEventListeners() {
     console.log('Setting up dynamic event listeners...');
-    
+
     // ربط أزرار الحذف والتعديل في جدول الكورسات
-    document.addEventListener('click', function(e) {
+    document.addEventListener('click', function (e) {
         // Manage content button (prefer data attributes)
         if (e.target.closest('.manage-content-btn')) {
             const button = e.target.closest('.manage-content-btn');
@@ -5430,7 +5430,7 @@ function setupDynamicEventListeners() {
 }
 
 // استدعاء تهيئة dynamic listeners بعد تحميل DOM
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     setTimeout(setupDynamicEventListeners, 1000);
 });
 
@@ -5445,17 +5445,17 @@ function testCoursesFunctionality() {
     console.log('typeof window.Courses.init:', typeof window.Courses?.init);
     console.log('typeof window.Courses.openAddCourseModal:', typeof window.Courses?.openAddCourseModal);
     console.log('typeof window.Courses.handleAddCourseSubmit:', typeof window.Courses?.handleAddCourseSubmit);
-    
+
     // اختبار العناصر
     console.log('courseModal:', document.getElementById('courseModal'));
     console.log('addCourseForm:', document.getElementById('addCourseForm'));
     console.log('add-course-button:', document.getElementById('add-course-button'));
-    
+
     console.log('=== TEST COMPLETE ===');
 }
 
 // تشغيل الاختبار بعد التهيئة
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     setTimeout(testCoursesFunctionality, 1500);
 });
 
@@ -5463,31 +5463,31 @@ document.addEventListener('DOMContentLoaded', function() {
 // التحقق من وجود جميع الـ modals
 function checkModalsExistence() {
     console.log('=== CHECKING MODALS EXISTENCE ===');
-    
+
     const modals = [
         'courseModal',
-        'courseContentModal', 
+        'courseContentModal',
         'addUserModal',
         'addLessonModal',
         'addUnitModal'
     ];
-    
+
     modals.forEach(modalId => {
         const modal = document.getElementById(modalId);
         console.log(`${modalId}:`, modal ? 'EXISTS' : 'NOT FOUND');
-        
+
         if (modal) {
             console.log(`  - display: ${modal.style.display}`);
             console.log(`  - classes: ${modal.className}`);
             console.log(`  - parent: ${modal.parentElement ? modal.parentElement.id : 'none'}`);
         }
     });
-    
+
     console.log('=== MODALS CHECK COMPLETE ===');
 }
 
 // تشغيل التحقق بعد التهيئة
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     setTimeout(checkModalsExistence, 1000);
 });
 
